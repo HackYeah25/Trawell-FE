@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Loader2, Pencil, Check, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -126,7 +127,7 @@ export default function ProjectView() {
   };
 
   const handleCreateTrip = async (locationId: string) => {
-    if (!projectId) return;
+    if (!projectId || createTripMutation.isPending) return;
 
     try {
       const result = await createTripMutation.mutateAsync({
@@ -234,39 +235,53 @@ export default function ProjectView() {
                 </p>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {locationSuggestions.map((location) => (
-                    <Card
-                      key={location.id}
-                      className="cursor-pointer transition-all hover:shadow-warm overflow-hidden group border-warm-coral/20"
-                    >
-                      {location.imageUrl && (
-                        <div className="h-48 overflow-hidden">
-                          <img
-                            src={location.imageUrl}
-                            alt={location.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      )}
-                      <CardHeader className="p-4">
-                        <CardTitle className="text-lg">
-                          {location.name}, {location.country}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 space-y-3">
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {location.teaser}
-                        </p>
-                        <Button
-                          onClick={() => handleCreateTrip(location.id)}
-                          disabled={createTripMutation.isPending}
-                          className="w-full bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
-                        >
-                          Create Trip
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {locationSuggestions.map((location) => {
+                    const isCreating = createTripMutation.isPending && createTripMutation.variables?.selectedLocationId === location.id;
+                    
+                    return (
+                      <Card
+                        key={location.id}
+                        className={cn(
+                          "cursor-pointer transition-all hover:shadow-warm overflow-hidden group border-warm-coral/20",
+                          isCreating && "opacity-50"
+                        )}
+                      >
+                        {location.imageUrl && (
+                          <div className="h-48 overflow-hidden">
+                            <img
+                              src={location.imageUrl}
+                              alt={location.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        )}
+                        <CardHeader className="p-4">
+                          <CardTitle className="text-lg">
+                            {location.name}, {location.country}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 pt-0 space-y-3">
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {location.teaser}
+                          </p>
+                          <Button
+                            onClick={() => handleCreateTrip(location.id)}
+                            disabled={createTripMutation.isPending}
+                            className="w-full bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+                          >
+                            {isCreating ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Creating...
+                              </>
+                            ) : (
+                              'Create Trip'
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -19,10 +19,20 @@ export const ChatMessage = memo(function ChatMessage({
 }: ChatMessageProps) {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  
+  // Track if this is a new message that should be animated
+  useEffect(() => {
+    if (message.role === 'assistant' && message.markdown) {
+      // Check if this message was just added by comparing its ID
+      const isNewMessage = !message.id.startsWith('initial-');
+      setShouldAnimate(isNewMessage);
+    }
+  }, [message.id, message.role, message.markdown]);
   
   // Typing animation for assistant messages
   useEffect(() => {
-    if (message.role === 'assistant' && message.markdown) {
+    if (message.role === 'assistant' && message.markdown && shouldAnimate) {
       setIsTyping(true);
       setDisplayedText('');
       
@@ -49,7 +59,7 @@ export const ChatMessage = memo(function ChatMessage({
       setDisplayedText(message.markdown || '');
       setIsTyping(false);
     }
-  }, [message.markdown, message.role]);
+  }, [message.markdown, message.role, shouldAnimate]);
 
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';

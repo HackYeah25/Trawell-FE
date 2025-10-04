@@ -88,7 +88,7 @@ export const AttractionCard = memo(function AttractionCard({
                 variant="outline"
                 onClick={() => onDecision(attraction.id, 'accept')}
                 disabled={disabled}
-                className="bg-warm-turquoise/10 border-warm-turquoise hover:bg-warm-turquoise/90 hover:text-white hover:border-warm-turquoise/90 w-full sm:w-auto"
+                className="bg-warm-turquoise/10 border-warm-turquoise text-warm-turquoise hover:bg-warm-turquoise hover:text-white hover:border-warm-turquoise transition-colors w-full sm:w-auto"
               >
                 <Check className="w-4 h-4 mr-1" />
                 Accept
