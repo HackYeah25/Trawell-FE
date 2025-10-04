@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, Loader2, Sparkles } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
 import {
   useOnboardingQuestions,
-  useAnswerQuestion,
+  useStartProfiling,
+  useProfilingWebSocket,
   useCompleteOnboarding,
 } from '@/api/hooks/use-onboarding';
 import type { ChatMessage } from '@/types';
@@ -15,51 +16,83 @@ import type { ChatMessage } from '@/types';
 export default function Onboarding() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showStartButton, setShowStartButton] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  const [isThinking, setIsThinking] = useState(false);
+  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
+  const streamingMessageIdRef = useRef<string | null>(null);
 
   const { data: questions, isLoading: questionsLoading } = useOnboardingQuestions();
-  const answerMutation = useAnswerQuestion();
+  const startProfilingMutation = useStartProfiling();
   const completeMutation = useCompleteOnboarding();
 
-  // Pagination for chat messages
-  const {
-    displayedMessages,
-    hasMore,
-    isLoadingMore,
-    loadMore,
-    remainingCount,
-  } = useChatPagination({
-    allMessages: messages,
-    pageSize: 10,
+  // WebSocket handlers
+  const { sendAnswer } = useProfilingWebSocket({
+    sessionId,
+    onMessage: (message) => {
+      if (message.role === 'assistant' && message.content) {
+        const assistantMessage: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          markdown: message.content,
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+        setCurrentStreamingMessage('');
+        streamingMessageIdRef.current = null;
+      }
+    },
+    onToken: (token) => {
+      setCurrentStreamingMessage((prev) => prev + token);
+      if (!streamingMessageIdRef.current) {
+        streamingMessageIdRef.current = `streaming-${Date.now()}`;
+      }
+    },
+    onProgress: (progress) => {
+      setCurrentQuestion(progress.current);
+      setTotalQuestions(progress.total);
+    },
+    onValidation: (validation) => {
+      console.log('Validation:', validation);
+    },
+    onComplete: async (data) => {
+      console.log('Profiling complete:', data);
+      // Complete onboarding
+      const result = await completeMutation.mutateAsync({
+        createInitialProject: true,
+      });
+      navigate(`/app/projects/${result.projectId}`);
+    },
+    onThinking: () => {
+      setIsThinking(true);
+      setTimeout(() => setIsThinking(false), 500);
+    },
   });
 
-  // Initialize with welcome message and first question
+  // Start profiling session
   useEffect(() => {
-    if (questions && questions.length > 0 && messages.length === 0) {
-        const welcomeMessage: ChatMessage = {
-        id: 'welcome',
-        role: 'system',
-        markdown:
-          '# Welcome to TravelAI! 🌴\n\nI\'ll help you plan your dream vacation. Let\'s start by understanding your travel preferences.',
-        createdAt: new Date().toISOString(),
-      };
+    if (!sessionId && !startProfilingMutation.isPending) {
+      startProfilingMutation.mutate(undefined, {
+        onSuccess: (data) => {
+          setSessionId(data.session.session_id);
+          setTotalQuestions(questions?.length || 0);
 
-      const firstQuestion: ChatMessage = {
-        id: questions[0].id,
-        role: 'assistant',
-        markdown: questions[0].markdownQuestion,
-        createdAt: new Date().toISOString(),
-      };
-
-      setMessages([welcomeMessage, firstQuestion]);
+          // Add welcome message
+          const welcomeMessage: ChatMessage = {
+            id: 'welcome',
+            role: 'system',
+            markdown: data.first_message,
+            createdAt: new Date().toISOString(),
+          };
+          setMessages([welcomeMessage]);
+        },
+      });
     }
-  }, [questions, messages.length]);
+  }, [sessionId, startProfilingMutation, questions]);
 
   const handleSendMessage = async (text: string) => {
-    if (!questions || currentQuestionIndex >= questions.length) return;
-
-    const currentQuestion = questions[currentQuestionIndex];
+    if (!sessionId) return;
 
     // Add user message
     const userMessage: ChatMessage = {
@@ -67,94 +100,16 @@ export default function Onboarding() {
       role: 'user',
       markdown: text,
       createdAt: new Date().toISOString(),
-      status: 'sending',
+      status: 'sent',
     };
 
     setMessages((prev) => [...prev, userMessage]);
 
-    try {
-      // Send answer to backend
-      const response = await answerMutation.mutateAsync({
-        questionId: currentQuestion.id,
-        answerText: text,
-      });
-
-      // Update user message status
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === userMessage.id ? { ...msg, status: 'sent' } : msg
-        )
-      );
-
-      // Handle response
-      if (response.status === 'needs_clarification' && response.followupMarkdown) {
-        // Backend asks for clarification
-        const followupMessage: ChatMessage = {
-          id: `followup-${Date.now()}`,
-          role: 'assistant',
-          markdown: response.followupMarkdown,
-          createdAt: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, followupMessage]);
-      } else {
-        // Move to next question or complete
-        const nextIndex = currentQuestionIndex + 1;
-
-        if (nextIndex < questions.length) {
-          const nextQuestion: ChatMessage = {
-            id: questions[nextIndex].id,
-            role: 'assistant',
-            markdown: questions[nextIndex].markdownQuestion,
-            createdAt: new Date().toISOString(),
-          };
-          setMessages((prev) => [...prev, nextQuestion]);
-          setCurrentQuestionIndex(nextIndex);
-        } else {
-          // All questions answered - show completion message with button
-          const thankYouMessage: ChatMessage = {
-            id: 'complete',
-            role: 'assistant',
-            markdown:
-              '✅ Perfect! I have everything I need to help you plan amazing trips.\n\nReady to start your adventure?',
-            createdAt: new Date().toISOString(),
-            quickReplies: [
-              {
-                id: 'start-adventure',
-                label: 'Start Adventure',
-                payload: 'start',
-              },
-            ],
-          };
-          setMessages((prev) => [...prev, thankYouMessage]);
-          setShowStartButton(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error answering question:', error);
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === userMessage.id ? { ...msg, status: 'error' } : msg
-        )
-      );
-      console.error('Failed to send answer');
-    }
+    // Send via WebSocket
+    sendAnswer(text);
   };
 
-  const handleStartAdventure = async () => {
-    try {
-      // Complete onboarding - this will update localStorage and invalidate cache
-      const result = await completeMutation.mutateAsync({
-        createInitialProject: true,
-      });
-
-      // Redirect to first project
-      navigate(`/app/projects/${result.projectId}`);
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-    }
-  };
-
-  if (questionsLoading) {
+  if (questionsLoading || startProfilingMutation.isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
         <div className="text-center">
@@ -162,10 +117,21 @@ export default function Onboarding() {
             <Plane className="w-8 h-8 text-white animate-pulse" />
           </div>
           <Loader2 className="w-8 h-8 mx-auto animate-spin text-warm-coral" />
-          <p className="mt-4 text-muted-foreground">Preparing questions...</p>
+          <p className="mt-4 text-muted-foreground">Preparing your travel profile...</p>
         </div>
       </div>
     );
+  }
+
+  // Combine messages with streaming message
+  const displayMessages = [...messages];
+  if (currentStreamingMessage && streamingMessageIdRef.current) {
+    displayMessages.push({
+      id: streamingMessageIdRef.current,
+      role: 'assistant',
+      markdown: currentStreamingMessage,
+      createdAt: new Date().toISOString(),
+    });
   }
 
   return (
@@ -181,16 +147,15 @@ export default function Onboarding() {
                 Let's Plan Your Trip
               </h1>
               <p className="text-sm text-muted-foreground">
-                Question {Math.min(currentQuestionIndex + 1, questions?.length || 0)} of{' '}
-                {questions?.length || 0}
+                Question {Math.min(currentQuestion, totalQuestions)} of {totalQuestions}
               </p>
             </div>
           </div>
         </div>
 
         <ChatThread
-          messages={displayedMessages}
-          isLoading={answerMutation.isPending || completeMutation.isPending}
+          messages={displayMessages}
+          isLoading={isThinking || completeMutation.isPending}
           className="flex-1"
           onQuickReply={handleStartAdventure}
           hasMore={hasMore}
@@ -201,12 +166,7 @@ export default function Onboarding() {
 
         <Composer
           onSend={handleSendMessage}
-          disabled={
-            answerMutation.isPending ||
-            completeMutation.isPending ||
-            showStartButton ||
-            currentQuestionIndex >= (questions?.length || 0)
-          }
+          disabled={isThinking || completeMutation.isPending || !sessionId}
           placeholder="Your answer..."
         />
       </div>
