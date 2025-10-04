@@ -74,18 +74,21 @@ export const mockLocations: Location[] = [
     name: 'Val Thorens',
     country: 'Francja',
     teaser: 'Najwyżej położony ośrodek narciarski w Europie z 600 km tras',
+    imageUrl: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80',
   },
   {
     id: 'loc2',
     name: 'Livigno',
     country: 'Włochy',
     teaser: 'Wolnocłowa strefa w Alpach z doskonałymi warunkami do jazdy',
+    imageUrl: 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&q=80',
   },
   {
     id: 'loc3',
     name: 'Sölden',
     country: 'Austria',
     teaser: 'Lodowiec zapewniający jazdę przez cały sezon, słynny z Bond movies',
+    imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&q=80',
   },
 ];
 

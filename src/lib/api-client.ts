@@ -253,18 +253,21 @@ export const apiClient = {
           title: 'Przejazd kolejką gondolową',
           description: 'Spektakularne widoki na Alpy podczas przejazdu nowoczesną kolejką',
           category: 'Transport',
+          imageUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80',
         },
         {
           id: 'attr2',
           title: 'Szkoła narciarska (2 dni)',
           description: 'Profesjonalne kursy dla początkujących i zaawansowanych',
           category: 'Aktywności',
+          imageUrl: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=80',
         },
         {
           id: 'attr3',
           title: 'Wieczór przy ognisku',
           description: 'Tradycyjne spotkanie z lokalnymi potrawami i muzyką',
           category: 'Rozrywka',
+          imageUrl: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=600&q=80',
         },
       ];
 
@@ -304,6 +307,33 @@ export const apiClient = {
     // Attraction decision
     if (endpoint.match(/^\/trips\/[^/]+\/attractions\/[^/]+\/decision$/)) {
       await mockDelay(400);
+      const tripId = endpoint.split('/')[2];
+      const attractionId = endpoint.split('/')[4];
+      const body = data as { decision: 'accept' | 'reject' };
+
+      // Update attraction decision in mock data
+      if (mockAttractions[tripId]) {
+        const attraction = mockAttractions[tripId].find((a) => a.id === attractionId);
+        if (attraction) {
+          attraction.decision = body.decision === 'accept' ? 'accepted' : 'rejected';
+        }
+      }
+
+      // Check if all attractions have been decided
+      const allDecided = mockAttractions[tripId]?.every((a) => a.decision);
+      
+      if (allDecided && mockTripMessages[tripId]) {
+        // Add post-attraction questions after all decisions are made
+        const { postAttractionQuestions } = await import('./mock-data');
+        
+        mockTripMessages[tripId].push({
+          id: `msg-${Date.now()}`,
+          role: 'assistant',
+          markdown: postAttractionQuestions[0].markdownQuestion,
+          createdAt: new Date().toISOString(),
+        });
+      }
+
       return { status: 'ok' } as T;
     }
 

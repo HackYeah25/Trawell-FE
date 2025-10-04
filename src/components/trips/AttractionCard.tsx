@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Check, X, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Attraction } from '@/types';
 import { cn } from '@/lib/utils';
@@ -25,19 +25,41 @@ export const AttractionCard = memo(function AttractionCard({
         attraction.decision === 'rejected' && 'opacity-50'
       )}
     >
+      {attraction.imageUrl && (
+        <div className="relative w-full h-40 sm:h-48 overflow-hidden">
+          <img 
+            src={attraction.imageUrl} 
+            alt={attraction.title}
+            className="w-full h-full object-cover"
+          />
+          {attraction.category && (
+            <Badge 
+              variant="secondary" 
+              className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm"
+            >
+              {attraction.category}
+            </Badge>
+          )}
+        </div>
+      )}
+      
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-3">
           <div className="flex items-start gap-2">
             <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <CardTitle className="text-base break-words">{attraction.title}</CardTitle>
-              {attraction.category && (
+              {!attraction.imageUrl && attraction.category && (
                 <Badge variant="secondary" className="mt-2">
                   {attraction.category}
                 </Badge>
               )}
             </div>
           </div>
+
+          <CardDescription className="text-sm break-words">
+            {attraction.description}
+          </CardDescription>
 
           {attraction.decision ? (
             <Badge
@@ -85,12 +107,6 @@ export const AttractionCard = memo(function AttractionCard({
           )}
         </div>
       </CardHeader>
-
-      <CardContent className="pt-0">
-        <CardDescription className="text-sm break-words">
-          {attraction.description}
-        </CardDescription>
-      </CardContent>
     </Card>
   );
 });
