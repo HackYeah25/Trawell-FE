@@ -24,14 +24,15 @@ export const ChatThread = memo(function ChatThread({
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    // Use requestAnimationFrame for better scroll timing
+    const frameId = requestAnimationFrame(() => {
+      if (bottomRef.current && containerRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
-    }, 100);
+    });
     
-    return () => clearTimeout(timer);
-  }, [messages, messages.length]);
+    return () => cancelAnimationFrame(frameId);
+  }, [messages.length]);
 
   return (
     <div

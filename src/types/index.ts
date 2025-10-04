@@ -102,15 +102,20 @@ export interface Attraction {
 
 export type SummaryCategory =
   | 'Pogoda'
+  | 'Weather'
   | 'Bezpieczeństwo'
+  | 'Safety'
   | 'Budżet/koszty'
+  | 'Budget'
   | 'Transport/Dojezdność'
+  | 'Transport'
   | 'Sezonowość/Tłok'
   | 'Formalności'
   | 'Kultura/Obyczaje'
   | 'Noclegi'
   | 'Jedzenie'
-  | 'Aktywności/atrakcje';
+  | 'Aktywności/atrakcje'
+  | 'Attractions';
 
 export interface TripSummarySection {
   category: SummaryCategory;

@@ -20,15 +20,20 @@ import type { TripSummarySection, SummaryCategory } from '@/types';
 
 const categoryIcons: Record<SummaryCategory, typeof Cloud> = {
   Pogoda: Cloud,
+  Weather: Cloud,
   Bezpieczeństwo: Shield,
+  Safety: Shield,
   'Budżet/koszty': DollarSign,
+  Budget: DollarSign,
   'Transport/Dojezdność': Plane,
+  Transport: Plane,
   'Sezonowość/Tłok': Users,
   Formalności: FileText,
   'Kultura/Obyczaje': Globe,
   Noclegi: Hotel,
   Jedzenie: Utensils,
   'Aktywności/atrakcje': Palmtree,
+  Attractions: Palmtree,
 };
 
 interface SummaryCardProps {

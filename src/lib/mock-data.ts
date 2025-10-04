@@ -188,6 +188,34 @@ export const specialSharedProject: Project = {
   ownerId: 'other-user-123', // Not owned by current user
 };
 
+// Special shared project with complete trip (accessible via IGUANA code)
+export const iguanaSharedProject: Project = {
+  id: 'shared-proj-iguana',
+  title: 'Barcelona Group Trip 2025',
+  createdAt: new Date('2025-01-08').toISOString(),
+  lastMessagePreview: 'Group planning for Barcelona adventure',
+  isShared: true,
+  shareCode: 'IGUANA',
+  ownerId: 'user-sarah-456',
+};
+
+export const iguanaTrip: Trip = {
+  id: 'trip-iguana-bcn',
+  projectId: 'shared-proj-iguana',
+  locationId: 'loc-barcelona',
+  locationName: 'Barcelona, Spain',
+  title: 'Barcelona Summer Adventure',
+  createdAt: new Date('2025-01-09').toISOString(),
+};
+
+export const iguanaLocation: Location = {
+  id: 'loc-barcelona',
+  name: 'Barcelona',
+  country: 'Spain',
+  teaser: 'Vibrant Mediterranean city with stunning architecture, beaches, and culture',
+  imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80',
+};
+
 // Available locations
 export const mockLocations: Location[] = [
   {
@@ -214,34 +242,42 @@ export const mockLocations: Location[] = [
 ];
 
 // Trip summary template
-export const getTripSummary = (): TripSummary => ({
+export const getTripSummary = (attractions?: Attraction[]): TripSummary => ({
   sections: [
     {
-      category: 'Pogoda',
-      title: 'Warunki pogodowe',
+      category: 'Weather',
+      title: 'Weather Conditions',
       markdown:
-        '**Grudzień - Marzec:** Idealne warunki narciarskie\n\n- Temperatura: -5°C do -15°C\n- Opady śniegu: wysokie\n- Nasłonecznienie: 6-7h dziennie',
+        '**December - March:** Perfect skiing conditions\n\n- Temperature: -5°C to -15°C\n- Snowfall: High\n- Sunshine: 6-7h daily',
     },
     {
-      category: 'Bezpieczeństwo',
-      title: 'Bezpieczeństwo i zdrowie',
+      category: 'Safety',
+      title: 'Safety & Health',
       markdown:
-        '✅ Bardzo bezpieczny region\n\n- Służby ratownicze: 24/7\n- Szpital: 15 min\n- Ubezpieczenie: zalecane',
+        '✅ Very safe region\n\n- Rescue services: 24/7\n- Hospital: 15 min\n- Insurance: Recommended',
       important: true,
     },
     {
-      category: 'Budżet/koszty',
-      title: 'Szacunkowe koszty',
+      category: 'Budget',
+      title: 'Estimated Costs',
       markdown:
-        '**Na osobę (7 dni):**\n\n- Karnet narciarski: €280-350\n- Nocleg: €70-150/noc\n- Wyżywienie: €40-60/dzień\n- Wypożyczenie sprzętu: €120-180',
-      tags: ['Premium', 'All-inclusive dostępne'],
+        '**Per person (7 days):**\n\n- Ski pass: €280-350\n- Accommodation: €70-150/night\n- Food: €40-60/day\n- Equipment rental: €120-180',
+      tags: ['Premium', 'All-inclusive available'],
     },
     {
-      category: 'Transport/Dojezdność',
-      title: 'Jak dojechać',
+      category: 'Transport',
+      title: 'How to Get There',
       markdown:
-        '**Opcje dojazdu:**\n\n1. Lot do Genewa + transfer (3h)\n2. Własny samochód z Polski (12-14h)\n3. Autokar zorganizowany\n\nTransfer z lotniska: €45-60 os/stronę',
+        '**Travel options:**\n\n1. Flight to Geneva + transfer (3h)\n2. Own car from Poland (12-14h)\n3. Organized coach\n\nAirport transfer: €45-60 per person/one-way',
     },
+    ...(attractions && attractions.length > 0 ? [{
+      category: 'Attractions' as const,
+      title: 'Selected Attractions',
+      markdown: attractions
+        .filter(a => a.decision === 'accepted')
+        .map(a => `**${a.title}**\n${a.description}${a.category ? ` (${a.category})` : ''}`)
+        .join('\n\n') || 'No attractions selected yet',
+    }] : []),
   ],
 });
 
