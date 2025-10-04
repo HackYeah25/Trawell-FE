@@ -34,10 +34,10 @@ export function ShareCodeDisplay({ shareCode, participants = [] }: ShareCodeDisp
   };
 
   return (
-    <Card className="border-warm-turquoise/30 bg-gradient-to-br from-warm-turquoise/5 to-warm-coral/5">
+    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="w-5 h-5 text-warm-turquoise" />
+          <Users className="w-5 h-5 text-blue-600" />
           Shared Project
         </CardTitle>
       </CardHeader>

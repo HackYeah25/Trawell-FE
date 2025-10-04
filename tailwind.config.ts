@@ -67,6 +67,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Warm colors for the design system
+        "warm-coral": "hsl(16, 90%, 58%)",
+        "warm-turquoise": "hsl(180, 65%, 55%)",
+        "warm-sand": "hsl(40, 35%, 88%)",
       },
       borderRadius: {
         lg: "var(--radius)",

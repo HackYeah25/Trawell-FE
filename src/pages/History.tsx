@@ -169,7 +169,7 @@ export default function History() {
                               : "bg-gradient-sunset"
                           )}>
                             {project.isShared ? (
-                              <UsersIcon className="w-5 h-5 text-white" />
+                              <UsersIcon className="w-5 h-5 text-blue-600" />
                             ) : (
                               <FolderKanban className="w-5 h-5 text-white" />
                             )}
@@ -239,7 +239,7 @@ export default function History() {
                                       className="w-full h-full object-cover"
                                     />
                                     {isTripSharedNotOwned && (
-                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-warm-coral flex items-center justify-center">
+                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
                                         <UsersIcon className="w-2.5 h-2.5 text-white" />
                                       </div>
                                     )}
@@ -251,7 +251,7 @@ export default function History() {
                                   )}>
                                     <MapPin className="w-5 h-5 text-warm-turquoise" />
                                     {isTripSharedNotOwned && (
-                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-warm-coral flex items-center justify-center">
+                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
                                         <UsersIcon className="w-2.5 h-2.5 text-white" />
                                       </div>
                                     )}

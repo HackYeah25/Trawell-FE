@@ -54,8 +54,8 @@ export function ProjectTypeDialog({
             className="h-auto flex-col items-start p-3 sm:p-4 gap-2 hover:border-warm-coral"
           >
             <div className="flex items-center gap-2 sm:gap-3 w-full">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-warm-turquoise/30 flex items-center justify-center flex-shrink-0">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-warm-turquoise" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
               </div>
               <div className="flex-1 text-left">
                 <div className="font-semibold text-sm sm:text-base">Shared Adventure</div>
