@@ -41,6 +41,25 @@ export const onboardingQuestions: OnboardingQuestion[] = [
   },
 ];
 
+// Post-attraction questions
+export const postAttractionQuestions: OnboardingQuestion[] = [
+  {
+    id: 'pq1',
+    markdownQuestion:
+      '**Pytanie 1/3:** Czy posiadasz wszystkie wymagane szczepienia do tej destynacji?\n\n(Przykład: tak/nie/nie wiem)',
+  },
+  {
+    id: 'pq2',
+    markdownQuestion:
+      '**Pytanie 2/3:** Czy potrzebujesz wizy do tego kraju?\n\n(Przykład: tak/nie/nie sprawdzałem)',
+  },
+  {
+    id: 'pq3',
+    markdownQuestion:
+      '**Pytanie 3/3:** Czy masz już ubezpieczenie podróżne?\n\n(Przykład: tak/nie/planuję wykupić)',
+  },
+];
+
 // Projects and trips
 export let mockProjects: Project[] = [];
 export let mockTrips: Trip[] = [];
