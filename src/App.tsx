@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from "./api/hooks/use-user";
+import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import History from "./pages/History";
 import ProjectView from "./pages/ProjectView";
@@ -41,38 +42,29 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          needsOnboarding ? (
-            <Navigate to="/onboarding" replace />
-          ) : (
-            <Navigate to="/app" replace />
-          )
-        }
-      />
+      <Route path="/" element={<Landing />} />
       <Route
         path="/onboarding"
         element={
-          needsOnboarding ? <Onboarding /> : <Navigate to="/app" replace />
+          user && needsOnboarding ? <Onboarding /> : user && !needsOnboarding ? <Navigate to="/app" replace /> : <Navigate to="/" replace />
         }
       />
       <Route
         path="/app"
         element={
-          needsOnboarding ? <Navigate to="/onboarding" replace /> : <History />
+          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <History /> : <Navigate to="/" replace />
         }
       />
       <Route
         path="/app/projects/:projectId"
         element={
-          needsOnboarding ? <Navigate to="/onboarding" replace /> : <ProjectView />
+          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <ProjectView /> : <Navigate to="/" replace />
         }
       />
       <Route
         path="/app/trips/:tripId"
         element={
-          needsOnboarding ? <Navigate to="/onboarding" replace /> : <TripView />
+          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <TripView /> : <Navigate to="/" replace />
         }
       />
       <Route path="*" element={<NotFound />} />
