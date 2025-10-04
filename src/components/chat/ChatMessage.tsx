@@ -57,56 +57,32 @@ export const ChatMessage = memo(function ChatMessage({
     }
   }, [message.id, message.role, message.markdown, disableAnimation]);
   
-  // Typing animation for assistant messages - only one at a time
+  // Typing animation for assistant messages - simplified
   useEffect(() => {
     if (message.role === 'assistant' && message.markdown && shouldAnimate && !disableAnimation) {
-      // Check if there's already a typing animation in progress
-      const existingTypingElements = document.querySelectorAll('[data-is-typing="true"]');
-      
-      if (existingTypingElements.length > 0) {
-        // Wait for existing animations to finish
-        const checkInterval = setInterval(() => {
-          const stillTyping = document.querySelectorAll('[data-is-typing="true"]');
-          if (stillTyping.length === 0) {
-            clearInterval(checkInterval);
-            startTyping();
-          }
-        }, 100);
-        
-        return () => clearInterval(checkInterval);
-      } else {
-        startTyping();
-      }
-    } else {
-      setDisplayedText(message.markdown || '');
-      setIsTyping(false);
-    }
-    
-    function startTyping() {
       setIsTyping(true);
       setDisplayedText('');
       
       let currentIndex = 0;
       const text = message.markdown || '';
-      const typingSpeed = 15; // ms per character
+      const typingSpeed = 20; // Slightly slower for smoother animation
       
-      const timer = setTimeout(() => {
-        const interval = setInterval(() => {
-          if (currentIndex < text.length) {
-            setDisplayedText(text.slice(0, currentIndex + 1));
-            currentIndex++;
-          } else {
-            setIsTyping(false);
-            clearInterval(interval);
-          }
-        }, typingSpeed);
-        
-        return () => clearInterval(interval);
-      }, 300); // Initial delay
+      const interval = setInterval(() => {
+        if (currentIndex < text.length) {
+          setDisplayedText(text.slice(0, currentIndex + 1));
+          currentIndex++;
+        } else {
+          setIsTyping(false);
+          clearInterval(interval);
+        }
+      }, typingSpeed);
       
-      return () => clearTimeout(timer);
+      return () => clearInterval(interval);
+    } else {
+      setDisplayedText(message.markdown || '');
+      setIsTyping(false);
     }
-  }, [message.markdown, message.role, shouldAnimate]);
+  }, [message.markdown, message.role, shouldAnimate, disableAnimation]);
 
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';

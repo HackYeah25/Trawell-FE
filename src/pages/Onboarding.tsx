@@ -177,9 +177,10 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
-      <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto">
-        <div className="p-6 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 p-6 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
+        <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm">
               <Plane className="w-6 h-6 text-white" />
@@ -194,19 +195,27 @@ export default function Onboarding() {
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Scrollable Chat Area */}
+      <div className="flex-1 overflow-hidden">
         <ChatThread
           messages={displayMessages}
           isLoading={isThinking || completeMutation.isPending}
-          className="flex-1"
+          className="h-full"
           onQuickReply={handleStartAdventure}
         />
+      </div>
 
-        <Composer
-          onSend={handleSendMessage}
-          disabled={isThinking || completeMutation.isPending || !sessionId}
-          placeholder="Your answer..."
-        />
+      {/* Fixed Footer */}
+      <div className="flex-shrink-0 border-t border-warm-coral/20 bg-card/80 backdrop-blur-md">
+        <div className="max-w-4xl mx-auto">
+          <Composer
+            onSend={handleSendMessage}
+            disabled={isThinking || completeMutation.isPending || !sessionId}
+            placeholder="Your answer..."
+          />
+        </div>
       </div>
     </div>
   );

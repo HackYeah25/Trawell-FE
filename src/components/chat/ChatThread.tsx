@@ -43,12 +43,15 @@ export const ChatThread = memo(function ChatThread({
   // Initial scroll to bottom on mount
   useEffect(() => {
     if (!hasScrolledToBottom.current && messages.length > 0) {
-      requestAnimationFrame(() => {
+      // Use a longer delay to ensure the container is properly rendered
+      const timeoutId = setTimeout(() => {
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
           hasScrolledToBottom.current = true;
         }
-      });
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [messages.length]);
 
@@ -58,12 +61,12 @@ export const ChatThread = memo(function ChatThread({
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
     
     if (isNewMessage && hasScrolledToBottom.current) {
-      // Small delay to ensure DOM is updated
+      // Use a small delay to ensure DOM is updated, then smooth scroll
       const timeoutId = setTimeout(() => {
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-      }, 100);
+      }, 50);
       
       previousMessagesLength.current = messages.length;
       return () => clearTimeout(timeoutId);
@@ -74,12 +77,12 @@ export const ChatThread = memo(function ChatThread({
 
   return (
     <div 
-      className={cn('flex-1', className)}
+      className={cn('h-full flex flex-col', className)}
       role="log"
       aria-live="polite"
       aria-label="Chat messages"
     >
-      <div className="px-4 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto">{/* Reduced from max-w-4xl to max-w-3xl for better desktop width */}
         {/* Load More Button */}
         {hasMore && !isLoadingMore && (
