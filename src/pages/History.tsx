@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users, UserPlus } from 'lucide-react';
+import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users as UsersIcon, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -149,7 +149,7 @@ export default function History() {
                             isSharedNotOwned ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80" : "bg-gradient-sunset"
                           )}>
                             {project.isShared ? (
-                              <Users className="w-5 h-5 text-white" />
+                              <UsersIcon className="w-5 h-5 text-white" />
                             ) : (
                               <FolderKanban className="w-5 h-5 text-white" />
                             )}
@@ -211,23 +211,38 @@ export default function History() {
                         </div>
                       ) : (
                         <div className="px-4 pb-4 pl-16 space-y-2">
-                          {projectTrips.map((trip) => (
-                            <div
-                              key={trip.id}
-                              onClick={() => navigate(`/app/trips/${trip.id}`)}
-                              className="p-3 rounded-lg border border-warm-coral/20 hover:border-warm-coral hover:bg-warm-coral/5 cursor-pointer transition-all flex items-center gap-3"
-                            >
-                              <div className="w-8 h-8 rounded bg-warm-turquoise/20 flex items-center justify-center flex-shrink-0">
-                                <Plane className="w-4 h-4 text-warm-turquoise" />
+                          {projectTrips.map((trip) => {
+                            const isTripSharedNotOwned = isSharedNotOwned;
+                            
+                            return (
+                              <div
+                                key={trip.id}
+                                onClick={() => navigate(`/app/trips/${trip.id}`)}
+                                className={cn(
+                                  "p-3 rounded-lg border hover:bg-warm-coral/5 cursor-pointer transition-all flex items-center gap-3",
+                                  isTripSharedNotOwned ? "border-warm-turquoise/30" : "border-warm-coral/20 hover:border-warm-coral"
+                                )}
+                              >
+                                <div className={cn(
+                                  "w-8 h-8 rounded flex items-center justify-center flex-shrink-0 relative",
+                                  isTripSharedNotOwned ? "bg-warm-turquoise/20" : "bg-warm-turquoise/20"
+                                )}>
+                                  <Plane className="w-4 h-4 text-warm-turquoise" />
+                                  {isTripSharedNotOwned && (
+                                    <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-warm-coral flex items-center justify-center">
+                                      <UsersIcon className="w-2 h-2 text-white" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm truncate">{trip.title}</p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {trip.locationName}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">{trip.title}</p>
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {trip.locationName}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </CollapsibleContent>

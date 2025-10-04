@@ -16,6 +16,7 @@ import {
   useCreateTripFromLocation,
 } from '@/api/hooks/use-projects';
 import { useRenameProject } from '@/api/hooks/use-rename';
+import { useTrips } from '@/api/hooks/use-trips';
 import { initialProjectQuestions } from '@/lib/mock-data';
 import { ShareCodeDisplay } from '@/components/projects/ShareCodeDisplay';
 import type { ChatMessage } from '@/types';
@@ -33,6 +34,7 @@ export default function ProjectView() {
   const { data: project } = useProject(projectId!);
   const { data: messagesData } = useProjectMessages(projectId!);
   const { data: locationSuggestions } = useProjectLocationSuggestions(projectId!);
+  const { data: trips } = useTrips();
   const sendMessageMutation = useSendProjectMessage();
   const createTripMutation = useCreateTripFromLocation();
   const renameMutation = useRenameProject();
@@ -174,6 +176,14 @@ export default function ProjectView() {
     locationSuggestions && 
     locationSuggestions.length > 0;
 
+  // Get existing trip locations for this project
+  const existingTripLocationIds = trips
+    ?.filter(trip => trip.projectId === projectId)
+    .map(trip => trip.locationId) || [];
+
+  // Hide composer when conversation ends (all questions answered)
+  const shouldShowComposer = answeredQuestions < initialProjectQuestions.length && !showLocationButton;
+
   return (
     <AppShell>
       <div className="h-[calc(100vh-4rem)] flex flex-col">
@@ -255,13 +265,16 @@ export default function ProjectView() {
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {locationSuggestions.map((location) => {
+                    const hasTrip = existingTripLocationIds.includes(location.id);
                     const isCreating = createTripMutation.isPending && createTripMutation.variables?.selectedLocationId === location.id;
                     
                     return (
                       <Card
                         key={location.id}
                         className={cn(
-                          "cursor-pointer transition-all hover:shadow-warm overflow-hidden group border-warm-coral/20",
+                          "transition-all overflow-hidden group border-warm-coral/20",
+                          hasTrip && "opacity-50 cursor-not-allowed",
+                          !hasTrip && "cursor-pointer hover:shadow-warm",
                           isCreating && "opacity-50"
                         )}
                       >
@@ -270,25 +283,36 @@ export default function ProjectView() {
                             <img
                               src={location.imageUrl}
                               alt={location.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className={cn(
+                                "w-full h-full object-cover transition-transform duration-300",
+                                !hasTrip && "group-hover:scale-105",
+                                hasTrip && "grayscale"
+                              )}
                             />
                           </div>
                         )}
                         <CardHeader className="p-4">
-                          <CardTitle className="text-lg">
+                          <CardTitle className={cn("text-lg", hasTrip && "text-muted-foreground")}>
                             {location.name}, {location.country}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4 pt-0 space-y-3">
-                          <p className="text-sm text-muted-foreground line-clamp-2">
+                          <p className={cn("text-sm line-clamp-2", hasTrip ? "text-muted-foreground/70" : "text-muted-foreground")}>
                             {location.teaser}
                           </p>
                           <Button
-                            onClick={() => handleCreateTrip(location.id)}
-                            disabled={createTripMutation.isPending}
-                            className="w-full bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+                            onClick={() => !hasTrip && handleCreateTrip(location.id)}
+                            disabled={createTripMutation.isPending || hasTrip}
+                            className={cn(
+                              "w-full shadow-warm border-0",
+                              hasTrip 
+                                ? "bg-muted text-muted-foreground cursor-not-allowed" 
+                                : "bg-gradient-sunset hover:opacity-90 text-white"
+                            )}
                           >
-                            {isCreating ? (
+                            {hasTrip ? (
+                              'Trip Created'
+                            ) : isCreating ? (
                               <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                 Creating...
@@ -306,14 +330,16 @@ export default function ProjectView() {
             </div>
           )}
 
-          {/* Composer - Always at bottom */}
-          <div className="flex-shrink-0">
-            <Composer
-              onSend={handleSendMessage}
-              disabled={sendMessageMutation.isPending || showLocationButton}
-              placeholder="Describe your expectations..."
-            />
-          </div>
+          {/* Composer - Only show during initial questions */}
+          {shouldShowComposer && (
+            <div className="flex-shrink-0">
+              <Composer
+                onSend={handleSendMessage}
+                disabled={sendMessageMutation.isPending}
+                placeholder="Describe your expectations..."
+              />
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
