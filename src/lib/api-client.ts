@@ -1,4 +1,37 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import type { 
+  User, 
+  OnboardingQuestion, 
+  OnboardingAnswerResponse,
+  Project,
+  Trip,
+  ChatMessage,
+  Location,
+  Attraction,
+  TripSummary,
+} from '@/types';
+import {
+  mockUser,
+  updateMockUser,
+  onboardingQuestions,
+  mockProjects,
+  mockTrips,
+  mockProjectMessages,
+  mockTripMessages,
+  mockAttractions,
+  mockLocations,
+  getTripSummary,
+} from './mock-data';
+
+// Simulate network delay
+async function mockDelay(ms: number = 300): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Simulate API response
+async function mockFetch<T>(data: T, delay: number = 300): Promise<T> {
+  await mockDelay(delay);
+  return data;
+}
 
 class ApiError extends Error {
   constructor(
@@ -11,72 +44,279 @@ class ApiError extends Error {
   }
 }
 
-async function fetchApi<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const token = localStorage.getItem('auth_token');
-
-  const config: RequestInit = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-  };
-
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new ApiError(
-        errorData.message || `HTTP error ${response.status}`,
-        response.status,
-        errorData
-      );
-    }
-
-    // Handle 204 No Content
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    return await response.json();
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(
-      error instanceof Error ? error.message : 'Network error',
-      0
-    );
-  }
-}
-
+// API Client implementation with mocked data
 export const apiClient = {
-  get: <T>(endpoint: string) => fetchApi<T>(endpoint, { method: 'GET' }),
+  // User endpoints
+  get: async <T>(endpoint: string): Promise<T> => {
+    // User
+    if (endpoint === '/me') {
+      return mockFetch(mockUser as T);
+    }
 
-  post: <T>(endpoint: string, data?: unknown) =>
-    fetchApi<T>(endpoint, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    }),
+    // Onboarding questions
+    if (endpoint === '/onboarding/questions') {
+      return mockFetch(onboardingQuestions as T);
+    }
 
-  patch: <T>(endpoint: string, data?: unknown) =>
-    fetchApi<T>(endpoint, {
-      method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
-    }),
+    // Projects list
+    if (endpoint === '/projects') {
+      return mockFetch(mockProjects as T);
+    }
 
-  put: <T>(endpoint: string, data?: unknown) =>
-    fetchApi<T>(endpoint, {
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    }),
+    // Single project
+    if (endpoint.match(/^\/projects\/[^/]+$/)) {
+      const projectId = endpoint.split('/')[2];
+      const project = mockProjects.find((p) => p.id === projectId);
+      if (!project) throw new ApiError('Project not found', 404);
+      return mockFetch(project as T);
+    }
 
-  delete: <T>(endpoint: string) => fetchApi<T>(endpoint, { method: 'DELETE' }),
+    // Project messages
+    if (endpoint.match(/^\/projects\/[^/]+\/messages$/)) {
+      const projectId = endpoint.split('/')[2];
+      const messages = mockProjectMessages[projectId] || [];
+      return mockFetch({ messages, nextCursor: null } as T);
+    }
+
+    // Project location suggestions
+    if (endpoint.match(/^\/projects\/[^/]+\/locations\/suggestions$/)) {
+      return mockFetch(mockLocations as T, 400);
+    }
+
+    // Trips list
+    if (endpoint === '/trips') {
+      return mockFetch(mockTrips as T);
+    }
+
+    // Single trip
+    if (endpoint.match(/^\/trips\/[^/]+$/)) {
+      const tripId = endpoint.split('/')[2];
+      const trip = mockTrips.find((t) => t.id === tripId);
+      if (!trip) throw new ApiError('Trip not found', 404);
+      return mockFetch(trip as T);
+    }
+
+    // Trip messages
+    if (endpoint.match(/^\/trips\/[^/]+\/messages$/)) {
+      const tripId = endpoint.split('/')[2];
+      const messages = mockTripMessages[tripId] || [];
+      return mockFetch({ messages, nextCursor: null } as T);
+    }
+
+    // Trip attractions
+    if (endpoint.match(/^\/trips\/[^/]+\/attractions$/)) {
+      const tripId = endpoint.split('/')[2];
+      return mockFetch((mockAttractions[tripId] || []) as T);
+    }
+
+    // Trip summary
+    if (endpoint.match(/^\/trips\/[^/]+\/summary$/)) {
+      return mockFetch(getTripSummary() as T, 500);
+    }
+
+    throw new ApiError(`Unknown endpoint: ${endpoint}`, 404);
+  },
+
+  patch: async <T>(endpoint: string, data?: unknown): Promise<T> => {
+    // Update user
+    if (endpoint === '/me') {
+      const updates = data as Partial<User>;
+      updateMockUser(updates);
+      return mockFetch(mockUser as T);
+    }
+
+    throw new ApiError(`Unknown endpoint: ${endpoint}`, 404);
+  },
+
+  post: async <T>(endpoint: string, data?: unknown): Promise<T> => {
+    // Answer onboarding question
+    if (endpoint === '/onboarding/answer') {
+      await mockDelay(500);
+      const body = data as { questionId: string; answerText: string };
+      
+      // Simple validation
+      if (body.answerText.length < 3) {
+        return {
+          status: 'needs_clarification',
+          followupMarkdown:
+            'Czy mógłbyś/mogłabyś podać więcej szczegółów? Pomoże mi to lepiej dobrać oferty.',
+        } as T;
+      }
+
+      return { status: 'ok' } as T;
+    }
+
+    // Complete onboarding
+    if (endpoint === '/onboarding/complete') {
+      await mockDelay(800);
+
+      const newProject: Project = {
+        id: `proj-${Date.now()}`,
+        title: 'Moja wymarzona podróż',
+        createdAt: new Date().toISOString(),
+        lastMessagePreview: 'Rozpocznijmy planowanie...',
+      };
+
+      mockProjects.push(newProject);
+
+      mockProjectMessages[newProject.id] = [
+        {
+          id: 'm1',
+          role: 'assistant',
+          markdown:
+            '🎉 Świetnie! Na podstawie Twoich odpowiedzi przygotowałem kilka propozycji.\n\nCzy chciałbyś zobaczyć sugerowane lokalizacje?',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+
+      return { projectId: newProject.id } as T;
+    }
+
+    // Create new project
+    if (endpoint === '/projects') {
+      await mockDelay(400);
+      const body = data as { title?: string };
+
+      const newProject: Project = {
+        id: `proj-${Date.now()}`,
+        title: body.title || 'Nowy projekt',
+        createdAt: new Date().toISOString(),
+      };
+
+      mockProjects.push(newProject);
+      mockProjectMessages[newProject.id] = [];
+
+      return { id: newProject.id } as T;
+    }
+
+    // Send project message
+    if (endpoint.match(/^\/projects\/[^/]+\/messages$/)) {
+      await mockDelay(800);
+      const projectId = endpoint.split('/')[2];
+      const body = data as { text: string };
+
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        role: 'user',
+        markdown: body.text,
+        createdAt: new Date().toISOString(),
+      };
+
+      const assistantMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'assistant',
+        markdown:
+          'Rozumiem! Oto kilka propozycji lokalizacji, które mogą Cię zainteresować. Możesz utworzyć podróż dla każdej z nich.',
+        createdAt: new Date().toISOString(),
+      };
+
+      if (!mockProjectMessages[projectId]) {
+        mockProjectMessages[projectId] = [];
+      }
+
+      mockProjectMessages[projectId].push(userMessage, assistantMessage);
+
+      return [userMessage, assistantMessage] as T;
+    }
+
+    // Create trip from location
+    if (endpoint.match(/^\/projects\/[^/]+\/locations$/)) {
+      await mockDelay(600);
+      const body = data as { selectedLocationId: string };
+
+      const location = mockLocations.find((l) => l.id === body.selectedLocationId);
+      if (!location) throw new ApiError('Location not found', 404);
+
+      const newTrip: Trip = {
+        id: `trip-${Date.now()}`,
+        projectId: 'proj-1',
+        locationId: location.id,
+        locationName: `${location.name}, ${location.country}`,
+        title: `Podróż do ${location.name}`,
+        createdAt: new Date().toISOString(),
+      };
+
+      mockTrips.push(newTrip);
+      mockTripMessages[newTrip.id] = [
+        {
+          id: 'tm1',
+          role: 'assistant',
+          markdown: `Witaj w planowaniu podróży do **${location.name}**! 🎿\n\nOpowiedz mi więcej o swoich oczekiwaniach, a ja przygotuję listę atrakcji.`,
+          createdAt: new Date().toISOString(),
+        },
+      ];
+
+      // Add mock attractions
+      mockAttractions[newTrip.id] = [
+        {
+          id: 'attr1',
+          title: 'Przejazd kolejką gondolową',
+          description: 'Spektakularne widoki na Alpy podczas przejazdu nowoczesną kolejką',
+          category: 'Transport',
+        },
+        {
+          id: 'attr2',
+          title: 'Szkoła narciarska (2 dni)',
+          description: 'Profesjonalne kursy dla początkujących i zaawansowanych',
+          category: 'Aktywności',
+        },
+        {
+          id: 'attr3',
+          title: 'Wieczór przy ognisku',
+          description: 'Tradycyjne spotkanie z lokalnymi potrawami i muzyką',
+          category: 'Rozrywka',
+        },
+      ];
+
+      return { tripId: newTrip.id } as T;
+    }
+
+    // Send trip message
+    if (endpoint.match(/^\/trips\/[^/]+\/messages$/)) {
+      await mockDelay(800);
+      const tripId = endpoint.split('/')[2];
+      const body = data as { text: string };
+
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        role: 'user',
+        markdown: body.text,
+        createdAt: new Date().toISOString(),
+      };
+
+      const assistantMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'assistant',
+        markdown:
+          'Świetnie! Sprawdź zakładkę **Atrakcje** - przygotowałem dla Ciebie propozycje. Zaakceptuj te, które Cię interesują.',
+        createdAt: new Date().toISOString(),
+      };
+
+      if (!mockTripMessages[tripId]) {
+        mockTripMessages[tripId] = [];
+      }
+
+      mockTripMessages[tripId].push(userMessage, assistantMessage);
+
+      return [userMessage, assistantMessage] as T;
+    }
+
+    // Attraction decision
+    if (endpoint.match(/^\/trips\/[^/]+\/attractions\/[^/]+\/decision$/)) {
+      await mockDelay(400);
+      return { status: 'ok' } as T;
+    }
+
+    throw new ApiError(`Unknown endpoint: ${endpoint}`, 404);
+  },
+
+  put: async <T>(endpoint: string, data?: unknown): Promise<T> => {
+    throw new ApiError(`PUT not implemented: ${endpoint}`, 404);
+  },
+
+  delete: async <T>(endpoint: string): Promise<T> => {
+    throw new ApiError(`DELETE not implemented: ${endpoint}`, 404);
+  },
 };
 
 export { ApiError };
