@@ -14,7 +14,10 @@ export const AttractionsPanel = memo(function AttractionsPanel({
   onDecision,
   disabled = false,
 }: AttractionsPanelProps) {
-  if (attractions.length === 0) {
+  // Only show attractions without decisions
+  const pendingAttractions = attractions.filter(a => !a.decision);
+
+  if (pendingAttractions.length === 0) {
     return null;
   }
 
@@ -27,7 +30,7 @@ export const AttractionsPanel = memo(function AttractionsPanel({
         </div>
 
         <div className="space-y-3">
-          {attractions.map((attraction) => (
+          {pendingAttractions.map((attraction) => (
             <AttractionCard
               key={attraction.id}
               attraction={attraction}

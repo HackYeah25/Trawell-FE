@@ -100,6 +100,9 @@ export default function TripView() {
     );
   }
 
+  // Check if there are pending attractions (without decisions)
+  const hasPendingAttractions = attractions?.some(a => !a.decision) || false;
+
   return (
     <AppShell>
       <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-4rem)] flex flex-col">
@@ -122,26 +125,28 @@ export default function TripView() {
           </div>
         </div>
 
-        {/* Chat Content */}
+        {/* Attractions or Chat Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <ChatThread
-            messages={localMessages}
-            isLoading={sendMessageMutation.isPending}
-          />
-          
-          {attractions && attractions.length > 0 && (
+          {hasPendingAttractions ? (
             <AttractionsPanel
-              attractions={attractions}
+              attractions={attractions || []}
               onDecision={handleAttractionDecision}
               disabled={attractionDecisionMutation.isPending}
             />
+          ) : (
+            <>
+              <ChatThread
+                messages={localMessages}
+                isLoading={sendMessageMutation.isPending}
+              />
+              
+              <Composer
+                onSend={handleSendMessage}
+                disabled={sendMessageMutation.isPending}
+                placeholder="Opisz swoje preferencje..."
+              />
+            </>
           )}
-
-          <Composer
-            onSend={handleSendMessage}
-            disabled={sendMessageMutation.isPending}
-            placeholder="Opisz swoje preferencje..."
-          />
         </div>
       </div>
     </AppShell>
