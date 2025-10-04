@@ -21,7 +21,7 @@ export default function Landing() {
 
           {/* Main heading with Pacifico */}
           <h1 className="text-5xl md:text-7xl font-pacifico text-white drop-shadow-lg">
-            TravelAI
+            TraWell
           </h1>
 
           {/* Subheading */}

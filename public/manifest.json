@@ -1,7 +1,7 @@
 {
-  "name": "TravelAI - Your AI Travel Companion",
-  "short_name": "TravelAI",
-  "description": "Plan your perfect trip with AI assistance. TravelAI helps you choose destinations, attractions and create your ideal travel plan.",
+  "name": "TraWell - Your AI Travel Companion",
+  "short_name": "TraWell",
+  "description": "Plan your perfect trip with AI assistance. TraWell helps you choose destinations, attractions and create your ideal travel plan.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
