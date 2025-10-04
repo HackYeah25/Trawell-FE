@@ -264,7 +264,11 @@ export default function TripView() {
                   Trip Summary
                 </h2>
                 {summary.sections.map((section, index) => (
-                  <SummaryCard key={index} section={section} />
+                  <SummaryCard 
+                    key={index} 
+                    section={section} 
+                    attractions={attractions}
+                  />
                 ))}
               </div>
             </div>

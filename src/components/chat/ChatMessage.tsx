@@ -91,48 +91,59 @@ export const ChatMessage = memo(function ChatMessage({
   return (
     <div
       className={cn(
-        'flex gap-3 mb-4',
-        isUser && !isOtherUser ? 'justify-end animate-slide-in-right' : 'justify-start animate-slide-in-left'
+        'flex mb-6',
+        isUser && !isOtherUser ? 'justify-end' : 'justify-start'
       )}
       role="article"
       aria-label={`${message.role} message`}
     >
-      {(!isUser || isOtherUser) && (
+      <div 
+        className={cn(
+          'flex gap-3 w-full max-w-2xl',
+          isUser && !isOtherUser && 'flex-row-reverse'
+        )}
+      >
+        {/* Avatar */}
         <div className="flex flex-col items-center gap-1 flex-shrink-0">
           <div
             className={cn(
               'w-8 h-8 rounded-full flex items-center justify-center shadow-sm',
               isOtherUser 
                 ? cn('text-white text-xs font-semibold', getAvatarColor(message.userName))
-                : isSystem 
-                  ? 'bg-muted' 
-                  : 'bg-gradient-sunset'
+                : isUser
+                  ? 'bg-warm-turquoise'
+                  : isSystem 
+                    ? 'bg-muted' 
+                    : 'bg-gradient-sunset'
             )}
             aria-hidden="true"
           >
             {isOtherUser ? (
               getInitials(message.userName!)
+            ) : isUser ? (
+              <User className="w-4 h-4 text-white" />
             ) : (
               <Bot className="w-4 h-4 text-white" />
             )}
           </div>
+        </div>
+
+        {/* Message content */}
+        <div className="flex-1 min-w-0">
           {isOtherUser && (
-            <p className="text-xs font-medium text-muted-foreground text-center max-w-[80px] truncate">
+            <p className="text-xs font-medium text-muted-foreground mb-1 px-1">
               {message.userName}
             </p>
           )}
-        </div>
-      )}
-
-      <div className={cn('flex flex-col gap-2 max-w-[80%] md:max-w-[70%]')}>
-        <div
-          className={cn(
-            'rounded-2xl px-4 py-3 shadow-sm',
-            isUser && !isOtherUser
-              ? 'bg-gradient-sunset text-white shadow-warm'
-              : 'bg-card text-card-foreground border border-warm-coral/20'
-          )}
-        >
+          
+          <div
+            className={cn(
+              'rounded-2xl px-4 py-3 shadow-sm',
+              isUser && !isOtherUser
+                ? 'bg-gradient-sunset text-white shadow-warm'
+                : 'bg-card text-card-foreground border border-warm-coral/20'
+            )}
+          >
           {message.markdown && (
             <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-ul:my-0 prose-ol:my-0">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -163,7 +174,7 @@ export const ChatMessage = memo(function ChatMessage({
         </div>
 
         {message.quickReplies && message.quickReplies.length > 0 && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Quick replies">
+          <div className="flex flex-wrap gap-2 mt-2" role="group" aria-label="Quick replies">
             {message.quickReplies.map((reply) => (
               <Button
                 key={reply.id}
@@ -197,16 +208,8 @@ export const ChatMessage = memo(function ChatMessage({
             )}
           </div>
         ))}
-      </div>
-
-      {isUser && !isOtherUser && (
-        <div
-          className="flex-shrink-0 w-8 h-8 rounded-full bg-warm-turquoise flex items-center justify-center shadow-sm"
-          aria-hidden="true"
-        >
-          <User className="w-4 h-4 text-white" />
         </div>
-      )}
+      </div>
     </div>
   );
 });

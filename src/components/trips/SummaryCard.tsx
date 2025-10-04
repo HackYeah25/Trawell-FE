@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { TripSummarySection, SummaryCategory } from '@/types';
+import type { TripSummarySection, SummaryCategory, Attraction } from '@/types';
 
 const categoryIcons: Record<SummaryCategory, typeof Cloud> = {
   Pogoda: Cloud,
@@ -38,10 +38,13 @@ const categoryIcons: Record<SummaryCategory, typeof Cloud> = {
 
 interface SummaryCardProps {
   section: TripSummarySection;
+  attractions?: Attraction[];
 }
 
-export const SummaryCard = memo(function SummaryCard({ section }: SummaryCardProps) {
+export const SummaryCard = memo(function SummaryCard({ section, attractions }: SummaryCardProps) {
   const Icon = categoryIcons[section.category] || FileText;
+  const isAttractionsSection = section.category === 'Attractions';
+  const acceptedAttractions = attractions?.filter(a => a.decision === 'accepted') || [];
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-warm border-warm-coral/20">
@@ -67,9 +70,39 @@ export const SummaryCard = memo(function SummaryCard({ section }: SummaryCardPro
       </CardHeader>
 
       <CardContent className="pt-4">
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.markdown}</ReactMarkdown>
-        </div>
+        {isAttractionsSection && acceptedAttractions.length > 0 ? (
+          <div className="space-y-4">
+            {acceptedAttractions.map((attraction) => (
+              <div 
+                key={attraction.id} 
+                className="flex gap-4 p-3 rounded-lg border border-warm-coral/20 hover:bg-warm-coral/5 transition-colors"
+              >
+                {attraction.imageUrl && (
+                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={attraction.imageUrl} 
+                      alt={attraction.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-base mb-1">{attraction.title}</h4>
+                  <p className="text-sm text-muted-foreground mb-2">{attraction.description}</p>
+                  {attraction.category && (
+                    <Badge variant="secondary" className="text-xs">
+                      {attraction.category}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.markdown}</ReactMarkdown>
+          </div>
+        )}
 
         {section.tags && section.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
