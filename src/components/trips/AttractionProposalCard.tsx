@@ -19,31 +19,34 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
     <Card
       className={cn(
         'overflow-hidden transition-all duration-300 animate-fade-in my-4',
-        isRejected && 'opacity-50 grayscale',
-        isRated && 'border-warm-turquoise shadow-warm ring-1 ring-warm-turquoise/20',
+        isRejected && 'opacity-40 grayscale border-2 border-muted',
+        isRated && 'border-2 border-warm-turquoise shadow-lg ring-2 ring-warm-turquoise/30 bg-warm-turquoise/5',
         !isDisabled && 'hover:scale-[1.02]'
       )}
     >
       {/* Image */}
       {attraction.imageUrl && (
-        <div className="relative h-32 sm:h-40 lg:h-48 overflow-hidden">
+        <div className={cn(
+          "relative h-32 sm:h-40 lg:h-48 overflow-hidden",
+          isRejected && "after:absolute after:inset-0 after:bg-muted/60 after:content-['']"
+        )}>
           <img
             src={attraction.imageUrl}
             alt={attraction.title}
             className="w-full h-full object-cover"
           />
           {isRated && attraction.rating && (
-            <Badge className="absolute top-2 right-2 bg-warm-turquoise text-white">
+            <Badge className="absolute top-3 right-3 bg-warm-turquoise text-white shadow-lg text-sm px-3 py-1.5 font-semibold z-10">
               {'★'.repeat(attraction.rating)}{'☆'.repeat(3 - attraction.rating)}
             </Badge>
           )}
           {isRejected && (
-            <Badge className="absolute top-2 right-2 bg-muted text-muted-foreground">
-              Odrzucono
+            <Badge className="absolute top-3 right-3 bg-muted/90 text-muted-foreground shadow-lg text-sm px-3 py-1.5 font-semibold z-10 border-2 border-border">
+              ✕ Odrzucono
             </Badge>
           )}
           {attraction.category && !isRejected && !isRated && (
-            <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur">
+            <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur shadow-md">
               {attraction.category}
             </Badge>
           )}
@@ -51,9 +54,18 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
       )}
 
       {/* Content */}
-      <div className="p-4 sm:p-5 space-y-3">
-        <h3 className="font-semibold text-lg">{attraction.title}</h3>
-        <p className="text-sm line-clamp-2">{attraction.description}</p>
+      <div className={cn(
+        "p-4 sm:p-5 space-y-3",
+        isRated && "bg-warm-turquoise/5"
+      )}>
+        <h3 className={cn(
+          "font-semibold text-lg",
+          isRejected && "line-through text-muted-foreground"
+        )}>{attraction.title}</h3>
+        <p className={cn(
+          "text-sm line-clamp-2",
+          isRejected && "text-muted-foreground"
+        )}>{attraction.description}</p>
 
         {/* Bottom Bar */}
         <div className="grid grid-cols-4 gap-2 pt-3">

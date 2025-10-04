@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { MapPin, Calendar, Loader2, Pencil, Check, X } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -24,6 +24,7 @@ import type { ChatMessage } from '@/types';
 
 export default function TripView() {
   const { tripId } = useParams<{ tripId: string }>();
+  const navigate = useNavigate();
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [activeTab, setActiveTab] = useState<'chat' | 'summary'>('chat');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -259,8 +260,31 @@ export default function TripView() {
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                {new Date(trip.createdAt).toLocaleDateString('en-US')}
+                {trip.startDate && trip.endDate 
+                  ? `${new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                  : new Date(trip.createdAt).toLocaleDateString('en-US')
+                }
               </span>
+              {trip.startDate && trip.endDate && (() => {
+                const now = new Date();
+                const start = new Date(trip.startDate);
+                const end = new Date(trip.endDate);
+                start.setDate(start.getDate() - 2);
+                end.setDate(end.getDate() + 2);
+                return now >= start && now <= end;
+              })() && (
+                <>
+                  <span>•</span>
+                  <button
+                    onClick={() => navigate(`/app/trips/${tripId}/live`)}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors group"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    <Radio className="w-3.5 h-3.5 text-red-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-semibold text-red-600">Live Assistant</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
