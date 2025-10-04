@@ -56,18 +56,18 @@ export const ChatThread = memo(function ChatThread({
             className="flex gap-3 mb-4 animate-slide-in-left"
             aria-label="Assistant is typing"
           >
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-ocean flex items-center justify-center">
-              <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-sunset flex items-center justify-center shadow-sm">
+              <Loader2 className="w-4 h-4 text-white animate-spin" />
             </div>
-            <div className="bg-card border border-border rounded-2xl px-4 py-3 shadow-sm">
+            <div className="bg-card border border-warm-coral/20 rounded-2xl px-4 py-3 shadow-sm">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-pulse-glow" />
+                <span className="w-2 h-2 bg-warm-coral/50 rounded-full animate-pulse-glow" />
                 <span
-                  className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-pulse-glow"
+                  className="w-2 h-2 bg-warm-coral/50 rounded-full animate-pulse-glow"
                   style={{ animationDelay: '0.2s' }}
                 />
                 <span
-                  className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-pulse-glow"
+                  className="w-2 h-2 bg-warm-coral/50 rounded-full animate-pulse-glow"
                   style={{ animationDelay: '0.4s' }}
                 />
               </div>

@@ -84,7 +84,7 @@ export const ChatMessage = memo(function ChatMessage({
                 variant="outline"
                 size="sm"
                 onClick={() => onQuickReply?.(reply.payload)}
-                className="bg-card hover:bg-secondary"
+                className="bg-card hover:bg-warm-coral/10 border-warm-coral/20"
               >
                 {reply.label}
               </Button>
@@ -102,7 +102,7 @@ export const ChatMessage = memo(function ChatMessage({
                     variant="outline"
                     size="sm"
                     onClick={() => onQuickReply?.(option.value)}
-                    className="justify-start bg-card hover:bg-secondary"
+                    className="justify-start bg-card hover:bg-warm-coral/10 border-warm-coral/20"
                   >
                     {option.label}
                   </Button>
