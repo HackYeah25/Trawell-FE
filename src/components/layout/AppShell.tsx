@@ -37,7 +37,7 @@ export function AppShell({ children }: AppShellProps) {
                 <Plane className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
-                TravelAI
+                TraWell
               </h1>
             </div>
           </div>

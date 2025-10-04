@@ -52,7 +52,9 @@ export function Composer({
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (!disabled) {
+        handleSend();
+      }
     }
   };
 
