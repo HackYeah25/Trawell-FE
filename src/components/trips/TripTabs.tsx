@@ -22,13 +22,13 @@ export function TripTabs({ activeTab, onTabChange, chatContent, summaryContent }
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="chat" className="flex-1 flex flex-col mt-0 min-h-0">
+      {activeTab === 'chat' && <TabsContent value="chat" className="flex-1 flex flex-col mt-0 min-h-0">
         {chatContent}
-      </TabsContent>
+      </TabsContent>  }
 
-      <TabsContent value="summary" className="flex-1 mt-0 overflow-auto p-4">
+      {activeTab === 'summary' && <TabsContent value="summary" className="flex-1 mt-0 overflow-auto p-4">
         {summaryContent}
-      </TabsContent>
+      </TabsContent>}
     </Tabs>
   );
 }
