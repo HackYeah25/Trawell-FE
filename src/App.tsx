@@ -12,6 +12,7 @@ import History from "./pages/History";
 import Profile from "./pages/Profile";
 import ProjectView from "./pages/ProjectView";
 import TripView from "./pages/TripView";
+import TripLiveChat from "./pages/TripLiveChat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -81,6 +82,10 @@ function AppRoutes() {
       <Route
         path="/app/trips/:tripId"
         element={user && !needsOnboarding ? <TripView /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/app/trips/:tripId/live"
+        element={user && !needsOnboarding ? <TripLiveChat /> : <Navigate to="/" replace />}
       />
       <Route path="*" element={<NotFound />} />
     </Routes>

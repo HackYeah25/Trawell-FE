@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, MapPin } from 'lucide-react';
+import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, MapPin, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -78,6 +78,17 @@ export default function History() {
     const allLocations = [...mockLocations, iguanaLocation];
     const location = allLocations.find(loc => loc.id === locationId);
     return location?.imageUrl;
+  };
+
+  const isTripActive = (trip: any) => {
+    if (!trip.startDate || !trip.endDate) return false;
+    const now = new Date();
+    const start = new Date(trip.startDate);
+    const end = new Date(trip.endDate);
+    // Active if within trip dates or within 2 days before/after
+    const twoDaysBefore = new Date(start.getTime() - 2 * 24 * 60 * 60 * 1000);
+    const twoDaysAfter = new Date(end.getTime() + 2 * 24 * 60 * 60 * 1000);
+    return now >= twoDaysBefore && now <= twoDaysAfter;
   };
 
   return (
@@ -258,9 +269,26 @@ export default function History() {
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-sm truncate">{trip.title}</p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    {trip.locationName}
-                                  </p>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {trip.locationName}
+                                    </p>
+                                    {isTripActive(trip) && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate(`/app/trips/${trip.id}/live`);
+                                        }}
+                                        className="h-5 px-1.5 gap-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                      >
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                        <Radio className="w-3 h-3" />
+                                        <span>Live</span>
+                                      </Button>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             );

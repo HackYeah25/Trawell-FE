@@ -96,6 +96,8 @@ export interface Trip {
   createdAt: string;
   lastMessagePreview?: string;
   updatedAt?: string;
+  startDate?: string; // Trip start date
+  endDate?: string; // Trip end date
 }
 
 export interface Attraction {

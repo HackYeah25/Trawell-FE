@@ -112,7 +112,18 @@ export const seedTrips: Trip[] = [
     title: 'Tokyo Adventure',
     createdAt: '2024-12-10T10:10:00Z',
     updatedAt: '2024-12-10T17:00:00Z',
-    lastMessagePreview: 'Anna: Togo Shrine trail? Perfect! 🥾'
+    lastMessagePreview: 'Anna: Togo Shrine trail? Perfect! 🥾',
+    // Active trip - dates set to current month for demo
+    startDate: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return d.toISOString();
+    })(),
+    endDate: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 5);
+      return d.toISOString();
+    })()
   }
 ];
 
