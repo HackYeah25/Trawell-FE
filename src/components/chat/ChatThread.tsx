@@ -55,18 +55,21 @@ export const ChatThread = memo(function ChatThread({
     }
   }, [messages.length]);
 
-  // Auto-scroll to bottom only for NEW messages (not when loading more)
+  // Auto-scroll to bottom for NEW messages
   useEffect(() => {
     // Only scroll if messages increased (new message added, not loaded)
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
     
-    if (isNewMessage && hasScrolledToBottom.current) {
-      // Use a small delay to ensure DOM is updated, then smooth scroll
+    if (isNewMessage) {
+      // Always scroll to bottom for new messages, regardless of previous scroll position
+      hasScrolledToBottom.current = true;
+      
+      // Use a longer delay to ensure DOM is fully updated
       const timeoutId = setTimeout(() => {
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-      }, 50);
+      }, 100);
       
       previousMessagesLength.current = messages.length;
       return () => clearTimeout(timeoutId);

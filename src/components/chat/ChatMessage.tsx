@@ -49,40 +49,22 @@ export const ChatMessage = memo(function ChatMessage({
   // Track if this is a new message that should be animated
   useEffect(() => {
     if (message.role === 'assistant' && message.markdown && !disableAnimation) {
-      // Check if this message was just added by comparing its ID
-      const isNewMessage = !message.id.startsWith('initial-') && !message.id.startsWith('iguana-');
+      // Only animate truly new messages (not system messages or pre-loaded ones)
+      const isNewMessage = !message.id.startsWith('initial-') && 
+                          !message.id.startsWith('iguana-') && 
+                          !message.id.startsWith('welcome') &&
+                          !message.id.startsWith('shared-');
       setShouldAnimate(isNewMessage);
     } else {
       setShouldAnimate(false);
     }
   }, [message.id, message.role, message.markdown, disableAnimation]);
   
-  // Typing animation for assistant messages - simplified
+  // Simple message display - no typing animation to avoid flickering
   useEffect(() => {
-    if (message.role === 'assistant' && message.markdown && shouldAnimate && !disableAnimation) {
-      setIsTyping(true);
-      setDisplayedText('');
-      
-      let currentIndex = 0;
-      const text = message.markdown || '';
-      const typingSpeed = 20; // Slightly slower for smoother animation
-      
-      const interval = setInterval(() => {
-        if (currentIndex < text.length) {
-          setDisplayedText(text.slice(0, currentIndex + 1));
-          currentIndex++;
-        } else {
-          setIsTyping(false);
-          clearInterval(interval);
-        }
-      }, typingSpeed);
-      
-      return () => clearInterval(interval);
-    } else {
-      setDisplayedText(message.markdown || '');
-      setIsTyping(false);
-    }
-  }, [message.markdown, message.role, shouldAnimate, disableAnimation]);
+    setDisplayedText(message.markdown || '');
+    setIsTyping(false);
+  }, [message.markdown]);
 
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
