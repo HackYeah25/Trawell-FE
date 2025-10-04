@@ -46,10 +46,9 @@ export default function History() {
     joinProjectMutation.mutate(
       { shareCode },
       {
-        onSuccess: (result) => {
+        onSuccess: () => {
           setShowJoinDialog(false);
-          toast.success('Joined project successfully!');
-          navigate(`/app/projects/${result.projectId}`);
+          // Project will appear in the list automatically due to query invalidation
         },
         onError: () => {
           toast.error('Invalid share code. Please check and try again.');
