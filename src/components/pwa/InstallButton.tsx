@@ -22,8 +22,8 @@ export function InstallButton({ variant = 'default', size = 'default', className
   if (isInstalled) {
     return (
       <Button variant="outline" size={size} className={className} disabled>
-        <Check className="w-4 h-4" />
-        Zainstalowano
+        <Check className="w-4 h-4 mr-2" />
+        Installed
       </Button>
     );
   }
@@ -40,8 +40,8 @@ export function InstallButton({ variant = 'default', size = 'default', className
       onClick={handleInstall}
       disabled={isInstalling}
     >
-      <Download className="w-4 h-4" />
-      {isInstalling ? 'Instalowanie...' : 'Zainstaluj aplikację'}
+      <Download className="w-4 h-4 mr-2" />
+      {isInstalling ? 'Installing...' : 'Install App'}
     </Button>
   );
 }

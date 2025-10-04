@@ -35,8 +35,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     };
 
     localStorage.setItem('travelai_user', JSON.stringify(user));
-    onOpenChange(false);
     navigate('/onboarding');
+    // Dialog will close automatically when route changes
   };
 
   return (

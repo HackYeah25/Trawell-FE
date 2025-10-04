@@ -41,11 +41,15 @@ export default function Landing() {
             <Button
               size="lg"
               onClick={() => setShowAuthDialog(true)}
-              className="bg-white text-primary hover:bg-white/90 font-medium text-lg px-8 shadow-xl"
+              className="bg-white text-primary hover:bg-white/90 font-medium text-lg px-8 shadow-xl hover:scale-105 transition-transform"
             >
               Start Planning
             </Button>
-            <InstallButton />
+            <InstallButton 
+              variant="outline" 
+              size="lg"
+              className="bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20 font-medium text-lg px-8"
+            />
           </div>
         </div>
       </div>
