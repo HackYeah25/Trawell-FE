@@ -69,7 +69,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/app/projects/:projectId"
+        path="/app/brainstorms/:projectId"
         element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/" replace />}
       />
       <Route

@@ -13,10 +13,10 @@ import {
   useSendProjectMessage,
   useProjectLocationSuggestions,
   useCreateTripFromLocation,
-} from '@/api/hooks/use-projects';
+} from '@/api/hooks/use-brainstorms';
 import { useRenameProject } from '@/api/hooks/use-rename';
 import { initialProjectQuestions } from '@/lib/mock-data';
-import { ShareCodeDisplay } from '@/components/projects/ShareCodeDisplay';
+import { ShareCodeDisplay } from '@/components/brainstorms/ShareCodeDisplay';
 import type { ChatMessage } from '@/types';
 
 export default function ProjectView() {
@@ -204,7 +204,7 @@ export default function ProjectView() {
               </p>
             </div>
 
-            {/* Share Code Display for Shared Projects */}
+            {/* Share Code Display for Shared brainstorms */}
             {project.isShared && project.shareCode && (
               <ShareCodeDisplay shareCode={project.shareCode} />
             )}

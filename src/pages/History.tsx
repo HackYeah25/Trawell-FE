@@ -4,22 +4,22 @@ import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useProjects, useCreateProject, useJoinProject } from '@/api/hooks/use-projects';
+import { useBrainstorms, useCreateProject, useJoinProject } from '@/api/hooks/use-brainstorms';
 import { useTrips } from '@/api/hooks/use-trips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ProjectTypeDialog } from '@/components/projects/ProjectTypeDialog';
-import { JoinProjectDialog } from '@/components/projects/JoinProjectDialog';
+import { ProjectTypeDialog } from '@/components/brainstorms/ProjectTypeDialog';
+import { JoinProjectDialog } from '@/components/brainstorms/JoinProjectDialog';
 import { toast } from 'sonner';
 
 export default function History() {
   const navigate = useNavigate();
-  const { data: projects, isLoading: projectsLoading } = useProjects();
+  const { data: brainstorms, isLoading: BrainstormsLoading } = useBrainstorms();
   const { data: trips, isLoading: tripsLoading } = useTrips();
   const createProjectMutation = useCreateProject();
   const joinProjectMutation = useJoinProject();
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [expandedBrainstorms, setExpandedBrainstorms] = useState<Set<string>>(new Set());
   const [showProjectTypeDialog, setShowProjectTypeDialog] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
 
@@ -32,7 +32,7 @@ export default function History() {
           if (isShared && result.shareCode) {
             toast.success(`Project created! Share code: ${result.shareCode}`);
           }
-          navigate(`/app/projects/${result.id}`);
+          navigate(`/app/brainstorms/${result.id}`);
         },
       }
     );
@@ -45,7 +45,7 @@ export default function History() {
         onSuccess: (result) => {
           setShowJoinDialog(false);
           toast.success('Joined project successfully!');
-          navigate(`/app/projects/${result.projectId}`);
+          navigate(`/app/brainstorms/${result.projectId}`);
         },
         onError: () => {
           toast.error('Invalid share code. Please check and try again.');
@@ -55,7 +55,7 @@ export default function History() {
   };
 
   const toggleProject = (projectId: string) => {
-    setExpandedProjects((prev) => {
+    setExpandedBrainstorms((prev) => {
       const next = new Set(prev);
       if (next.has(projectId)) {
         next.delete(projectId);
@@ -96,19 +96,19 @@ export default function History() {
           </div>
         </div>
 
-        {/* Projects list */}
-        {projectsLoading ? (
+        {/* brainstorms list */}
+        {BrainstormsLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-20" />
             ))}
           </div>
-        ) : !projects || projects.length === 0 ? (
+        ) : !brainstorms || brainstorms.length === 0 ? (
           <Card className="p-12 text-center border-dashed border-warm-coral/30 bg-gradient-to-br from-warm-coral/5 to-warm-turquoise/5">
             <div className="w-20 h-20 rounded-full bg-gradient-sunset flex items-center justify-center mb-4 mx-auto shadow-warm">
               <Palmtree className="w-10 h-10 text-white" />
             </div>
-            <p className="text-muted-foreground mb-4">You don't have any projects yet</p>
+            <p className="text-muted-foreground mb-4">You don't have any brainstorms yet</p>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
               disabled={createProjectMutation.isPending}
@@ -120,9 +120,9 @@ export default function History() {
           </Card>
         ) : (
           <div className="space-y-2">
-            {projects.map((project) => {
+            {brainstorms.map((project) => {
               const projectTrips = getProjectTrips(project.id);
-              const isExpanded = expandedProjects.has(project.id);
+              const isExpanded = expandedBrainstorms.has(project.id);
 
               return (
                 <Collapsible
@@ -170,7 +170,7 @@ export default function History() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/app/projects/${project.id}`);
+                              navigate(`/app/brainstorms/${project.id}`);
                             }}
                             className="hover:bg-warm-coral/10"
                           >

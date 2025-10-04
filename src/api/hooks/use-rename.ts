@@ -7,10 +7,10 @@ export function useRenameProject() {
 
   return useMutation({
     mutationFn: (data: { projectId: string; title: string }) =>
-      apiClient.patch<Project>(`/projects/${data.projectId}`, { title: data.title }),
+      apiClient.patch<Project>(`/brainstorms/${data.projectId}`, { title: data.title }),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['project', variables.projectId] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['brainstorms'] });
     },
   });
 }

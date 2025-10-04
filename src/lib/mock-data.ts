@@ -82,8 +82,8 @@ export const postAttractionQuestions: OnboardingQuestion[] = [
   },
 ];
 
-// Projects and trips
-export let mockProjects: Project[] = [];
+// brainstorms and trips
+export let mockBrainstorms: Project[] = [];
 export let mockTrips: Trip[] = [];
 export let mockProjectMessages: Record<string, ChatMessage[]> = {};
 export let mockTripMessages: Record<string, ChatMessage[]> = {};

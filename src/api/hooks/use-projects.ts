@@ -7,17 +7,17 @@ import {
 import { apiClient } from '@/lib/api-client';
 import type { Project, ChatMessage, Location } from '@/types';
 
-export function useProjects() {
+export function useBrainstorms() {
   return useQuery({
-    queryKey: ['projects'],
-    queryFn: () => apiClient.get<Project[]>('/projects'),
+    queryKey: ['brainstorms'],
+    queryFn: () => apiClient.get<Project[]>('/brainstorms'),
   });
 }
 
 export function useProject(projectId: string) {
   return useQuery({
     queryKey: ['project', projectId],
-    queryFn: () => apiClient.get<Project>(`/projects/${projectId}`),
+    queryFn: () => apiClient.get<Project>(`/brainstorms/${projectId}`),
     enabled: !!projectId,
   });
 }
@@ -28,7 +28,7 @@ export function useProjectMessages(projectId: string) {
     queryFn: ({ pageParam = null }) => {
       const params = pageParam ? `?cursor=${pageParam}` : '';
       return apiClient.get<{ messages: ChatMessage[]; nextCursor: string | null }>(
-        `/projects/${projectId}/messages${params}`
+        `/brainstorms/${projectId}/messages${params}`
       );
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -43,7 +43,7 @@ export function useSendProjectMessage() {
   return useMutation({
     mutationFn: (data: { projectId: string; text: string }) =>
       apiClient.post<ChatMessage[]>(
-        `/projects/${data.projectId}/messages`,
+        `/brainstorms/${data.projectId}/messages`,
         { text: data.text }
       ),
     onSuccess: (_, variables) => {
@@ -58,7 +58,7 @@ export function useProjectLocationSuggestions(projectId: string) {
   return useQuery({
     queryKey: ['project', projectId, 'locations', 'suggestions'],
     queryFn: () =>
-      apiClient.get<Location[]>(`/projects/${projectId}/locations/suggestions`),
+      apiClient.get<Location[]>(`/brainstorms/${projectId}/locations/suggestions`),
     enabled: !!projectId,
   });
 }
@@ -69,7 +69,7 @@ export function useCreateTripFromLocation() {
   return useMutation({
     mutationFn: (data: { projectId: string; selectedLocationId: string }) =>
       apiClient.post<{ tripId: string }>(
-        `/projects/${data.projectId}/locations`,
+        `/brainstorms/${data.projectId}/locations`,
         { selectedLocationId: data.selectedLocationId }
       ),
     onSuccess: () => {
@@ -83,9 +83,9 @@ export function useCreateProject() {
 
   return useMutation({
     mutationFn: (data: { title?: string; seedFromOnboarding?: boolean; isShared?: boolean }) =>
-      apiClient.post<{ id: string; shareCode?: string }>('/projects', data),
+      apiClient.post<{ id: string; shareCode?: string }>('/brainstorms', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['brainstorms'] });
     },
   });
 }
@@ -95,9 +95,9 @@ export function useJoinProject() {
 
   return useMutation({
     mutationFn: (data: { shareCode: string }) =>
-      apiClient.post<{ projectId: string }>('/projects/join', data),
+      apiClient.post<{ projectId: string }>('/brainstorms/join', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['brainstorms'] });
     },
   });
 }

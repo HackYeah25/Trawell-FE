@@ -115,7 +115,7 @@ src/
    - GET/PATCH `/me`
    - GET `/onboarding/questions`
    - POST `/onboarding/answer`, `/onboarding/complete`
-   - CRUD dla `/projects` i `/trips`
+   - CRUD dla `/brainstorms` i `/trips`
    - Atrakcje i podsumowania
 
 ## 🧪 Testy Akceptacyjne (Checklist)

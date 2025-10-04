@@ -13,7 +13,7 @@ import {
   mockUser,
   updateMockUser,
   onboardingQuestions,
-  mockProjects,
+  mockBrainstorms,
   mockTrips,
   mockProjectMessages,
   mockTripMessages,
@@ -64,28 +64,28 @@ export const apiClient = {
       return response.json();
     }
 
-    // Projects list
-    if (endpoint === '/projects') {
-      return mockFetch(mockProjects as T);
+    // brainstorms list
+    if (endpoint === '/brainstorms') {
+      return mockFetch(mockBrainstorms as T);
     }
 
     // Single project
-    if (endpoint.match(/^\/projects\/[^/]+$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+$/)) {
       const projectId = endpoint.split('/')[2];
-      const project = mockProjects.find((p) => p.id === projectId);
+      const project = mockBrainstorms.find((p) => p.id === projectId);
       if (!project) throw new ApiError('Project not found', 404);
       return mockFetch(project as T);
     }
 
     // Project messages
-    if (endpoint.match(/^\/projects\/[^/]+\/messages$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+\/messages$/)) {
       const projectId = endpoint.split('/')[2];
       const messages = mockProjectMessages[projectId] || [];
       return mockFetch({ messages, nextCursor: null } as T);
     }
 
     // Project location suggestions
-    if (endpoint.match(/^\/projects\/[^/]+\/locations\/suggestions$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+\/locations\/suggestions$/)) {
       return mockFetch(mockLocations as T, 400);
     }
 
@@ -132,10 +132,10 @@ export const apiClient = {
     }
 
     // Update project
-    if (endpoint.match(/^\/projects\/[^/]+$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+$/)) {
       await mockDelay(300);
       const projectId = endpoint.split('/')[2];
-      const project = mockProjects.find((p) => p.id === projectId);
+      const project = mockBrainstorms.find((p) => p.id === projectId);
       if (!project) throw new ApiError('Project not found', 404);
       
       const updates = data as Partial<Project>;
@@ -202,7 +202,7 @@ export const apiClient = {
         lastMessagePreview: 'Rozpocznijmy planowanie...',
       };
 
-      mockProjects.push(newProject);
+      mockBrainstorms.push(newProject);
 
       mockProjectMessages[newProject.id] = [
         {
@@ -218,7 +218,7 @@ export const apiClient = {
     }
 
     // Create new project
-    if (endpoint === '/projects') {
+    if (endpoint === '/brainstorms') {
       await mockDelay(400);
       const body = data as { title?: string; isShared?: boolean };
 
@@ -234,18 +234,18 @@ export const apiClient = {
         newProject.shareCode = generateShareCode();
       }
 
-      mockProjects.push(newProject);
+      mockBrainstorms.push(newProject);
       mockProjectMessages[newProject.id] = [];
 
       return { id: newProject.id, shareCode: newProject.shareCode } as T;
     }
 
     // Join shared project
-    if (endpoint === '/projects/join') {
+    if (endpoint === '/brainstorms/join') {
       await mockDelay(600);
       const body = data as { shareCode: string };
 
-      const project = mockProjects.find((p) => p.shareCode === body.shareCode);
+      const project = mockBrainstorms.find((p) => p.shareCode === body.shareCode);
       if (!project) {
         throw new ApiError('Project not found with that share code', 404);
       }
@@ -255,7 +255,7 @@ export const apiClient = {
     }
 
     // Send project message
-    if (endpoint.match(/^\/projects\/[^/]+\/messages$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+\/messages$/)) {
       await mockDelay(800);
       const projectId = endpoint.split('/')[2];
       const body = data as { text: string };
@@ -285,7 +285,7 @@ export const apiClient = {
     }
 
     // Create trip from location
-    if (endpoint.match(/^\/projects\/[^/]+\/locations$/)) {
+    if (endpoint.match(/^\/brainstorms\/[^/]+\/locations$/)) {
       await mockDelay(600);
       const body = data as { selectedLocationId: string };
 

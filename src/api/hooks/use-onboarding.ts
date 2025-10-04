@@ -243,7 +243,7 @@ export function useCompleteOnboarding() {
 
       // Invalidate cache to trigger re-render
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['brainstorms'] });
     },
   });
 }

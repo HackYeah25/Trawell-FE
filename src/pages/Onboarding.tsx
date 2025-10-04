@@ -78,7 +78,7 @@ export default function Onboarding() {
       const result = await completeMutation.mutateAsync({
         createInitialProject: true,
       });
-      navigate(`/app/projects/${result.projectId}`);
+      navigate(`/app/brainstorms/${result.projectId}`);
     },
     onThinking: () => {
       setIsThinking(true);
