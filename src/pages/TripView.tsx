@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { MapPin, Calendar, Loader2 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { AttractionsPanel } from '@/components/trips/AttractionsPanel';
-import { Button } from '@/components/ui/button';
 import {
   useTrip,
   useTripMessages,
@@ -105,46 +104,51 @@ export default function TripView() {
 
   return (
     <AppShell>
-      <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-4rem)] flex flex-col">
+      <div className="h-[calc(100vh-4rem)] flex flex-col">
         {/* Header */}
-        <div className="border-b border-border bg-card/50 backdrop-blur-sm p-4">
+        <div className="border-b border-border bg-card/50 backdrop-blur-sm p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(`/app/projects/${trip.projectId}`)}
-              className="mb-3"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Powrót do projektu
-            </Button>
-            <h1 className="text-2xl font-bold">{trip.title}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {trip.locationName} · {new Date(trip.createdAt).toLocaleDateString('pl-PL')}
-            </p>
+            <h1 className="text-xl md:text-2xl font-bold truncate">{trip.title}</h1>
+            <div className="flex flex-wrap items-center gap-2 mt-1 text-xs md:text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 md:w-4 md:h-4" />
+                {trip.locationName}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3 md:w-4 md:h-4" />
+                {new Date(trip.createdAt).toLocaleDateString('pl-PL')}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Attractions or Chat Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Content - Chat or Attractions */}
+        <div className="flex-1 flex flex-col min-h-0">
           {hasPendingAttractions ? (
-            <AttractionsPanel
-              attractions={attractions || []}
-              onDecision={handleAttractionDecision}
-              disabled={attractionDecisionMutation.isPending}
-            />
+            <div className="flex-1 overflow-y-auto">
+              <AttractionsPanel
+                attractions={attractions || []}
+                onDecision={handleAttractionDecision}
+                disabled={attractionDecisionMutation.isPending}
+              />
+            </div>
           ) : (
             <>
-              <ChatThread
-                messages={localMessages}
-                isLoading={sendMessageMutation.isPending}
-              />
+              <div className="flex-1 overflow-hidden">
+                <ChatThread
+                  messages={localMessages}
+                  isLoading={sendMessageMutation.isPending}
+                />
+              </div>
               
-              <Composer
-                onSend={handleSendMessage}
-                disabled={sendMessageMutation.isPending}
-                placeholder="Opisz swoje preferencje..."
-              />
+              <div className="flex-shrink-0">
+                <Composer
+                  onSend={handleSendMessage}
+                  disabled={sendMessageMutation.isPending}
+                  placeholder="Opisz swoje preferencje..."
+                />
+              </div>
             </>
           )}
         </div>

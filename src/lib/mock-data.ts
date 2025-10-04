@@ -17,6 +17,28 @@ export let mockUser: User = {
   onboardingCompleted: false,
 };
 
+// Initial project questions (asked when starting a new project)
+export const initialProjectQuestions: ChatMessage[] = [
+  {
+    id: 'pq1',
+    role: 'assistant',
+    markdown: 'Witaj! Zacznijmy planowanie Twojej podróży. Dokąd chciałbyś pojechać?',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'pq2',
+    role: 'assistant',
+    markdown: 'Jaki jest Twój budżet na tę podróż?',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'pq3',
+    role: 'assistant',
+    markdown: 'Jakie masz preferencje dotyczące zakwaterowania i transportu?',
+    createdAt: new Date().toISOString(),
+  },
+];
+
 // Onboarding questions
 export const onboardingQuestions: OnboardingQuestion[] = [
   {
