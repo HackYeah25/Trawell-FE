@@ -48,7 +48,7 @@ export default function TripView() {
         const welcomeMessage: ChatMessage = {
           id: 'welcome',
           role: 'assistant',
-          markdown: `Witaj w planowaniu podróży! 🌟 Pomogę Ci stworzyć idealny plan. Powiedz mi, czego szukasz?`,
+          markdown: `Welcome to trip planning! 🌟 I'll help you create the perfect plan. Tell me what you're looking for?`,
           createdAt: new Date().toISOString(),
         };
         setLocalMessages([welcomeMessage]);

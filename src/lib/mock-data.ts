@@ -403,22 +403,22 @@ export const mockLocations: Location[] = [
   {
     id: 'loc1',
     name: 'Val Thorens',
-    country: 'Francja',
-    teaser: 'Najwyżej położony ośrodek narciarski w Europie z 600 km tras',
+    country: 'France',
+    teaser: 'Highest ski resort in Europe with 600 km of slopes',
     imageUrl: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80',
   },
   {
     id: 'loc2',
     name: 'Livigno',
-    country: 'Włochy',
-    teaser: 'Wolnocłowa strefa w Alpach z doskonałymi warunkami do jazdy',
+    country: 'Italy',
+    teaser: 'Duty-free zone in the Alps with excellent skiing conditions',
     imageUrl: 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&q=80',
   },
   {
     id: 'loc3',
     name: 'Sölden',
     country: 'Austria',
-    teaser: 'Lodowiec zapewniający jazdę przez cały sezon, słynny z Bond movies',
+    teaser: 'Glacier skiing all season long, famous from Bond movies',
     imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&q=80',
   },
 ];
@@ -430,296 +430,296 @@ export const getTripSummary = (attractions?: Attraction[]): TripSummary => {
   return {
     sections: [
       {
-        category: 'Najważniejsze',
-        title: '⚠️ Najważniejsze informacje',
-        markdown: `**Pamiętaj o tych rzeczach:**
+        category: 'Key Info',
+        title: '⚠️ Most Important Information',
+        markdown: `**Remember these things:**
 
-✅ **Paszport ważny minimum 6 miesięcy**
-✅ **Ubezpieczenie podróżne obowiązkowe**
-✅ **Szczepienia: brak wymaganych**
-✅ **Wiza: nie wymagana (do 90 dni)**
+✅ **Passport valid for at least 6 months**
+✅ **Travel insurance mandatory**
+✅ **Vaccinations: none required**
+✅ **Visa: not required (up to 90 days)**
 
-🚨 **Numery alarmowe:**
-- Pogotowie: 112
-- Ambasada: +81 3-5562-1100`,
+🚨 **Emergency numbers:**
+- Emergency: 112
+- Embassy: +81 3-5562-1100`,
         important: true,
-        tags: ['Najważniejsze', 'Must-know'],
+        tags: ['Essential', 'Must-know'],
       },
       {
-        category: 'Pogoda',
-        title: 'Pogoda w marcu',
-        markdown: `**Warunki pogodowe:**
+        category: 'Weather',
+        title: 'Weather in March',
+        markdown: `**Weather conditions:**
 
-🌸 **Sezon kwitnienia wiśni (Sakura)**
-- Temperatura: 12-18°C
-- Opady: średnie (parasol przydatny)
-- Wschód słońca: 5:45, zachód: 17:50
-- Najlepszy miesiąc na zwiedzanie!
+🌸 **Cherry blossom season (Sakura)**
+- Temperature: 12-18°C (54-64°F)
+- Precipitation: moderate (umbrella useful)
+- Sunrise: 5:45 AM, Sunset: 5:50 PM
+- Best month for sightseeing!
 
-**Co zabrać:**
-- Lekką kurtkę
-- Warstwowe ubrania
-- Parasol`,
-        tags: ['Wiosna', 'Sakura', 'Idealna temperatura'],
+**What to pack:**
+- Light jacket
+- Layered clothing
+- Umbrella`,
+        tags: ['Spring', 'Sakura', 'Perfect temperature'],
       },
       {
-        category: 'Loty',
-        title: 'Połączenia lotnicze',
-        markdown: `**Opcje przelotu:**
+        category: 'Flights',
+        title: 'Flight Connections',
+        markdown: `**Flight options:**
 
-✈️ **1. LOT Polish Airlines** (polecane)
-- Warszawa → Tokio (Narita)
-- Bezpośredni: ~11h
-- Cena: 2800-3500 PLN w obie strony
+✈️ **1. LOT Polish Airlines** (recommended)
+- Warsaw → Tokyo (Narita)
+- Direct: ~11h
+- Price: $650-850 round trip
 
 ✈️ **2. Turkish Airlines**
-- Z przesiadką w Stambule
-- Całkowity czas: ~15h
-- Cena: 2200-2800 PLN
+- With layover in Istanbul
+- Total time: ~15h
+- Price: $500-650
 
 ✈️ **3. Lufthansa**
-- Z przesiadką w Frankfurcie
-- Całkowity czas: ~14h
-- Cena: 2500-3200 PLN
+- With layover in Frankfurt
+- Total time: ~14h
+- Price: $580-750
 
-🎫 **Pro tip:** Rezerwuj 2-3 miesiące wcześniej dla najlepszych cen`,
+🎫 **Pro tip:** Book 2-3 months in advance for best prices`,
         tags: ['Direct flight available', 'Book early'],
       },
       {
-        category: 'Hotele',
-        title: 'Rekomendowane noclegi',
-        markdown: `**Propozycje hoteli:**
+        category: 'Hotels',
+        title: 'Recommended Accommodations',
+        markdown: `**Hotel options:**
 
-🏨 **Budget (150-250 PLN/noc):**
-- Capsule hotels (unikalne doświadczenie!)
-- Hostele w Shinjuku/Shibuya
-- Airbnb w dzielnicach mieszkalnych
+🏨 **Budget ($35-60/night):**
+- Capsule hotels (unique experience!)
+- Hostels in Shinjuku/Shibuya
+- Airbnb in residential areas
 
-🏨 **Mid-range (300-500 PLN/noc):**
-- Hotel Gracery Shinjuku (widok na Godzillę!)
+🏨 **Mid-range ($70-120/night):**
+- Hotel Gracery Shinjuku (Godzilla view!)
 - Cross Hotel Osaka
 - Richmond Hotel Asakusa
 
-🏨 **Luxury (600+ PLN/noc):**
+🏨 **Luxury ($140+/night):**
 - Park Hyatt Tokyo (Lost in Translation!)
 - Aman Tokyo
 - The Peninsula Tokyo
 
-💡 **Wskazówka:** Wybierz hotel blisko stacji metra - to klucz do wygodnego zwiedzania!`,
+💡 **Tip:** Choose hotel near metro station - key to comfortable sightseeing!`,
         tags: ['Variety', 'Metro access important'],
       },
       {
-        category: 'Terminy',
-        title: 'Najlepsze terminy podróży',
-        markdown: `**Kalendarz podróżny:**
+        category: 'Dates',
+        title: 'Best Travel Dates',
+        markdown: `**Travel calendar:**
 
-🌸 **Marzec-Kwiecień** (polecane!)
-- Sezon Sakury
-- Idealna pogoda: 12-20°C
-- Większy ruch turystyczny
-- Rezerwuj z wyprzedzeniem!
+🌸 **March-April** (recommended!)
+- Sakura season
+- Perfect weather: 12-20°C (54-68°F)
+- Higher tourist traffic
+- Book in advance!
 
-🍂 **Październik-Listopad**
-- Kolorowa jesień (Momiji)
-- Przyjemna pogoda: 15-22°C
-- Mniej tłoczno niż w sezonie Sakury
+🍂 **October-November**
+- Colorful fall (Momiji)
+- Pleasant weather: 15-22°C (59-72°F)
+- Less crowded than Sakura season
 
-❄️ **Grudzień-Luty**
-- Skiing w Alpach Japońskich
-- Świąteczne iluminacje
-- Ciepłe onsen (gorące źródła)
+❄️ **December-February**
+- Skiing in Japanese Alps
+- Christmas illuminations
+- Warm onsen (hot springs)
 
-🔥 **Unikaj:** Lipiec-Sierpień (gorąco i wilgotno, pora deszczowa)`,
+🔥 **Avoid:** July-August (hot and humid, rainy season)`,
         tags: ['Sakura season', 'Fall foliage'],
       },
       {
-        category: 'Lokalizacja',
-        title: 'Tokio - stolica Japonii',
-        markdown: `**O mieście:**
+        category: 'Location',
+        title: 'Tokyo - Capital of Japan',
+        markdown: `**About the city:**
 
-📍 **Położenie:** Wschodnia Japonia, nad Zatoką Tokijską
-🏙️ **Populacja:** ~14 mln (38 mln w aglomeracji!)
-🗼 **Dzielnice must-see:**
-- **Shibuya** - słynne skrzyżowanie, młodzieżowa moda
-- **Shinjuku** - neonowe światła, życie nocne
-- **Asakusa** - tradycyjna dzielnica, świątynie
-- **Harajuku** - moda, kawaii culture
-- **Ginza** - luksusowe zakupy
+📍 **Location:** Eastern Japan, on Tokyo Bay
+🏙️ **Population:** ~14 million (38 million in metro area!)
+🗼 **Must-see districts:**
+- **Shibuya** - famous crossing, youth fashion
+- **Shinjuku** - neon lights, nightlife
+- **Asakusa** - traditional district, temples
+- **Harajuku** - fashion, kawaii culture
+- **Ginza** - luxury shopping
 
-⏰ **Strefa czasowa:** UTC+9 (7h do przodu od Polski)`,
+⏰ **Time zone:** UTC+9 (7h ahead of GMT)`,
         tags: ['Megacity', 'Safe', 'Modern + Traditional'],
       },
       {
-        category: 'Opis',
-        title: 'Czego się spodziewać',
-        markdown: `**Tokio to:**
+        category: 'Description',
+        title: 'What to Expect',
+        markdown: `**Tokyo is:**
 
-🎌 **Kontrast tradycji i nowoczesności**
-- Starożytne świątynie obok drapaczy chmur
-- Tradycyjne ogródki herbaciane i futurystyczne kawiarnie robotów
+🎌 **Contrast of tradition and modernity**
+- Ancient temples next to skyscrapers
+- Traditional tea gardens and futuristic robot cafes
 
-🍱 **Kulinarny raj**
-- Najwięcej restauracji z gwiazdkami Michelin na świecie
+🍱 **Culinary paradise**
+- Most Michelin-starred restaurants in the world
 - Street food: ramen, sushi, takoyaki
-- Konbini (sklepy 24/7) z pysznym jedzeniem
+- Konbini (24/7 stores) with delicious food
 
-🚄 **Perfekcyjna infrastruktura**
-- Metro NIGDY się nie spóźnia
-- Wszystko ultraczyste
-- Wysokie bezpieczeństwo
+🚄 **Perfect infrastructure**
+- Metro NEVER late
+- Everything ultra-clean
+- High safety
 
-🎭 **Unikalne doświadczenia**
-- Karaoke boxy
-- Onsen (gorące źródła)
+🎭 **Unique experiences**
+- Karaoke boxes
+- Onsen (hot springs)
 - Anime & manga cafes
 - Gaming centers`,
       },
       {
         category: 'Transport',
-        title: 'Poruszanie się po Tokio',
-        markdown: `**System komunikacji:**
+        title: 'Getting Around Tokyo',
+        markdown: `**Transportation system:**
 
 🎫 **Suica Card / Pasmo** (must-have!)
-- Karta miejska na metro/autobusy/pociągi
-- Zakup na lotnisku: 1000-2000 ¥
-- Uzupełnianie w automatach
+- City card for metro/buses/trains
+- Purchase at airport: 1000-2000 ¥
+- Refill at vending machines
 
 🚇 **Metro:**
-- 13 linii metra + 10 linii JR
-- Godziny szczytu: 7:30-9:30, 17:30-19:30
-- Google Maps ZAWSZE pokazuje najlepszą trasę
+- 13 metro lines + 10 JR lines
+- Rush hours: 7:30-9:30 AM, 5:30-7:30 PM
+- Google Maps ALWAYS shows best route
 
-🚅 **JR Pass** (dla dłuższych pobytów)
-- Unlimited przejazdy JR przez 7/14/21 dni
-- Opłacalne jeśli planujesz wyjazdy poza Tokio
-- Cena: ~1200 PLN za 7 dni
+🚅 **JR Pass** (for longer stays)
+- Unlimited JR rides for 7/14/21 days
+- Worth it if planning trips outside Tokyo
+- Price: ~$280 for 7 days
 
 🚕 **Taxi:**
-- Drogie! (start: ~300 ¥, każdy km: ~100 ¥)
-- Używaj tylko jako ostateczność
+- Expensive! (start: ~$2.70, per km: ~$0.90)
+- Use only as last resort
 
-💡 **Pro tip:** Pobierz offline mapy w Google Maps!`,
+💡 **Pro tip:** Download offline maps in Google Maps!`,
         tags: ['Suica essential', 'Metro best option'],
       },
       {
-        category: 'Budżet/koszty',
-        title: 'Szacunkowy budżet (7 dni)',
-        markdown: `**Koszty per osoba:**
+        category: 'Budget',
+        title: 'Estimated Budget (7 days)',
+        markdown: `**Costs per person:**
 
-✈️ **Przelot:** 2500-3500 PLN
-🏨 **Noclegi:** 1500-3000 PLN (zależnie od kategorii)
-🍜 **Jedzenie:**
-- Budget: 70-100 PLN/dzień
-- Mid: 120-200 PLN/dzień
-- Premium: 250+ PLN/dzień
+✈️ **Flight:** $650-850
+🏨 **Accommodation:** $350-700 (depending on category)
+🍜 **Food:**
+- Budget: $16-23/day
+- Mid: $28-46/day
+- Premium: $58+/day
 
-🎫 **Atrakcje & transport:** 500-800 PLN
-🛍️ **Zakupy & pamiątki:** 300-1000 PLN
+🎫 **Attractions & transport:** $115-185
+🛍️ **Shopping & souvenirs:** $70-230
 
-**💰 RAZEM: 5500-9000 PLN**
+**💰 TOTAL: $1,280-2,100**
 
-💡 **Jak oszczędzać:**
-- Jedzenie w convenience stores (konbini)
-- Free attractions: świątynie, parki, dzielnice
-- Happy hours w restauracjach (lunch sets!)`,
+💡 **How to save:**
+- Eat at convenience stores (konbini)
+- Free attractions: temples, parks, districts
+- Happy hours at restaurants (lunch sets!)`,
         tags: ['Mid-range budget', 'Savings tips'],
       },
       {
-        category: 'Co zabrać',
-        title: 'Lista pakowania',
-        markdown: `**Niezbędne rzeczy:**
+        category: 'Packing',
+        title: 'Packing List',
+        markdown: `**Essential items:**
 
-📱 **Elektronika:**
-- ☑️ Powerbank (długie dni zwiedzania!)
+📱 **Electronics:**
+- ☑️ Powerbank (long sightseeing days!)
 - ☑️ Adapter (Japanese plugs: Type A/B)
-- ☑️ Pocket WiFi lub SIM card
+- ☑️ Pocket WiFi or SIM card
 
-👕 **Ubrania (Marzec):**
-- ☑️ Lekka kurtka/wiatrówka
-- ☑️ Swetry/bluzy (warstwowe!)
-- ☑️ Wygodne buty do chodzenia
-- ☑️ Parasol kompaktowy
+👕 **Clothing (March):**
+- ☑️ Light jacket/windbreaker
+- ☑️ Sweaters/hoodies (layers!)
+- ☑️ Comfortable walking shoes
+- ☑️ Compact umbrella
 
-💊 **Zdrowie:**
-- ☑️ Podstawowe leki (ból głowy, żołądek)
-- ☑️ Witaminy
-- ☑️ Ubezpieczenie (kopia!)
+💊 **Health:**
+- ☑️ Basic medications (headache, stomach)
+- ☑️ Vitamins
+- ☑️ Insurance (copy!)
 
-🎒 **Przydatne:**
-- ☑️ Mała torba/plecak na dzień
-- ☑️ Butelka wielorazowa
+🎒 **Useful:**
+- ☑️ Small bag/backpack for the day
+- ☑️ Reusable water bottle
 - ☑️ Powerbank
-- ☑️ Gotówka (wiele miejsc bez karty!)
+- ☑️ Cash (many places don't take cards!)
 
-❌ **NIE zabieraj:**
-- Dużej walizki (metra mają schody!)
-- Za dużo ubrań (zrobisz zakupy tam!)`,
+❌ **DON'T bring:**
+- Large suitcase (metros have stairs!)
+- Too many clothes (you'll shop there!)`,
       },
       {
-        category: 'Dokumenty',
-        title: 'Wymagane dokumenty',
-        markdown: `**Co musisz mieć:**
+        category: 'Documents',
+        title: 'Required Documents',
+        markdown: `**What you must have:**
 
-✅ **Paszport:**
-- Ważność: minimum 6 miesięcy od daty wyjazdu
-- Minimum 2 puste strony
+✅ **Passport:**
+- Validity: minimum 6 months from departure date
+- Minimum 2 blank pages
 
-✅ **Ubezpieczenie podróżne:**
-- Obowiązkowe!
-- Pokrycie min. 30,000 EUR
-- Kopia polisy w telefonie + wydruk
+✅ **Travel insurance:**
+- Mandatory!
+- Coverage min. $30,000
+- Copy of policy on phone + printout
 
-✅ **Karta pokładowa:**
-- Online check-in 24h przed lotem
-- Zapisz w telefonie (Google/Apple Wallet)
+✅ **Boarding pass:**
+- Online check-in 24h before flight
+- Save on phone (Google/Apple Wallet)
 
-✅ **Rezerwacje:**
-- Potwierdzenie hotelu (wydruk/PDF)
-- Bilet powrotny (mogą sprawdzić na granicy!)
+✅ **Reservations:**
+- Hotel confirmation (printout/PDF)
+- Return ticket (may be checked at border!)
 
-📱 **W telefonie:**
-- Zdjęcie paszportu
-- Potwierdzenia rezerwacji
-- Numery alarmowe
-- Offline mapy
+📱 **On phone:**
+- Passport photo
+- Reservation confirmations
+- Emergency numbers
+- Offline maps
 
-💡 **Pro tip:** Zrób kopie wszystkiego i wyślij do siebie na email!`,
+💡 **Pro tip:** Make copies of everything and email to yourself!`,
         important: true,
       },
       {
-        category: 'Checklista',
-        title: 'Checklist przed wylotem',
-        markdown: `**3 miesiące przed:**
-- ☑️ Zarezerwuj loty
-- ☑️ Zarezerwuj hotel
-- ☑️ Sprawdź ważność paszportu
+        category: 'Checklist',
+        title: 'Pre-flight Checklist',
+        markdown: `**3 months before:**
+- ☑️ Book flights
+- ☑️ Book hotel
+- ☑️ Check passport validity
 
-**1 miesiąc przed:**
-- ☑️ Wykup ubezpieczenie
-- ☑️ Zamów Pocket WiFi/SIM card
-- ☑️ Zarezerwuj bilety na atrakcje (TeamLab!)
-- ☑️ Wymień część pieniędzy na JPY
+**1 month before:**
+- ☑️ Get travel insurance
+- ☑️ Order Pocket WiFi/SIM card
+- ☑️ Book attraction tickets (TeamLab!)
+- ☑️ Exchange some money to JPY
 
-**1 tydzień przed:**
+**1 week before:**
 - ☑️ Online check-in
-- ☑️ Pobierz offline mapy
-- ☑️ Zainstaluj apps: Google Translate, Google Maps, Suica
-- ☑️ Sprawdź prognozę pogody
+- ☑️ Download offline maps
+- ☑️ Install apps: Google Translate, Google Maps, Suica
+- ☑️ Check weather forecast
 
-**Dzień przed:**
-- ☑️ Spakuj walizkę (max 23kg!)
-- ☑️ Naładuj wszystkie urządzenia
-- ☑️ Wydrukuj potwierdzenia
-- ☑️ Powiadom bank o wyjeździe
+**Day before:**
+- ☑️ Pack luggage (max 23kg!)
+- ☑️ Charge all devices
+- ☑️ Print confirmations
+- ☑️ Notify bank of travel
 
-**Na lotnisku:**
-- ☑️ Paszport + bilet
-- ☑️ Gotówka JPY (minimum 10,000¥)
-- ☑️ Suica card (kup na lotnisku Narita!)`,
+**At airport:**
+- ☑️ Passport + ticket
+- ☑️ Cash JPY (minimum 10,000¥)
+- ☑️ Suica card (buy at Narita airport!)`,
       },
       ...(ratedAttractions.length > 0 ? [{
-        category: 'Atrakcje' as const,
-        title: '⭐ Zaakceptowane atrakcje',
+        category: 'Attractions' as const,
+        title: '⭐ Accepted Attractions',
         markdown: ratedAttractions
           .map(a => {
             const stars = '⭐'.repeat(a.rating || 0);

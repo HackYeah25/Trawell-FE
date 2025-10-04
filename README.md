@@ -1,175 +1,202 @@
-# TravelAI - Aplikacja Podróżnicza MVP
+# TravelAI - Travel Planning App MVP
 
-Nowoczesna aplikacja webowa do planowania podróży z asystentem AI, czatem i zarządzaniem projektami.
+Modern web application for trip planning with AI assistant, chat, and project management.
 
-## 🚀 Funkcjonalności
+## 🚀 Features
 
-### ✅ Jednorazowy Onboarding
-- Czat z 4 pytaniami o preferencje podróżnicze
-- Automatyczne utworzenie pierwszego projektu
-- Inteligentna walidacja odpowiedzi z możliwością doprecyzowania
+### ✅ One-time Onboarding
+- Chat with 4 questions about travel preferences
+- Automatic creation of first project
+- Intelligent answer validation with clarification option
 
-### ✅ Projekty Podróży
-- Chat-first interface do doprecyzowania wymagań
-- Propozycje lokalizacji od AI
-- Tworzenie wielu podróży z jednego projektu
+### ✅ Travel Projects
+- Chat-first interface for refining requirements
+- Location proposals from AI
+- Creating multiple trips from one project
 
-### ✅ Szczegółowe Podróże
-- Interaktywny czat dla konkretnej lokalizacji
-- Panel atrakcji z możliwością akceptacji/odrzucenia
-- Kompleksowe podsumowanie (pogoda, bezpieczeństwo, budżet, transport, etc.)
+### ✅ Detailed Trips
+- Interactive chat for specific location
+- Attractions panel with accept/reject options
+- Comprehensive summary (weather, safety, budget, transport, etc.)
 
-### ✅ Responsywny Design
+### ✅ Responsive Design
 - Mobile-first approach
-- Gradient ocean/sunset theme
-- Płynne animacje i przejścia
+- Ocean/sunset gradient theme
+- Smooth animations and transitions
 - Dark mode ready
 
-### ✅ Dostępność
+### ✅ Accessibility
 - WCAG 2.2 AA compliance
-- Aria-live dla czatu
-- Focus states i keyboard navigation
+- Aria-live for chat
+- Focus states and keyboard navigation
 - Screen reader friendly
 
-## 🛠️ Stack Technologiczny
+## 🛠️ Technology Stack
 
 - **React 18** + **TypeScript** + **Vite**
 - **React Router** - routing
 - **TanStack Query (React Query)** - data fetching & caching
 - **Zustand** - lightweight UI state
-- **Tailwind CSS** - styling z custom design system
+- **Tailwind CSS** - styling with custom design system
 - **shadcn/ui** + **Radix UI** - accessible components
 - **react-markdown** + **remark-gfm** - markdown rendering
-- **MSW (Mock Service Worker)** - mock backend dla developmentu
+- **MSW (Mock Service Worker)** - mock backend for development
 
-## 📦 Instalacja i uruchomienie
+## 📦 Installation and Running
 
 ```bash
-# Instalacja zależności
+# Install dependencies
 npm install
 
-# Uruchomienie dev servera (z mock backendem)
+# Run dev server (with mock backend)
 npm run dev
 
-# Build produkcyjny
+# Production build
 npm run build
 
-# Preview buildu
+# Preview build
 npm run preview
 ```
 
-Aplikacja będzie dostępna pod adresem: http://localhost:8080
+The app will be available at: http://localhost:8080
 
 ## 🎨 Design System
 
-### Kolory
-- **Primary (Ocean Blue):** HSL(210, 85%, 42%) - główny kolor brandowy
-- **Accent (Coral/Sunset):** HSL(16, 85%, 60%) - akcenty i CTA
-- **Success:** HSL(142, 71%, 45%) - pozytywne akcje
-- **Gradienty:** ocean, sunset, sky - dla hero sections i kart
+### Colors
+- **Primary (Ocean Blue):** HSL(210, 85%, 42%) - main brand color
+- **Accent (Coral/Sunset):** HSL(16, 85%, 60%) - accents and CTA
+- **Success:** HSL(142, 71%, 45%) - positive actions
+- **Gradients:** ocean, sunset, sky - for hero sections and cards
 
-### Komponenty
-Wszystkie style są definiowane w design systemie (`index.css` + `tailwind.config.ts`).
-**Nigdy** nie używamy ad-hoc klas jak `text-white` czy `bg-blue-500`.
+### Components
+All styles are defined in the design system (`index.css` + `tailwind.config.ts`).
+**Never** use ad-hoc classes like `text-white` or `bg-blue-500`.
 
-## 📁 Struktura Projektu
+## 📁 Project Structure
 
 ```
 src/
 ├── api/
-│   └── hooks/          # React Query hooks dla API
+│   └── hooks/          # React Query hooks for API
 ├── components/
 │   ├── ui/             # shadcn/ui components
 │   ├── chat/           # ChatThread, ChatMessage, Composer
 │   ├── trips/          # AttractionsPanel, SummaryCard
 │   └── layout/         # AppShell, Navigation
 ├── pages/
-│   ├── Onboarding.tsx  # 4 pytania onboardingowe
-│   ├── History.tsx     # Lista projektów i podróży
-│   ├── ProjectView.tsx # Czat projektu + lokalizacje
-│   └── TripView.tsx    # Czat podróży + atrakcje + podsumowanie
+│   ├── Onboarding.tsx  # 4 onboarding questions
+│   ├── History.tsx     # List of projects and trips
+│   ├── ProjectView.tsx # Project chat + locations
+│   └── TripView.tsx    # Trip chat + attractions + summary
 ├── mocks/
 │   ├── handlers.ts     # MSW request handlers
 │   └── browser.ts      # MSW setup
 ├── store/
-│   └── ui-store.ts     # Zustand store dla UI state
+│   └── ui-store.ts     # Zustand store for UI state
 ├── types/
 │   └── index.ts        # TypeScript types
 └── lib/
-    ├── api-client.ts   # Fetch wrapper z error handling
+    ├── api-client.ts   # Fetch wrapper with error handling
     └── utils.ts        # Utilities (cn, etc.)
 ```
 
-## 🔌 Integracja z Realnym Backendem
+## 🔌 Integration with Real Backend
 
-1. **Ustaw zmienną środowiskową:**
+1. **Set environment variable:**
    ```bash
    VITE_API_URL=https://your-backend.com/api
    ```
 
-2. **Wyłącz MSW w produkcji:**
-   Mock Service Worker jest automatycznie wyłączony w production builds.
+2. **Disable MSW in production:**
+   Mock Service Worker is automatically disabled in production builds.
 
-3. **Kontrakt API:**
-   Backend musi implementować endpointy opisane w pliku `src/mocks/handlers.ts`:
+3. **API Contract:**
+   Backend must implement endpoints described in `src/mocks/handlers.ts`:
    - GET/PATCH `/me`
    - GET `/onboarding/questions`
    - POST `/onboarding/answer`, `/onboarding/complete`
-   - CRUD dla `/projects` i `/trips`
-   - Atrakcje i podsumowania
+   - CRUD for `/projects` and `/trips`
+   - Attractions and summaries
 
-## 🧪 Testy Akceptacyjne (Checklist)
+## 🧪 Acceptance Tests (Checklist)
 
-- [x] Nowy user trafia na onboarding po zalogowaniu
-- [x] 4 pytania z możliwością doprecyzowania
-- [x] Automatyczne utworzenie projektu po zakończeniu
-- [x] Tworzenie podróży z proponowanych lokalizacji
-- [x] Akceptacja/odrzucanie atrakcji z optimistic updates
-- [x] Wyświetlanie kart podsumowania w 10 kategoriach
-- [x] Responsywność mobile/desktop
-- [x] Dostępność z klawiatury i screen readers
+- [x] New user lands on onboarding after login
+- [x] 4 questions with clarification option
+- [x] Automatic project creation after completion
+- [x] Creating trips from proposed locations
+- [x] Accept/reject attractions with optimistic updates
+- [x] Display summary cards in 10 categories
+- [x] Mobile/desktop responsiveness
+- [x] Keyboard and screen reader accessibility
 
-## 🌍 i18n (Przyszłość)
+## 🌍 i18n (Future)
 
-Aplikacja jest gotowa na internationalizację:
-- Wszystkie teksty są w zmiennych (łatwe do wyciągnięcia)
-- Struktura wspiera tłumaczenia
-- Na MVP: polska wersja językowa
+Application is ready for internationalization:
+- All texts are in variables (easy to extract)
+- Structure supports translations
+- MVP: English language version
 
-## 📝 Notatki
+## 📝 Notes
 
-- **Error Handling:** Wszystkie API calle mają retry (2x), error states i toasty
-- **Loading States:** Skeletony, spinners, optimistic updates
+- **Error Handling:** All API calls have retry (2x), error states, and toasts
+- **Loading States:** Skeletons, spinners, optimistic updates
 - **Accessibility:** Aria-labels, focus management, semantic HTML
 - **Performance:** React Query caching, lazy loading, code splitting ready
 
 ## 🌱 Mock Data & Seed Users
 
-Aplikacja zawiera **3 kompletne profile użytkowników** do testowania rozmów grupowych:
+The application contains **3 complete user profiles** for testing group conversations:
 
-**Użytkownicy:** Anna Kowalska (explorer), Tomasz Nowak (relaxer), Maria Wiśniewska (culture)  
-**Projekty:** Alpine Adventure 2025 (`ALPS2025`), Japan Dream Trip (`JPNDREAM`), Caribbean Escape (`CARIBBEAN`)
+### User Accounts
 
-**Zmiana użytkownika (dev):**
+**1. Anna Kowalska** (Mountain Explorer)
+- **Email:** anna@example.com
+- **Password:** password123
+- **Profile:** Adventure seeker, loves trekking and mountains
+- **Preferences:** High activity, hostels, vegetarian
+- **Past trips:** Nepal Himalayas, Patagonia, Iceland
+
+**2. Tomasz Nowak** (Beach Relaxer)
+- **Email:** tomasz@example.com
+- **Password:** password123
+- **Profile:** Luxury beach vacationer, loves relaxation
+- **Preferences:** Low activity, all-inclusive, foodie
+- **Past trips:** Maldives, Zanzibar, Bali
+
+**3. Maria Wiśniewska** (Culture Enthusiast)
+- **Email:** maria@example.com
+- **Password:** password123
+- **Profile:** Urban explorer, architecture and food lover
+- **Preferences:** Medium activity, boutique hotels, gluten-free
+- **Past trips:** Lisbon, Barcelona, Budapest
+
+### Shared Projects
+
+- **Alpine Adventure 2025** - Share code: `ALPS2025` (All 3 users)
+- **Japan Dream Trip** - Share code: `JPNDREAM` (Anna & Maria)
+- **Caribbean Escape** - Share code: `CARIBBEAN` (Tomasz only)
+
+### Change User (Dev Mode)
+
 ```js
-window.__switchUser('user-anna-001') // Anna
+window.__switchUser('user-anna-001')   // Anna
 window.__switchUser('user-tomasz-002') // Tomasz  
-window.__switchUser('user-maria-003') // Maria
+window.__switchUser('user-maria-003')  // Maria
 ```
 
-📁 Szczegóły: `src/lib/seeds/README.md`
+📁 Details: `src/lib/seeds/README.md`
 
 ## 🎯 Roadmap
 
-- [ ] Integracja z realnym backendem AI
-- [ ] Eksport podróży do PDF
-- [ ] Współdzielenie podróży z innymi użytkownikami
-- [ ] Kalendarz i rezerwacje
-- [ ] Mapa interaktywna
+- [ ] Integration with real AI backend
+- [ ] Export trips to PDF
+- [ ] Share trips with other users
+- [ ] Calendar and bookings
+- [ ] Interactive map
 - [ ] Multi-language support
 
 ---
 
-**Autor:** Generated by Lovable AI  
-**Licencja:** MIT  
-**Kontakt:** Dodaj swoje dane kontaktowe
+**Author:** Generated by Lovable AI  
+**License:** MIT  
+**Contact:** Add your contact details

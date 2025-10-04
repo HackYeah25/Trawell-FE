@@ -18,7 +18,7 @@ export function TripTabs({ activeTab, onTabChange, chatContent, summaryContent }
         </TabsTrigger>
         <TabsTrigger value="summary" className="flex items-center gap-2">
           <ClipboardList className="h-4 w-4" />
-          <span>Podsumowanie</span>
+          <span>Summary</span>
         </TabsTrigger>
       </TabsList>
 
