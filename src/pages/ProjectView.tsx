@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, Pencil, Check, X, Share2 } from 'lucide-react';
+import { ChatMessageSkeleton } from '@/components/chat/ChatMessageSkeleton';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -232,7 +233,11 @@ export default function ProjectView() {
     return (
       <AppShell>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-warm-coral" />
+          <div className="space-y-4 w-full max-w-3xl px-4">
+            <ChatMessageSkeleton width="75%" />
+            <ChatMessageSkeleton width="85%" />
+            <ChatMessageSkeleton width="65%" />
+          </div>
         </div>
       </AppShell>
     );

@@ -80,7 +80,7 @@ export const ChatThread = memo(function ChatThread({
       aria-label="Chat messages"
     >
       <div className="px-4 py-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">{/* Reduced from max-w-4xl to max-w-3xl for better desktop width */}
         {/* Load More Button */}
         {hasMore && !isLoadingMore && (
           <div className="flex justify-center mb-6 animate-fade-in">

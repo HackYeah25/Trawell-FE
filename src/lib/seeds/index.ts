@@ -6,6 +6,7 @@ import usersData from './users.json';
 import sharedProjectsData from './shared-projects.json';
 import alpineConversation from './conversations/project-alpine-2025.json';
 import japanConversation from './conversations/project-japan-dream.json';
+import krakowConversation from './conversations/project-krakow-iguana.json';
 import tokyoConversation from './conversations/trip-tokyo.json';
 
 // Type definitions for seed data
@@ -36,6 +37,7 @@ export const seedProjects: SeedProject[] = sharedProjectsData as SeedProject[];
 export const seedConversations: Record<string, ChatMessage[]> = {
   'proj-alpine-2025': alpineConversation as ChatMessage[],
   'proj-japan-dream': japanConversation as ChatMessage[],
+  'proj-krakow-iguana': krakowConversation as ChatMessage[],
 };
 
 // Trip conversations
@@ -124,6 +126,18 @@ export const seedTrips: Trip[] = [
       d.setDate(d.getDate() + 5);
       return d.toISOString();
     })()
+  },
+  {
+    id: 'trip-iguana-bcn',
+    projectId: 'proj-krakow-iguana',
+    locationId: 'loc-krakow',
+    locationName: 'Kraków, Poland',
+    title: 'Krakow Winter Escape',
+    createdAt: '2025-01-10T10:00:00Z',
+    updatedAt: '2025-01-10T10:30:00Z',
+    lastMessagePreview: 'Tomek: Sunrise na Błoniach - genialne! 🌅',
+    startDate: '2025-02-14T00:00:00Z',
+    endDate: '2025-02-17T23:59:59Z'
   }
 ];
 
