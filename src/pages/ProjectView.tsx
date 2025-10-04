@@ -201,14 +201,14 @@ export default function ProjectView() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 group">
+                <div className="flex items-center gap-2">
                   <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
                     {project.title}
                   </h1>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
+                    className="hover:bg-warm-coral/10"
                     onClick={() => {
                       setEditedTitle(project.title);
                       setIsEditingTitle(true);
