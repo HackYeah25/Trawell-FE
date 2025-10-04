@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Plane } from 'lucide-react';
+import { useLogin, useSignup } from '@/api/hooks/use-auth';
 
 interface AuthDialogProps {
   open: boolean;
@@ -24,20 +25,36 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
+  const loginMutation = useLogin();
+  const signupMutation = useSignup();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const user = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      name: isLogin ? email.split('@')[0] : name,
-      onboardingCompleted: false,
-    };
-
-    localStorage.setItem('travelai_user', JSON.stringify(user));
-    navigate('/onboarding');
-    // Dialog will close automatically when route changes
+    if (isLogin) {
+      loginMutation.mutate(
+        { email, password },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            navigate('/onboarding');
+          },
+        }
+      );
+    } else {
+      signupMutation.mutate(
+        { email, password, name },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            navigate('/onboarding');
+          },
+        }
+      );
+    }
   };
+
+  const isLoading = loginMutation.isPending || signupMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -92,8 +109,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-sunset">
-            {isLogin ? 'Sign In' : 'Sign Up'}
+          <Button type="submit" className="w-full bg-gradient-sunset" disabled={isLoading}>
+            {isLoading ? 'Please wait...' : isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
 
           <div className="text-center text-sm">

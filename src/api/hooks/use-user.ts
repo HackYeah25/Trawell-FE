@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
 
 export interface User {
   id: string;
@@ -8,21 +7,23 @@ export interface User {
   onboardingCompleted: boolean;
 }
 
-export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('travelai_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+function getUserFromStorage(): User | null {
+  const storedUser = localStorage.getItem('travelai_user');
+  if (storedUser) {
+    try {
+      return JSON.parse(storedUser);
+    } catch {
+      return null;
     }
-  }, []);
+  }
+  return null;
+}
 
+export function useUser() {
   return useQuery({
     queryKey: ['user'],
-    queryFn: () => user,
-    enabled: !!user,
-    initialData: user,
+    queryFn: getUserFromStorage,
+    staleTime: Infinity,
   });
 }
 

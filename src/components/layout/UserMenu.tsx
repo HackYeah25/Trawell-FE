@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useLogout } from '@/api/hooks/use-auth';
 
 interface UserMenuProps {
   user: {
@@ -20,11 +21,14 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const navigate = useNavigate();
+  const logoutMutation = useLogout();
 
   const handleLogout = () => {
-    localStorage.removeItem('travelai_user');
-    navigate('/');
-    window.location.reload();
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        navigate('/');
+      },
+    });
   };
 
   const getInitials = (name: string) => {
