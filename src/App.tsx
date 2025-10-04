@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from "./api/hooks/use-user";
+import { UpdateNotification } from "./components/pwa/UpdateNotification";
 
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
@@ -89,6 +90,7 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <UpdateNotification />
       <Toaster />
       <Sonner position="top-center" />
       <BrowserRouter>
