@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users as UsersIcon, UserPlus } from 'lucide-react';
+import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProjects, useCreateProject, useJoinProject } from '@/api/hooks/use-projects';
 import { useTrips } from '@/api/hooks/use-trips';
+import { mockLocations, iguanaLocation } from '@/lib/mock-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -71,6 +72,12 @@ export default function History() {
 
   const getProjectTrips = (projectId: string) => {
     return trips?.filter((trip) => trip.projectId === projectId) || [];
+  };
+
+  const getLocationImage = (locationId: string) => {
+    const allLocations = [...mockLocations, iguanaLocation];
+    const location = allLocations.find(loc => loc.id === locationId);
+    return location?.imageUrl;
   };
 
   return (
@@ -213,6 +220,7 @@ export default function History() {
                         <div className="px-4 pb-4 pl-16 space-y-2">
                           {projectTrips.map((trip) => {
                             const isTripSharedNotOwned = isSharedNotOwned;
+                            const locationImage = getLocationImage(trip.locationId);
                             
                             return (
                               <div
@@ -223,17 +231,32 @@ export default function History() {
                                   isTripSharedNotOwned ? "border-warm-turquoise/30" : "border-warm-coral/20 hover:border-warm-coral"
                                 )}
                               >
-                                <div className={cn(
-                                  "w-8 h-8 rounded flex items-center justify-center flex-shrink-0 relative",
-                                  isTripSharedNotOwned ? "bg-warm-turquoise/20" : "bg-warm-turquoise/20"
-                                )}>
-                                  <Plane className="w-4 h-4 text-warm-turquoise" />
-                                  {isTripSharedNotOwned && (
-                                    <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-warm-coral flex items-center justify-center">
-                                      <UsersIcon className="w-2 h-2 text-white" />
-                                    </div>
-                                  )}
-                                </div>
+                                {locationImage ? (
+                                  <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0 relative">
+                                    <img 
+                                      src={locationImage} 
+                                      alt={trip.locationName}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    {isTripSharedNotOwned && (
+                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-warm-coral flex items-center justify-center">
+                                        <UsersIcon className="w-2.5 h-2.5 text-white" />
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className={cn(
+                                    "w-12 h-12 rounded flex items-center justify-center flex-shrink-0 relative",
+                                    isTripSharedNotOwned ? "bg-warm-turquoise/20" : "bg-warm-turquoise/20"
+                                  )}>
+                                    <MapPin className="w-5 h-5 text-warm-turquoise" />
+                                    {isTripSharedNotOwned && (
+                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-warm-coral flex items-center justify-center">
+                                        <UsersIcon className="w-2.5 h-2.5 text-white" />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-sm truncate">{trip.title}</p>
                                   <p className="text-xs text-muted-foreground truncate">

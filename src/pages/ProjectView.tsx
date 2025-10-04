@@ -269,7 +269,16 @@ export default function ProjectView() {
                 </p>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {locationSuggestions.map((location) => {
+                  {locationSuggestions
+                    .sort((a, b) => {
+                      // Sort locations without trips first
+                      const aHasTrip = existingTripLocationIds.includes(a.id);
+                      const bHasTrip = existingTripLocationIds.includes(b.id);
+                      if (aHasTrip && !bHasTrip) return 1;
+                      if (!aHasTrip && bHasTrip) return -1;
+                      return 0;
+                    })
+                    .map((location) => {
                     const hasTrip = existingTripLocationIds.includes(location.id);
                     const isCreating = createTripMutation.isPending && createTripMutation.variables?.selectedLocationId === location.id;
                     

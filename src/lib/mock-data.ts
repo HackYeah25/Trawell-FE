@@ -244,44 +244,47 @@ export const mockLocations: Location[] = [
 ];
 
 // Trip summary template
-export const getTripSummary = (attractions?: Attraction[]): TripSummary => ({
-  sections: [
-    {
-      category: 'Weather',
-      title: 'Weather Conditions',
-      markdown:
-        '**December - March:** Perfect skiing conditions\n\n- Temperature: -5°C to -15°C\n- Snowfall: High\n- Sunshine: 6-7h daily',
-    },
-    {
-      category: 'Safety',
-      title: 'Safety & Health',
-      markdown:
-        '✅ Very safe region\n\n- Rescue services: 24/7\n- Hospital: 15 min\n- Insurance: Recommended',
-      important: true,
-    },
-    {
-      category: 'Budget',
-      title: 'Estimated Costs',
-      markdown:
-        '**Per person (7 days):**\n\n- Ski pass: €280-350\n- Accommodation: €70-150/night\n- Food: €40-60/day\n- Equipment rental: €120-180',
-      tags: ['Premium', 'All-inclusive available'],
-    },
-    {
-      category: 'Transport',
-      title: 'How to Get There',
-      markdown:
-        '**Travel options:**\n\n1. Flight to Geneva + transfer (3h)\n2. Own car from Poland (12-14h)\n3. Organized coach\n\nAirport transfer: €45-60 per person/one-way',
-    },
-    ...(attractions && attractions.length > 0 ? [{
-      category: 'Attractions' as const,
-      title: 'Selected Attractions',
-      markdown: attractions
-        .filter(a => a.decision === 'accepted')
-        .map(a => `**${a.title}**\n${a.description}${a.category ? ` (${a.category})` : ''}`)
-        .join('\n\n') || 'No attractions selected yet',
-    }] : []),
-  ],
-});
+export const getTripSummary = (attractions?: Attraction[]): TripSummary => {
+  const acceptedAttractions = attractions?.filter(a => a.decision === 'accepted') || [];
+  
+  return {
+    sections: [
+      {
+        category: 'Weather',
+        title: 'Weather Conditions',
+        markdown:
+          '**December - March:** Perfect skiing conditions\n\n- Temperature: -5°C to -15°C\n- Snowfall: High\n- Sunshine: 6-7h daily',
+      },
+      {
+        category: 'Safety',
+        title: 'Safety & Health',
+        markdown:
+          '✅ Very safe region\n\n- Rescue services: 24/7\n- Hospital: 15 min\n- Insurance: Recommended',
+        important: true,
+      },
+      {
+        category: 'Budget',
+        title: 'Estimated Costs',
+        markdown:
+          '**Per person (7 days):**\n\n- Ski pass: €280-350\n- Accommodation: €70-150/night\n- Food: €40-60/day\n- Equipment rental: €120-180',
+        tags: ['Premium', 'All-inclusive available'],
+      },
+      {
+        category: 'Transport',
+        title: 'How to Get There',
+        markdown:
+          '**Travel options:**\n\n1. Flight to Geneva + transfer (3h)\n2. Own car from Poland (12-14h)\n3. Organized coach\n\nAirport transfer: €45-60 per person/one-way',
+      },
+      ...(acceptedAttractions.length > 0 ? [{
+        category: 'Attractions' as const,
+        title: 'Worth Seeing',
+        markdown: acceptedAttractions
+          .map(a => `**${a.title}**\n${a.description}${a.category ? ` (${a.category})` : ''}`)
+          .join('\n\n'),
+      }] : []),
+    ],
+  };
+};
 
 // Helper function to update user
 export function updateMockUser(updates: Partial<User>) {
