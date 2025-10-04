@@ -214,6 +214,7 @@ export default function Onboarding() {
             onSend={handleSendMessage}
             disabled={isThinking || completeMutation.isPending || !sessionId}
             placeholder="Your answer..."
+            disableMobileFixed={true}
           />
         </div>
       </div>

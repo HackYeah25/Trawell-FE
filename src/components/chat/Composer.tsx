@@ -11,6 +11,7 @@ interface ComposerProps {
   placeholder?: string;
   className?: string;
   autoFocus?: boolean;
+  disableMobileFixed?: boolean;
 }
 
 export function Composer({
@@ -19,6 +20,7 @@ export function Composer({
   placeholder = 'Type a message...',
   className,
   autoFocus = true,
+  disableMobileFixed = false,
 }: ComposerProps) {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,7 +66,7 @@ export function Composer({
     <div
       className={cn(
         'border-t border-warm-coral/20 bg-card/80 backdrop-blur-md p-3 flex items-end gap-2',
-        isMobile && 'fixed bottom-0 left-0 right-0 z-50',
+        isMobile && !disableMobileFixed && 'fixed bottom-0 left-0 right-0 z-50',
         className
       )}
     >

@@ -208,7 +208,7 @@ export const ChatThread = memo(function ChatThread({
           </div>
         )}
 
-        <div ref={bottomRef} className="h-4" />
+        <div ref={bottomRef} className="h-1 sm:h-2 md:h-3" />
         </div>
       </div>
     </div>
