@@ -1,0 +1,38 @@
+[
+  {
+    "id": "proj-alpine-2025",
+    "title": "Alpine Adventure 2025",
+    "createdAt": "2025-01-10T08:00:00Z",
+    "updatedAt": "2025-01-22T16:45:00Z",
+    "lastMessagePreview": "Maria: Kompromis? Gondola rano, a potem kto chce może...",
+    "isShared": true,
+    "shareCode": "ALPS2025",
+    "ownerId": "user-anna-001",
+    "hasLocationSuggestions": true,
+    "participants": ["user-anna-001", "user-tomasz-002", "user-maria-003"]
+  },
+  {
+    "id": "proj-japan-dream",
+    "title": "Japan Dream Trip",
+    "createdAt": "2024-12-05T10:30:00Z",
+    "updatedAt": "2025-01-21T11:20:00Z",
+    "lastMessagePreview": "Anna: Zaakceptowałam Senso-ji Temple! 🏯",
+    "isShared": true,
+    "shareCode": "JPNDREAM",
+    "ownerId": "user-maria-003",
+    "hasLocationSuggestions": true,
+    "participants": ["user-anna-001", "user-maria-003"]
+  },
+  {
+    "id": "proj-caribbean-escape",
+    "title": "Caribbean Escape",
+    "createdAt": "2025-01-15T14:00:00Z",
+    "updatedAt": "2025-01-20T10:30:00Z",
+    "lastMessagePreview": "Cześć! Szukam ciepłego miejsca z all-inclusive...",
+    "isShared": false,
+    "shareCode": "CARIBBEAN",
+    "ownerId": "user-tomasz-002",
+    "hasLocationSuggestions": true,
+    "participants": ["user-tomasz-002"]
+  }
+]

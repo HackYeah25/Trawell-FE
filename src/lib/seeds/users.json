@@ -1,0 +1,125 @@
+[
+  {
+    "id": "user-anna-001",
+    "name": "Anna Kowalska",
+    "email": "anna@example.com",
+    "onboardingCompleted": true,
+    "profile": {
+      "id": "user-anna-001",
+      "name": "Anna Kowalska",
+      "onboardingCompleted": true,
+      "completeness": 0.95,
+      "preferences": {
+        "traveler_type": "explorer",
+        "activity_level": "high",
+        "accommodation_style": "hostel",
+        "environment": "mountains",
+        "budget_sensitivity": "medium",
+        "culture_interest": "high",
+        "food_importance": "medium"
+      },
+      "constraints": {
+        "dietary_restrictions": ["vegetarian"],
+        "mobility_limitations": [],
+        "climate_preferences": ["cool_cold", "mild_temperate"],
+        "language_preferences": ["English proficient"]
+      },
+      "experience": {
+        "past_destinations": [
+          { "name": "Nepal, Himalaje", "highlight": "Trekking do Base Camp Everestu" },
+          { "name": "Patagonia, Argentyna", "highlight": "Lodowce i dzika przyroda" },
+          { "name": "Islandia", "highlight": "Zorza polarna i gejzery" }
+        ],
+        "wishlist_regions": ["Nowa Zelandia", "Norwegia", "Alaska"]
+      },
+      "insights": {
+        "personaLabel": "Adrenaline Explorer - Górska Pasjonatka",
+        "summaryMarkdown": "Uwielbiasz **intensywne** wyprawy górskie z trekkingiem i aktywnościami outdoorowymi. Preferujesz **hostele i schroniska**, gdzie poznasz innych podróżników. Budżet średni, ale **doświadczenia** są priorytetem.",
+        "topTags": ["mountains", "trekking", "explorer", "adventure", "vegetarian"]
+      },
+      "updatedAt": "2025-01-15T10:30:00Z"
+    }
+  },
+  {
+    "id": "user-tomasz-002",
+    "name": "Tomasz Nowak",
+    "email": "tomasz@example.com",
+    "onboardingCompleted": true,
+    "profile": {
+      "id": "user-tomasz-002",
+      "name": "Tomasz Nowak",
+      "onboardingCompleted": true,
+      "completeness": 0.88,
+      "preferences": {
+        "traveler_type": "relaxer",
+        "activity_level": "low",
+        "accommodation_style": "all_inclusive",
+        "environment": "beach",
+        "budget_sensitivity": "low",
+        "culture_interest": "low",
+        "food_importance": "high"
+      },
+      "constraints": {
+        "dietary_restrictions": [],
+        "mobility_limitations": ["Prefers avoiding long walks"],
+        "climate_preferences": ["hot_tropical"],
+        "language_preferences": ["Prefers Polish-speaking guides"]
+      },
+      "experience": {
+        "past_destinations": [
+          { "name": "Malediwy", "highlight": "Relaks w overwater bungalow" },
+          { "name": "Zanzibar, Tanzania", "highlight": "Plaże i seafood" },
+          { "name": "Bali, Indonezja", "highlight": "Spa i masaże balijskie" }
+        ],
+        "wishlist_regions": ["Karaiby", "Mauritius", "Tajlandia"]
+      },
+      "insights": {
+        "personaLabel": "Luxury Beach Relaxer - Smakosz Spokoju",
+        "summaryMarkdown": "Kochasz **spokojny relaks** na plaży z all-inclusive. Jedzenie i komfort są najważniejsze. Preferujesz **tropikalny klimat** i minimal effort przy zwiedzaniu.",
+        "topTags": ["beach", "luxury", "all-inclusive", "foodie", "spa"]
+      },
+      "updatedAt": "2025-01-18T14:20:00Z"
+    }
+  },
+  {
+    "id": "user-maria-003",
+    "name": "Maria Wiśniewska",
+    "email": "maria@example.com",
+    "onboardingCompleted": true,
+    "profile": {
+      "id": "user-maria-003",
+      "name": "Maria Wiśniewska",
+      "onboardingCompleted": true,
+      "completeness": 0.92,
+      "preferences": {
+        "traveler_type": "mixed",
+        "activity_level": "medium",
+        "accommodation_style": "boutique",
+        "environment": "city",
+        "budget_sensitivity": "medium",
+        "culture_interest": "high",
+        "food_importance": "high"
+      },
+      "constraints": {
+        "dietary_restrictions": ["gluten-free"],
+        "mobility_limitations": [],
+        "climate_preferences": ["mild_temperate"],
+        "language_preferences": ["Multilingual friendly"]
+      },
+      "experience": {
+        "past_destinations": [
+          { "name": "Lizbona, Portugalia", "highlight": "Pastel de nata i tramwaje" },
+          { "name": "Barcelona, Hiszpania", "highlight": "Gaudí i tapas" },
+          { "name": "Budapeszt, Węgry", "highlight": "Termy i ruin bary" }
+        ],
+        "wishlist_regions": ["Japonia", "Portugalia (Porto)", "Grecja"]
+      },
+      "insights": {
+        "personaLabel": "Urban Culture Enthusiast - Miejska Esteta",
+        "summaryMarkdown": "Mix **kultury i relaksu** w europejskich miastach. Uwielbiasz **butikowe hotele**, lokalną kuchnię i architekturę. Średnio-intensywne zwiedzanie z przerwami na kawę i jedzenie.",
+        "topTags": ["city", "culture", "architecture", "foodie", "boutique"]
+      },
+      "updatedAt": "2025-01-20T09:15:00Z"
+    }
+  }
+]

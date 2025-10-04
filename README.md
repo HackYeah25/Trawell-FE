@@ -143,6 +143,22 @@ Aplikacja jest gotowa na internationalizację:
 - **Accessibility:** Aria-labels, focus management, semantic HTML
 - **Performance:** React Query caching, lazy loading, code splitting ready
 
+## 🌱 Mock Data & Seed Users
+
+Aplikacja zawiera **3 kompletne profile użytkowników** do testowania rozmów grupowych:
+
+**Użytkownicy:** Anna Kowalska (explorer), Tomasz Nowak (relaxer), Maria Wiśniewska (culture)  
+**Projekty:** Alpine Adventure 2025 (`ALPS2025`), Japan Dream Trip (`JPNDREAM`), Caribbean Escape (`CARIBBEAN`)
+
+**Zmiana użytkownika (dev):**
+```js
+window.__switchUser('user-anna-001') // Anna
+window.__switchUser('user-tomasz-002') // Tomasz  
+window.__switchUser('user-maria-003') // Maria
+```
+
+📁 Szczegóły: `src/lib/seeds/README.md`
+
 ## 🎯 Roadmap
 
 - [ ] Integracja z realnym backendem AI

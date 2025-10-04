@@ -8,14 +8,37 @@ import type {
   Attraction,
   TripSummary,
 } from '@/types';
+import { 
+  seedUsers, 
+  seedProjects, 
+  seedConversations, 
+  seedTripConversations,
+  seedAttractions,
+  seedTrips,
+  getSeedUserById,
+  getSeedProjectsForUser 
+} from './seeds';
 
-// User data
-export let mockUser: User = {
-  id: '1',
-  name: 'Jan Kowalski',
-  email: 'jan@example.com',
-  onboardingCompleted: false,
-};
+// Get current user from storage
+function getCurrentUserId(): string {
+  const storedUser = localStorage.getItem('travelai_user');
+  if (storedUser) {
+    try {
+      const user = JSON.parse(storedUser);
+      return user.id;
+    } catch {
+      return 'user-anna-001';
+    }
+  }
+  return 'user-anna-001';
+}
+
+// User data - dynamically from seed
+export let mockUser: User = (() => {
+  const userId = getCurrentUserId();
+  const seedUser = getSeedUserById(userId);
+  return seedUser || seedUsers[0];
+})();
 
 // Initial project questions (asked when starting a new project)
 export const initialProjectQuestions: ChatMessage[] = [
@@ -82,66 +105,93 @@ export const postAttractionQuestions: OnboardingQuestion[] = [
   },
 ];
 
-// Default projects and trips
-export let mockProjects: Project[] = [
-  {
+// Projects and trips - merge seed data with defaults
+export let mockProjects: Project[] = (() => {
+  const userId = getCurrentUserId();
+  const userProjects = getSeedProjectsForUser(userId);
+  
+  // Add default project if user has no seed projects
+  const defaultProject: Project = {
     id: 'default-proj-1',
     title: 'My Summer Adventure 2025',
     createdAt: new Date('2025-01-15').toISOString(),
     lastMessagePreview: 'Planning an amazing summer getaway...',
     isShared: false,
-    hasLocationSuggestions: true, // Has location suggestions ready
-  },
-];
+    hasLocationSuggestions: true,
+  };
+  
+  return userProjects.length > 0 ? [...userProjects, defaultProject] : [defaultProject];
+})();
 
-export let mockTrips: Trip[] = [
-  {
-    id: 'default-trip-1',
-    projectId: 'default-proj-1',
-    locationId: 'loc1',
-    locationName: 'Val Thorens, France',
-    title: 'Val Thorens Ski Trip',
-    createdAt: new Date('2025-01-16').toISOString(),
-  },
-  {
-    id: 'default-trip-2',
-    projectId: 'default-proj-1',
-    locationId: 'loc2',
-    locationName: 'Livigno, Italy',
-    title: 'Livigno Winter Escape',
-    createdAt: new Date('2025-01-17').toISOString(),
-  },
-];
-
-export let mockProjectMessages: Record<string, ChatMessage[]> = {
-  'default-proj-1': [
+export let mockTrips: Trip[] = (() => {
+  // Get trips from seed data
+  const userTrips = seedTrips.filter(trip => {
+    const project = seedProjects.find(p => p.id === trip.projectId);
+    return project?.participants.includes(getCurrentUserId());
+  });
+  
+  // Add default trips
+  const defaultTrips: Trip[] = [
     {
-      id: 'initial-msg-1',
-      role: 'assistant',
-      markdown: 'Welcome to your summer adventure planning! I\'ve prepared some great destinations for you.',
-      createdAt: new Date('2025-01-15').toISOString(),
-    },
-  ],
-};
-
-export let mockTripMessages: Record<string, ChatMessage[]> = {
-  'default-trip-1': [
-    {
-      id: 'trip-msg-1',
-      role: 'assistant',
-      markdown: 'Welcome to **Val Thorens**! 🎿\n\nThis is the highest ski resort in Europe. What activities interest you?',
+      id: 'default-trip-1',
+      projectId: 'default-proj-1',
+      locationId: 'loc1',
+      locationName: 'Val Thorens, France',
+      title: 'Val Thorens Ski Trip',
       createdAt: new Date('2025-01-16').toISOString(),
     },
-  ],
-  'default-trip-2': [
     {
-      id: 'trip-msg-2',
-      role: 'assistant',
-      markdown: 'Welcome to **Livigno**! 🏔️\n\nA duty-free paradise in the Alps. Let\'s plan your perfect trip!',
+      id: 'default-trip-2',
+      projectId: 'default-proj-1',
+      locationId: 'loc2',
+      locationName: 'Livigno, Italy',
+      title: 'Livigno Winter Escape',
       createdAt: new Date('2025-01-17').toISOString(),
     },
-  ],
-  'trip-iguana-bcn': [
+  ];
+  
+  return [...userTrips, ...defaultTrips];
+})();
+
+export let mockProjectMessages: Record<string, ChatMessage[]> = (() => {
+  const messages: Record<string, ChatMessage[]> = {
+    'default-proj-1': [
+      {
+        id: 'initial-msg-1',
+        role: 'assistant',
+        markdown: 'Welcome to your summer adventure planning! I\'ve prepared some great destinations for you.',
+        createdAt: new Date('2025-01-15').toISOString(),
+      },
+    ],
+  };
+  
+  // Merge with seed conversations
+  Object.entries(seedConversations).forEach(([projectId, msgs]) => {
+    messages[projectId] = msgs;
+  });
+  
+  return messages;
+})();
+
+export let mockTripMessages: Record<string, ChatMessage[]> = (() => {
+  const messages: Record<string, ChatMessage[]> = {
+    'default-trip-1': [
+      {
+        id: 'trip-msg-1',
+        role: 'assistant',
+        markdown: 'Welcome to **Val Thorens**! 🎿\n\nThis is the highest ski resort in Europe. What activities interest you?',
+        createdAt: new Date('2025-01-16').toISOString(),
+      },
+    ],
+    'default-trip-2': [
+      {
+        id: 'trip-msg-2',
+        role: 'assistant',
+        markdown: 'Welcome to **Livigno**! 🏔️\n\nA duty-free paradise in the Alps. Let\'s plan your perfect trip!',
+        createdAt: new Date('2025-01-17').toISOString(),
+      },
+    ],
+    'trip-iguana-bcn': [
     {
       id: 'iguana-msg-1',
       role: 'assistant',
@@ -216,9 +266,18 @@ export let mockTripMessages: Record<string, ChatMessage[]> = {
       createdAt: new Date('2025-01-09T11:35:00').toISOString(),
     },
   ],
-};
+  };
+  
+  // Merge with seed trip conversations
+  Object.entries(seedTripConversations).forEach(([tripId, msgs]) => {
+    messages[tripId] = msgs;
+  });
+  
+  return messages;
+})();
 
-export let mockAttractions: Record<string, Attraction[]> = {
+export let mockAttractions: Record<string, Attraction[]> = (() => {
+  const attractions: Record<string, Attraction[]> = {
   'default-trip-1': [
     {
       id: 'attr-vt-1',
@@ -285,7 +344,15 @@ export let mockAttractions: Record<string, Attraction[]> = {
       decision: 'accepted',
     },
   ],
-};
+  };
+  
+  // Merge with seed attractions
+  Object.entries(seedAttractions).forEach(([tripId, attrs]) => {
+    attractions[tripId] = attrs;
+  });
+  
+  return attractions;
+})();
 
 // Special shared project (only accessible via ABC123 code)
 export const specialSharedProject: Project = {

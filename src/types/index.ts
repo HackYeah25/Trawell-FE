@@ -131,3 +131,23 @@ export interface TripSummarySection {
 export interface TripSummary {
   sections: TripSummarySection[];
 }
+
+// Seed data types
+export interface SeedUser extends User {
+  profile: import('@/types/profile').UserProfile;
+}
+
+export interface SeedProject extends Project {
+  participants: string[]; // User IDs
+}
+
+export interface SeedConversation {
+  projectId: string;
+  messages: ChatMessage[];
+}
+
+export interface SeedTrip {
+  tripId: string;
+  messages: ChatMessage[];
+  attractions: Attraction[];
+}
