@@ -8,7 +8,7 @@ import { useUser } from "./api/hooks/use-user";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import History from "./pages/History";
-import ProjectView from "./pages/ProjectView";
+import ProjectView from "./pages/BraistormView";
 import TripView from "./pages/TripView";
 import NotFound from "./pages/NotFound";
 

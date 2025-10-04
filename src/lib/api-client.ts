@@ -2,7 +2,7 @@ import type {
   User, 
   OnboardingQuestion, 
   OnboardingAnswerResponse,
-  Project,
+  Brainstorm,
   Trip,
   ChatMessage,
   Location,
@@ -69,22 +69,22 @@ export const apiClient = {
       return mockFetch(mockBrainstorms as T);
     }
 
-    // Single project
+    // Single Brainstorm
     if (endpoint.match(/^\/brainstorms\/[^/]+$/)) {
       const projectId = endpoint.split('/')[2];
-      const project = mockBrainstorms.find((p) => p.id === projectId);
-      if (!project) throw new ApiError('Project not found', 404);
-      return mockFetch(project as T);
+      const Brainstorm = mockBrainstorms.find((p) => p.id === projectId);
+      if (!Brainstorm) throw new ApiError('Brainstorm not found', 404);
+      return mockFetch(Brainstorm as T);
     }
 
-    // Project messages
+    // Brainstorm messages
     if (endpoint.match(/^\/brainstorms\/[^/]+\/messages$/)) {
       const projectId = endpoint.split('/')[2];
       const messages = mockProjectMessages[projectId] || [];
       return mockFetch({ messages, nextCursor: null } as T);
     }
 
-    // Project location suggestions
+    // Brainstorm location suggestions
     if (endpoint.match(/^\/brainstorms\/[^/]+\/locations\/suggestions$/)) {
       return mockFetch(mockLocations as T, 400);
     }
@@ -131,16 +131,16 @@ export const apiClient = {
       return mockFetch(mockUser as T);
     }
 
-    // Update project
+    // Update Brainstorm
     if (endpoint.match(/^\/brainstorms\/[^/]+$/)) {
       await mockDelay(300);
       const projectId = endpoint.split('/')[2];
-      const project = mockBrainstorms.find((p) => p.id === projectId);
-      if (!project) throw new ApiError('Project not found', 404);
+      const Brainstorm = mockBrainstorms.find((p) => p.id === projectId);
+      if (!Brainstorm) throw new ApiError('Brainstorm not found', 404);
       
-      const updates = data as Partial<Project>;
-      Object.assign(project, updates);
-      return mockFetch(project as T);
+      const updates = data as Partial<Brainstorm>;
+      Object.assign(Brainstorm, updates);
+      return mockFetch(Brainstorm as T);
     }
 
     // Update trip
@@ -195,7 +195,7 @@ export const apiClient = {
     if (endpoint === '/onboarding/complete') {
       await mockDelay(800);
 
-      const newProject: Project = {
+      const newProject: Brainstorm = {
         id: `proj-${Date.now()}`,
         title: 'Moja wymarzona podróż',
         createdAt: new Date().toISOString(),
@@ -217,14 +217,14 @@ export const apiClient = {
       return { projectId: newProject.id } as T;
     }
 
-    // Create new project
+    // Create new Brainstorm
     if (endpoint === '/brainstorms') {
       await mockDelay(400);
       const body = data as { title?: string; isShared?: boolean };
 
-      const newProject: Project = {
+      const newProject: Brainstorm = {
         id: `proj-${Date.now()}`,
-        title: body.title || 'New Project',
+        title: body.title || 'New Brainstorm',
         createdAt: new Date().toISOString(),
         isShared: body.isShared || false,
       };
@@ -240,21 +240,21 @@ export const apiClient = {
       return { id: newProject.id, shareCode: newProject.shareCode } as T;
     }
 
-    // Join shared project
+    // Join shared Brainstorm
     if (endpoint === '/brainstorms/join') {
       await mockDelay(600);
       const body = data as { shareCode: string };
 
-      const project = mockBrainstorms.find((p) => p.shareCode === body.shareCode);
-      if (!project) {
-        throw new ApiError('Project not found with that share code', 404);
+      const Brainstorm = mockBrainstorms.find((p) => p.shareCode === body.shareCode);
+      if (!Brainstorm) {
+        throw new ApiError('Brainstorm not found with that share code', 404);
       }
 
-      // In a real app, this would add the user to the project participants
-      return { projectId: project.id } as T;
+      // In a real app, this would add the user to the Brainstorm participants
+      return { projectId: Brainstorm.id } as T;
     }
 
-    // Send project message
+    // Send Brainstorm message
     if (endpoint.match(/^\/brainstorms\/[^/]+\/messages$/)) {
       await mockDelay(800);
       const projectId = endpoint.split('/')[2];

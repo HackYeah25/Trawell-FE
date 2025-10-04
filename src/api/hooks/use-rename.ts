@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import type { Project, Trip } from '@/types';
+import type { Brainstorm, Trip } from '@/types';
 
 export function useRenameProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: { projectId: string; title: string }) =>
-      apiClient.patch<Project>(`/brainstorms/${data.projectId}`, { title: data.title }),
+      apiClient.patch<Brainstorm>(`/brainstorms/${data.projectId}`, { title: data.title }),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['project', variables.projectId] });
+      queryClient.invalidateQueries({ queryKey: ['Brainstorm', variables.projectId] });
       queryClient.invalidateQueries({ queryKey: ['brainstorms'] });
     },
   });

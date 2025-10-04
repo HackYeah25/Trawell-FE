@@ -24,10 +24,10 @@ export function ProjectTypeDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
-            Create New Project
+            Create New Brainstorm
           </DialogTitle>
           <DialogDescription>
-            Choose the type of project you want to create
+            Choose the type of Brainstorm you want to create
           </DialogDescription>
         </DialogHeader>
 
@@ -42,7 +42,7 @@ export function ProjectTypeDialog({
                 <Lock className="w-5 h-5 text-warm-coral" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold">Private Project</div>
+                <div className="font-semibold">Private Brainstorm</div>
                 <div className="text-sm text-muted-foreground">Only you can access</div>
               </div>
             </div>
@@ -58,7 +58,7 @@ export function ProjectTypeDialog({
                 <Users className="w-5 h-5 text-warm-turquoise" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold">Shared Project</div>
+                <div className="font-semibold">Shared Brainstorm</div>
                 <div className="text-sm text-muted-foreground">
                   Collaborate with others via share code
                 </div>

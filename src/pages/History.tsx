@@ -26,11 +26,11 @@ export default function History() {
   const handleSelectProjectType = (isShared: boolean) => {
     setShowProjectTypeDialog(false);
     createProjectMutation.mutate(
-      { title: 'New Project', isShared },
+      { title: 'New Brainstorm', isShared },
       {
         onSuccess: (result) => {
           if (isShared && result.shareCode) {
-            toast.success(`Project created! Share code: ${result.shareCode}`);
+            toast.success(`Brainstorm created! Share code: ${result.shareCode}`);
           }
           navigate(`/app/brainstorms/${result.id}`);
         },
@@ -44,7 +44,7 @@ export default function History() {
       {
         onSuccess: (result) => {
           setShowJoinDialog(false);
-          toast.success('Joined project successfully!');
+          toast.success('Joined Brainstorm successfully!');
           navigate(`/app/brainstorms/${result.projectId}`);
         },
         onError: () => {
@@ -83,7 +83,7 @@ export default function History() {
               className="hidden sm:flex"
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              Join Project
+              Join Brainstorm
             </Button>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
@@ -91,7 +91,7 @@ export default function History() {
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
             >
               <Plus className="w-4 h-4 mr-2" />
-              New Project
+              New Brainstorm
             </Button>
           </div>
         </div>
@@ -115,28 +115,28 @@ export default function History() {
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Your First Project
+              Create Your First Brainstorm
             </Button>
           </Card>
         ) : (
           <div className="space-y-2">
-            {brainstorms.map((project) => {
-              const projectTrips = getProjectTrips(project.id);
-              const isExpanded = expandedBrainstorms.has(project.id);
+            {brainstorms.map((Brainstorm) => {
+              const projectTrips = getProjectTrips(Brainstorm.id);
+              const isExpanded = expandedBrainstorms.has(Brainstorm.id);
 
               return (
                 <Collapsible
-                  key={project.id}
+                  key={Brainstorm.id}
                   open={isExpanded}
-                  onOpenChange={() => toggleProject(project.id)}
+                  onOpenChange={() => toggleProject(Brainstorm.id)}
                 >
                   <Card className="border-warm-coral/20 bg-card/80 backdrop-blur-sm">
-                    {/* Project header */}
+                    {/* Brainstorm header */}
                     <CollapsibleTrigger asChild>
                       <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-warm-coral/5 transition-colors">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
-                            {project.isShared ? (
+                            {Brainstorm.isShared ? (
                               <Users className="w-5 h-5 text-white" />
                             ) : (
                               <FolderKanban className="w-5 h-5 text-white" />
@@ -144,8 +144,8 @@ export default function History() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold truncate">{project.title}</h3>
-                              {project.isShared && (
+                              <h3 className="font-semibold truncate">{Brainstorm.title}</h3>
+                              {Brainstorm.isShared && (
                                 <Badge variant="secondary" className="text-xs">
                                   Shared
                                 </Badge>
@@ -153,7 +153,7 @@ export default function History() {
                             </div>
                              <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {new Date(project.createdAt).toLocaleDateString('en-US')}
+                              {new Date(Brainstorm.createdAt).toLocaleDateString('en-US')}
                               {projectTrips.length > 0 && (
                                 <>
                                   <span className="mx-1">•</span>
@@ -170,7 +170,7 @@ export default function History() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/app/brainstorms/${project.id}`);
+                              navigate(`/app/brainstorms/${Brainstorm.id}`);
                             }}
                             className="hover:bg-warm-coral/10"
                           >
@@ -185,11 +185,11 @@ export default function History() {
                       </div>
                     </CollapsibleTrigger>
 
-                    {/* Project trips */}
+                    {/* Brainstorm trips */}
                     <CollapsibleContent>
                       {projectTrips.length === 0 ? (
                         <div className="px-4 pb-4 pl-16 text-sm text-muted-foreground">
-                          No trips in this project yet
+                          No trips in this Brainstorm yet
                         </div>
                       ) : (
                         <div className="px-4 pb-4 pl-16 space-y-2">

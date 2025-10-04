@@ -40,10 +40,10 @@ export function JoinProjectDialog({
         <DialogHeader>
           <DialogTitle className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent flex items-center gap-2">
             <UserPlus className="w-6 h-6 text-warm-coral" />
-            Join Shared Project
+            Join Shared Brainstorm
           </DialogTitle>
           <DialogDescription>
-            Enter the share code to join an existing project
+            Enter the share code to join an existing Brainstorm
           </DialogDescription>
         </DialogHeader>
 
@@ -61,7 +61,7 @@ export function JoinProjectDialog({
                 autoFocus
               />
               <p className="text-xs text-muted-foreground">
-                Ask the project owner for the 6-character code
+                Ask the Brainstorm owner for the 6-character code
               </p>
             </div>
           </div>
@@ -80,7 +80,7 @@ export function JoinProjectDialog({
               disabled={!shareCode.trim() || isLoading}
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
             >
-              {isLoading ? 'Joining...' : 'Join Project'}
+              {isLoading ? 'Joining...' : 'Join Brainstorm'}
             </Button>
           </DialogFooter>
         </form>

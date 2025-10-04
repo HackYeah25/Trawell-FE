@@ -53,7 +53,7 @@ export interface OnboardingAnswerResponse {
   followupMarkdown?: string;
 }
 
-export interface Project {
+export interface Brainstorm {
   id: ID;
   title: string;
   createdAt: string;

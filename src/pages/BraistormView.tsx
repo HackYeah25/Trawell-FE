@@ -27,7 +27,7 @@ export default function ProjectView() {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
 
-  const { data: project } = useProject(projectId!);
+  const { data: Brainstorm } = useProject(projectId!);
   const { data: messagesData } = useProjectMessages(projectId!);
   const { data: locationSuggestions } = useProjectLocationSuggestions(projectId!);
   const sendMessageMutation = useSendProjectMessage();
@@ -62,13 +62,13 @@ export default function ProjectView() {
       });
       setIsEditingTitle(false);
     } catch (error) {
-      console.error('Error renaming project:', error);
+      console.error('Error renaming Brainstorm:', error);
     }
   };
 
   const handleCancelEdit = () => {
     setIsEditingTitle(false);
-    setEditedTitle(project?.title || '');
+    setEditedTitle(Brainstorm?.title || '');
   };
 
   const handleSendMessage = async (text: string) => {
@@ -140,7 +140,7 @@ export default function ProjectView() {
     }
   };
 
-  if (!projectId || !project) {
+  if (!projectId || !Brainstorm) {
     return (
       <AppShell>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -184,14 +184,14 @@ export default function ProjectView() {
               ) : (
                 <div className="flex items-center gap-2 group">
                   <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
-                    {project.title}
+                    {Brainstorm.title}
                   </h1>
                   <Button
                     size="icon"
                     variant="ghost"
                     className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
                     onClick={() => {
-                      setEditedTitle(project.title);
+                      setEditedTitle(Brainstorm.title);
                       setIsEditingTitle(true);
                     }}
                   >
@@ -200,13 +200,13 @@ export default function ProjectView() {
                 </div>
               )}
               <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
+                Travel Brainstorm · {new Date(Brainstorm.createdAt).toLocaleDateString('en-US')}
               </p>
             </div>
 
             {/* Share Code Display for Shared brainstorms */}
-            {project.isShared && project.shareCode && (
-              <ShareCodeDisplay shareCode={project.shareCode} />
+            {Brainstorm.isShared && Brainstorm.shareCode && (
+              <ShareCodeDisplay shareCode={Brainstorm.shareCode} />
             )}
           </div>
         </div>

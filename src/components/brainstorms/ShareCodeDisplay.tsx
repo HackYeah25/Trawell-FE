@@ -38,7 +38,7 @@ export function ShareCodeDisplay({ shareCode, participants = [] }: ShareCodeDisp
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Users className="w-5 h-5 text-warm-turquoise" />
-          Shared Project
+          Shared Brainstorm
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

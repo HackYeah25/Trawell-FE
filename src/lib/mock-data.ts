@@ -1,7 +1,7 @@
 import type {
   User,
   OnboardingQuestion,
-  Project,
+  Brainstorm,
   Trip,
   ChatMessage,
   Location,
@@ -17,7 +17,7 @@ export let mockUser: User = {
   onboardingCompleted: false,
 };
 
-// Initial project questions (asked when starting a new project)
+// Initial Brainstorm questions (asked when starting a new Brainstorm)
 export const initialProjectQuestions: ChatMessage[] = [
   {
     id: 'pq1',
@@ -83,7 +83,7 @@ export const postAttractionQuestions: OnboardingQuestion[] = [
 ];
 
 // brainstorms and trips
-export let mockBrainstorms: Project[] = [];
+export let mockBrainstorms: Brainstorm[] = [];
 export let mockTrips: Trip[] = [];
 export let mockProjectMessages: Record<string, ChatMessage[]> = {};
 export let mockTripMessages: Record<string, ChatMessage[]> = {};

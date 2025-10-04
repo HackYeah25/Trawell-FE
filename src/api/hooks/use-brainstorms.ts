@@ -5,26 +5,26 @@ import {
   useInfiniteQuery,
 } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import type { Project, ChatMessage, Location } from '@/types';
+import type { Brainstorm, ChatMessage, Location } from '@/types';
 
 export function useBrainstorms() {
   return useQuery({
     queryKey: ['brainstorms'],
-    queryFn: () => apiClient.get<Project[]>('/brainstorms'),
+    queryFn: () => apiClient.get<Brainstorm[]>('/brainstorms'),
   });
 }
 
 export function useProject(projectId: string) {
   return useQuery({
-    queryKey: ['project', projectId],
-    queryFn: () => apiClient.get<Project>(`/brainstorms/${projectId}`),
+    queryKey: ['Brainstorm', projectId],
+    queryFn: () => apiClient.get<Brainstorm>(`/brainstorms/${projectId}`),
     enabled: !!projectId,
   });
 }
 
 export function useProjectMessages(projectId: string) {
   return useInfiniteQuery({
-    queryKey: ['project', projectId, 'messages'],
+    queryKey: ['Brainstorm', projectId, 'messages'],
     queryFn: ({ pageParam = null }) => {
       const params = pageParam ? `?cursor=${pageParam}` : '';
       return apiClient.get<{ messages: ChatMessage[]; nextCursor: string | null }>(
@@ -48,7 +48,7 @@ export function useSendProjectMessage() {
       ),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['project', variables.projectId, 'messages'],
+        queryKey: ['Brainstorm', variables.projectId, 'messages'],
       });
     },
   });
@@ -56,7 +56,7 @@ export function useSendProjectMessage() {
 
 export function useProjectLocationSuggestions(projectId: string) {
   return useQuery({
-    queryKey: ['project', projectId, 'locations', 'suggestions'],
+    queryKey: ['Brainstorm', projectId, 'locations', 'suggestions'],
     queryFn: () =>
       apiClient.get<Location[]>(`/brainstorms/${projectId}/locations/suggestions`),
     enabled: !!projectId,
