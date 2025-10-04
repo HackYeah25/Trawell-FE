@@ -116,12 +116,8 @@ export default function Onboarding() {
           // Mark user as onboarded
           await updateUserMutation.mutateAsync({ onboardingCompleted: true });
 
-          toast.success('Onboarding ukończony!');
-
           // Redirect to first project
-          setTimeout(() => {
-            navigate(`/app/projects/${result.projectId}`);
-          }, 1500);
+          navigate(`/app/projects/${result.projectId}`);
         }
       }
     } catch (error) {
@@ -131,7 +127,7 @@ export default function Onboarding() {
           msg.id === userMessage.id ? { ...msg, status: 'error' } : msg
         )
       );
-      toast.error('Nie udało się wysłać odpowiedzi. Spróbuj ponownie.');
+      console.error('Failed to send answer');
     }
   };
 

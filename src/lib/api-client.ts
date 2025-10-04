@@ -125,6 +125,30 @@ export const apiClient = {
       return mockFetch(mockUser as T);
     }
 
+    // Update project
+    if (endpoint.match(/^\/projects\/[^/]+$/)) {
+      await mockDelay(300);
+      const projectId = endpoint.split('/')[2];
+      const project = mockProjects.find((p) => p.id === projectId);
+      if (!project) throw new ApiError('Project not found', 404);
+      
+      const updates = data as Partial<Project>;
+      Object.assign(project, updates);
+      return mockFetch(project as T);
+    }
+
+    // Update trip
+    if (endpoint.match(/^\/trips\/[^/]+$/)) {
+      await mockDelay(300);
+      const tripId = endpoint.split('/')[2];
+      const trip = mockTrips.find((t) => t.id === tripId);
+      if (!trip) throw new ApiError('Trip not found', 404);
+      
+      const updates = data as Partial<Trip>;
+      Object.assign(trip, updates);
+      return mockFetch(trip as T);
+    }
+
     throw new ApiError(`Unknown endpoint: ${endpoint}`, 404);
   },
 

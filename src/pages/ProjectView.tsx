@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Pencil, Check, X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   useProject,
   useProjectMessages,
@@ -13,7 +14,7 @@ import {
   useProjectLocationSuggestions,
   useCreateTripFromLocation,
 } from '@/api/hooks/use-projects';
-import { toast } from 'sonner';
+import { useRenameProject } from '@/api/hooks/use-rename';
 import { initialProjectQuestions } from '@/lib/mock-data';
 import type { ChatMessage } from '@/types';
 
@@ -22,12 +23,15 @@ export default function ProjectView() {
   const navigate = useNavigate();
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
 
   const { data: project } = useProject(projectId!);
   const { data: messagesData } = useProjectMessages(projectId!);
   const { data: locationSuggestions } = useProjectLocationSuggestions(projectId!);
   const sendMessageMutation = useSendProjectMessage();
   const createTripMutation = useCreateTripFromLocation();
+  const renameMutation = useRenameProject();
 
   // Initialize with questions and flatten paginated messages
   useEffect(() => {
@@ -43,6 +47,28 @@ export default function ProjectView() {
       }
     }
   }, [messagesData]);
+
+  const handleSaveTitle = async () => {
+    if (!projectId || !editedTitle.trim()) {
+      setIsEditingTitle(false);
+      return;
+    }
+
+    try {
+      await renameMutation.mutateAsync({
+        projectId,
+        title: editedTitle.trim(),
+      });
+      setIsEditingTitle(false);
+    } catch (error) {
+      console.error('Error renaming project:', error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingTitle(false);
+    setEditedTitle(project?.title || '');
+  };
 
   const handleSendMessage = async (text: string) => {
     if (!projectId) return;
@@ -94,7 +120,7 @@ export default function ProjectView() {
       setLocalMessages((prev) =>
         prev.map((m) => (m.id === tempMessage.id ? { ...m, status: 'error' } : m))
       );
-      toast.error('Nie udało się wysłać wiadomości');
+      console.error('Failed to send message');
     }
   };
 
@@ -107,11 +133,9 @@ export default function ProjectView() {
         selectedLocationId: locationId,
       });
 
-      toast.success('Podróż utworzona!');
       navigate(`/app/trips/${result.tripId}`);
     } catch (error) {
       console.error('Error creating trip:', error);
-      toast.error('Nie udało się utworzyć podróży');
     }
   };
 
@@ -136,7 +160,41 @@ export default function ProjectView() {
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold truncate">{project.title}</h1>
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveTitle();
+                    if (e.key === 'Escape') handleCancelEdit();
+                  }}
+                  className="text-xl md:text-2xl font-bold"
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 group">
+                <h1 className="text-xl md:text-2xl font-bold truncate">{project.title}</h1>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => {
+                    setEditedTitle(project.title);
+                    setIsEditingTitle(true);
+                  }}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
             <p className="text-xs md:text-sm text-muted-foreground mt-1">
               Projekt podróży · {new Date(project.createdAt).toLocaleDateString('pl-PL')}
             </p>
@@ -153,35 +211,46 @@ export default function ProjectView() {
             />
           </div>
 
-          {/* Location Suggestions - Above Composer */}
+          {/* Location Suggestions - Full Screen */}
           {showLocationSuggestions && (
-            <div className="border-t border-border bg-muted/30 p-3 md:p-4 flex-shrink-0 overflow-y-auto max-h-[40vh]">
-              <div className="max-w-4xl mx-auto space-y-3">
-                <h3 className="font-semibold flex items-center gap-2 text-sm md:text-base">
-                  <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <div className="absolute inset-0 bg-background z-10 overflow-y-auto">
+              <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <MapPin className="w-6 h-6 text-primary" />
                   Proponowane lokalizacje
-                </h3>
+                </h2>
+                <p className="text-muted-foreground">
+                  Wybierz lokalizację, aby rozpocząć planowanie podróży
+                </p>
 
-                <div className="grid gap-2 md:gap-3 sm:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {locationSuggestions.map((location) => (
                     <Card
                       key={location.id}
-                      className="cursor-pointer transition-all hover:shadow-md"
+                      className="cursor-pointer transition-all hover:shadow-lg overflow-hidden group"
                     >
-                      <CardHeader className="p-3 md:p-4">
-                        <CardTitle className="text-sm md:text-base">
+                      {location.imageUrl && (
+                        <div className="h-48 overflow-hidden">
+                          <img
+                            src={location.imageUrl}
+                            alt={location.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <CardHeader className="p-4">
+                        <CardTitle className="text-lg">
                           {location.name}, {location.country}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-3 pt-0 md:p-4 md:pt-0 space-y-2 md:space-y-3">
-                        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                      <CardContent className="p-4 pt-0 space-y-3">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           {location.teaser}
                         </p>
                         <Button
                           onClick={() => handleCreateTrip(location.id)}
                           disabled={createTripMutation.isPending}
                           className="w-full"
-                          size="sm"
                         >
                           Utwórz podróż
                         </Button>
