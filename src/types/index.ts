@@ -111,6 +111,26 @@ export interface Attraction {
 export type SummaryCategory =
   | 'Pogoda'
   | 'Weather'
+  | 'Hotele'
+  | 'Hotels'
+  | 'Loty'
+  | 'Flights'
+  | 'Atrakcje'
+  | 'Attractions'
+  | 'Terminy'
+  | 'Dates'
+  | 'Lokalizacja'
+  | 'Location'
+  | 'Opis'
+  | 'Description'
+  | 'Co zabrać'
+  | 'Packing'
+  | 'Dokumenty'
+  | 'Documents'
+  | 'Checklista'
+  | 'Checklist'
+  | 'Najważniejsze'
+  | 'Key Info'
   | 'Bezpieczeństwo'
   | 'Safety'
   | 'Budżet/koszty'
@@ -121,9 +141,7 @@ export type SummaryCategory =
   | 'Formalności'
   | 'Kultura/Obyczaje'
   | 'Noclegi'
-  | 'Jedzenie'
-  | 'Aktywności/atrakcje'
-  | 'Attractions';
+  | 'Jedzenie';
 
 export interface TripSummarySection {
   category: SummaryCategory;

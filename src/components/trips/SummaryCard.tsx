@@ -11,29 +11,52 @@ import {
   Globe,
   Hotel,
   Utensils,
-  Palmtree,
-  AlertTriangle,
+  MapPin,
+  Calendar,
+  Home,
+  ShoppingBag,
+  ListChecks,
+  AlertCircle,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { TripSummarySection, SummaryCategory, Attraction } from '@/types';
 
-const categoryIcons: Record<SummaryCategory, typeof Cloud> = {
-  Pogoda: Cloud,
-  Weather: Cloud,
-  Bezpieczeństwo: Shield,
-  Safety: Shield,
+const categoryIcons: Record<SummaryCategory, LucideIcon> = {
+  'Pogoda': Cloud,
+  'Weather': Cloud,
+  'Bezpieczeństwo': Shield,
+  'Safety': Shield,
   'Budżet/koszty': DollarSign,
-  Budget: DollarSign,
+  'Budget': DollarSign,
   'Transport/Dojezdność': Plane,
-  Transport: Plane,
-  'Sezonowość/Tłok': Users,
-  Formalności: FileText,
-  'Kultura/Obyczaje': Globe,
-  Noclegi: Hotel,
-  Jedzenie: Utensils,
-  'Aktywności/atrakcje': Palmtree,
-  Attractions: Palmtree,
+  'Transport': Plane,
+  'Sezonowość/Tłok': Calendar,
+  'Formalności': FileText,
+  'Kultura/Obyczaje': Users,
+  'Noclegi': Home,
+  'Jedzenie': Utensils,
+  'Atrakcje': MapPin,
+  'Attractions': MapPin,
+  'Hotele': Home,
+  'Hotels': Home,
+  'Loty': Plane,
+  'Flights': Plane,
+  'Terminy': Calendar,
+  'Dates': Calendar,
+  'Lokalizacja': MapPin,
+  'Location': MapPin,
+  'Opis': FileText,
+  'Description': FileText,
+  'Co zabrać': ShoppingBag,
+  'Packing': ShoppingBag,
+  'Dokumenty': FileText,
+  'Documents': FileText,
+  'Checklista': ListChecks,
+  'Checklist': ListChecks,
+  'Najważniejsze': AlertCircle,
+  'Key Info': AlertCircle,
 };
 
 interface SummaryCardProps {
@@ -43,8 +66,8 @@ interface SummaryCardProps {
 
 export const SummaryCard = memo(function SummaryCard({ section, attractions }: SummaryCardProps) {
   const Icon = categoryIcons[section.category] || FileText;
-  const isAttractionsSection = section.category === 'Attractions';
-  const acceptedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
+  const isAttractionsSection = section.category === 'Attractions' || section.category === 'Atrakcje';
+  const ratedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-warm border-warm-coral/20">
@@ -54,65 +77,59 @@ export const SummaryCard = memo(function SummaryCard({ section, attractions }: S
             <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
               <Icon className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <CardTitle className="text-lg">{section.title}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">{section.category}</p>
-            </div>
+            <CardTitle className="text-lg">{section.title}</CardTitle>
           </div>
-
           {section.important && (
-            <Badge variant="destructive" className="flex-shrink-0">
-              <AlertTriangle className="w-3 h-3 mr-1" />
-              Important
+            <Badge variant="destructive" className="bg-warm-coral">
+              Ważne!
             </Badge>
           )}
         </div>
-      </CardHeader>
-
-      <CardContent className="pt-4">
-        {isAttractionsSection && acceptedAttractions.length > 0 ? (
-          <div className="space-y-4">
-            {acceptedAttractions.map((attraction) => (
-              <div 
-                key={attraction.id} 
-                className="flex gap-4 p-3 rounded-lg border border-warm-coral/20 hover:bg-warm-coral/5 transition-colors"
-              >
-                {attraction.imageUrl && (
-                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={attraction.imageUrl} 
-                      alt={attraction.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-base mb-1">{attraction.title}</h4>
-                  <p className="text-sm text-muted-foreground mb-2">{attraction.description}</p>
-                  {attraction.category && (
-                    <Badge variant="secondary" className="text-xs">
-                      {attraction.category}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.markdown}</ReactMarkdown>
-          </div>
-        )}
-
         {section.tags && section.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
-            {section.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
+          <div className="flex flex-wrap gap-2 mt-2">
+            {section.tags.map((tag, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
                 {tag}
               </Badge>
             ))}
           </div>
         )}
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              img: ({ src, alt }) => (
+                <img
+                  src={src}
+                  alt={alt}
+                  className="rounded-lg w-full h-48 object-cover my-4 shadow-md"
+                />
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-lg font-semibold mt-4 mb-2 text-foreground">{children}</h3>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>
+              ),
+              li: ({ children }) => (
+                <li className="text-muted-foreground">{children}</li>
+              ),
+              p: ({ children }) => (
+                <p className="text-muted-foreground my-2">{children}</p>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-foreground">{children}</strong>
+              ),
+              hr: () => (
+                <hr className="my-4 border-warm-coral/20" />
+              ),
+            }}
+          >
+            {section.markdown}
+          </ReactMarkdown>
+        </div>
       </CardContent>
     </Card>
   );

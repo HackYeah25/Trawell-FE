@@ -425,42 +425,309 @@ export const mockLocations: Location[] = [
 
 // Trip summary template
 export const getTripSummary = (attractions?: Attraction[]): TripSummary => {
-  const acceptedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
+  const ratedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
   
   return {
     sections: [
       {
-        category: 'Weather',
-        title: 'Weather Conditions',
-        markdown:
-          '**December - March:** Perfect skiing conditions\n\n- Temperature: -5°C to -15°C\n- Snowfall: High\n- Sunshine: 6-7h daily',
-      },
-      {
-        category: 'Safety',
-        title: 'Safety & Health',
-        markdown:
-          '✅ Very safe region\n\n- Rescue services: 24/7\n- Hospital: 15 min\n- Insurance: Recommended',
+        category: 'Najważniejsze',
+        title: '⚠️ Najważniejsze informacje',
+        markdown: `**Pamiętaj o tych rzeczach:**
+
+✅ **Paszport ważny minimum 6 miesięcy**
+✅ **Ubezpieczenie podróżne obowiązkowe**
+✅ **Szczepienia: brak wymaganych**
+✅ **Wiza: nie wymagana (do 90 dni)**
+
+🚨 **Numery alarmowe:**
+- Pogotowie: 112
+- Ambasada: +81 3-5562-1100`,
         important: true,
+        tags: ['Najważniejsze', 'Must-know'],
       },
       {
-        category: 'Budget',
-        title: 'Estimated Costs',
-        markdown:
-          '**Per person (7 days):**\n\n- Ski pass: €280-350\n- Accommodation: €70-150/night\n- Food: €40-60/day\n- Equipment rental: €120-180',
-        tags: ['Premium', 'All-inclusive available'],
+        category: 'Pogoda',
+        title: 'Pogoda w marcu',
+        markdown: `**Warunki pogodowe:**
+
+🌸 **Sezon kwitnienia wiśni (Sakura)**
+- Temperatura: 12-18°C
+- Opady: średnie (parasol przydatny)
+- Wschód słońca: 5:45, zachód: 17:50
+- Najlepszy miesiąc na zwiedzanie!
+
+**Co zabrać:**
+- Lekką kurtkę
+- Warstwowe ubrania
+- Parasol`,
+        tags: ['Wiosna', 'Sakura', 'Idealna temperatura'],
+      },
+      {
+        category: 'Loty',
+        title: 'Połączenia lotnicze',
+        markdown: `**Opcje przelotu:**
+
+✈️ **1. LOT Polish Airlines** (polecane)
+- Warszawa → Tokio (Narita)
+- Bezpośredni: ~11h
+- Cena: 2800-3500 PLN w obie strony
+
+✈️ **2. Turkish Airlines**
+- Z przesiadką w Stambule
+- Całkowity czas: ~15h
+- Cena: 2200-2800 PLN
+
+✈️ **3. Lufthansa**
+- Z przesiadką w Frankfurcie
+- Całkowity czas: ~14h
+- Cena: 2500-3200 PLN
+
+🎫 **Pro tip:** Rezerwuj 2-3 miesiące wcześniej dla najlepszych cen`,
+        tags: ['Direct flight available', 'Book early'],
+      },
+      {
+        category: 'Hotele',
+        title: 'Rekomendowane noclegi',
+        markdown: `**Propozycje hoteli:**
+
+🏨 **Budget (150-250 PLN/noc):**
+- Capsule hotels (unikalne doświadczenie!)
+- Hostele w Shinjuku/Shibuya
+- Airbnb w dzielnicach mieszkalnych
+
+🏨 **Mid-range (300-500 PLN/noc):**
+- Hotel Gracery Shinjuku (widok na Godzillę!)
+- Cross Hotel Osaka
+- Richmond Hotel Asakusa
+
+🏨 **Luxury (600+ PLN/noc):**
+- Park Hyatt Tokyo (Lost in Translation!)
+- Aman Tokyo
+- The Peninsula Tokyo
+
+💡 **Wskazówka:** Wybierz hotel blisko stacji metra - to klucz do wygodnego zwiedzania!`,
+        tags: ['Variety', 'Metro access important'],
+      },
+      {
+        category: 'Terminy',
+        title: 'Najlepsze terminy podróży',
+        markdown: `**Kalendarz podróżny:**
+
+🌸 **Marzec-Kwiecień** (polecane!)
+- Sezon Sakury
+- Idealna pogoda: 12-20°C
+- Większy ruch turystyczny
+- Rezerwuj z wyprzedzeniem!
+
+🍂 **Październik-Listopad**
+- Kolorowa jesień (Momiji)
+- Przyjemna pogoda: 15-22°C
+- Mniej tłoczno niż w sezonie Sakury
+
+❄️ **Grudzień-Luty**
+- Skiing w Alpach Japońskich
+- Świąteczne iluminacje
+- Ciepłe onsen (gorące źródła)
+
+🔥 **Unikaj:** Lipiec-Sierpień (gorąco i wilgotno, pora deszczowa)`,
+        tags: ['Sakura season', 'Fall foliage'],
+      },
+      {
+        category: 'Lokalizacja',
+        title: 'Tokio - stolica Japonii',
+        markdown: `**O mieście:**
+
+📍 **Położenie:** Wschodnia Japonia, nad Zatoką Tokijską
+🏙️ **Populacja:** ~14 mln (38 mln w aglomeracji!)
+🗼 **Dzielnice must-see:**
+- **Shibuya** - słynne skrzyżowanie, młodzieżowa moda
+- **Shinjuku** - neonowe światła, życie nocne
+- **Asakusa** - tradycyjna dzielnica, świątynie
+- **Harajuku** - moda, kawaii culture
+- **Ginza** - luksusowe zakupy
+
+⏰ **Strefa czasowa:** UTC+9 (7h do przodu od Polski)`,
+        tags: ['Megacity', 'Safe', 'Modern + Traditional'],
+      },
+      {
+        category: 'Opis',
+        title: 'Czego się spodziewać',
+        markdown: `**Tokio to:**
+
+🎌 **Kontrast tradycji i nowoczesności**
+- Starożytne świątynie obok drapaczy chmur
+- Tradycyjne ogródki herbaciane i futurystyczne kawiarnie robotów
+
+🍱 **Kulinarny raj**
+- Najwięcej restauracji z gwiazdkami Michelin na świecie
+- Street food: ramen, sushi, takoyaki
+- Konbini (sklepy 24/7) z pysznym jedzeniem
+
+🚄 **Perfekcyjna infrastruktura**
+- Metro NIGDY się nie spóźnia
+- Wszystko ultraczyste
+- Wysokie bezpieczeństwo
+
+🎭 **Unikalne doświadczenia**
+- Karaoke boxy
+- Onsen (gorące źródła)
+- Anime & manga cafes
+- Gaming centers`,
       },
       {
         category: 'Transport',
-        title: 'How to Get There',
-        markdown:
-          '**Travel options:**\n\n1. Flight to Geneva + transfer (3h)\n2. Own car from Poland (12-14h)\n3. Organized coach\n\nAirport transfer: €45-60 per person/one-way',
+        title: 'Poruszanie się po Tokio',
+        markdown: `**System komunikacji:**
+
+🎫 **Suica Card / Pasmo** (must-have!)
+- Karta miejska na metro/autobusy/pociągi
+- Zakup na lotnisku: 1000-2000 ¥
+- Uzupełnianie w automatach
+
+🚇 **Metro:**
+- 13 linii metra + 10 linii JR
+- Godziny szczytu: 7:30-9:30, 17:30-19:30
+- Google Maps ZAWSZE pokazuje najlepszą trasę
+
+🚅 **JR Pass** (dla dłuższych pobytów)
+- Unlimited przejazdy JR przez 7/14/21 dni
+- Opłacalne jeśli planujesz wyjazdy poza Tokio
+- Cena: ~1200 PLN za 7 dni
+
+🚕 **Taxi:**
+- Drogie! (start: ~300 ¥, każdy km: ~100 ¥)
+- Używaj tylko jako ostateczność
+
+💡 **Pro tip:** Pobierz offline mapy w Google Maps!`,
+        tags: ['Suica essential', 'Metro best option'],
       },
-      ...(acceptedAttractions.length > 0 ? [{
-        category: 'Attractions' as const,
-        title: 'Worth Seeing',
-        markdown: acceptedAttractions
-          .map(a => `**${a.title}**\n${a.description}${a.category ? ` (${a.category})` : ''}`)
-          .join('\n\n'),
+      {
+        category: 'Budżet/koszty',
+        title: 'Szacunkowy budżet (7 dni)',
+        markdown: `**Koszty per osoba:**
+
+✈️ **Przelot:** 2500-3500 PLN
+🏨 **Noclegi:** 1500-3000 PLN (zależnie od kategorii)
+🍜 **Jedzenie:**
+- Budget: 70-100 PLN/dzień
+- Mid: 120-200 PLN/dzień
+- Premium: 250+ PLN/dzień
+
+🎫 **Atrakcje & transport:** 500-800 PLN
+🛍️ **Zakupy & pamiątki:** 300-1000 PLN
+
+**💰 RAZEM: 5500-9000 PLN**
+
+💡 **Jak oszczędzać:**
+- Jedzenie w convenience stores (konbini)
+- Free attractions: świątynie, parki, dzielnice
+- Happy hours w restauracjach (lunch sets!)`,
+        tags: ['Mid-range budget', 'Savings tips'],
+      },
+      {
+        category: 'Co zabrać',
+        title: 'Lista pakowania',
+        markdown: `**Niezbędne rzeczy:**
+
+📱 **Elektronika:**
+- ☑️ Powerbank (długie dni zwiedzania!)
+- ☑️ Adapter (Japanese plugs: Type A/B)
+- ☑️ Pocket WiFi lub SIM card
+
+👕 **Ubrania (Marzec):**
+- ☑️ Lekka kurtka/wiatrówka
+- ☑️ Swetry/bluzy (warstwowe!)
+- ☑️ Wygodne buty do chodzenia
+- ☑️ Parasol kompaktowy
+
+💊 **Zdrowie:**
+- ☑️ Podstawowe leki (ból głowy, żołądek)
+- ☑️ Witaminy
+- ☑️ Ubezpieczenie (kopia!)
+
+🎒 **Przydatne:**
+- ☑️ Mała torba/plecak na dzień
+- ☑️ Butelka wielorazowa
+- ☑️ Powerbank
+- ☑️ Gotówka (wiele miejsc bez karty!)
+
+❌ **NIE zabieraj:**
+- Dużej walizki (metra mają schody!)
+- Za dużo ubrań (zrobisz zakupy tam!)`,
+      },
+      {
+        category: 'Dokumenty',
+        title: 'Wymagane dokumenty',
+        markdown: `**Co musisz mieć:**
+
+✅ **Paszport:**
+- Ważność: minimum 6 miesięcy od daty wyjazdu
+- Minimum 2 puste strony
+
+✅ **Ubezpieczenie podróżne:**
+- Obowiązkowe!
+- Pokrycie min. 30,000 EUR
+- Kopia polisy w telefonie + wydruk
+
+✅ **Karta pokładowa:**
+- Online check-in 24h przed lotem
+- Zapisz w telefonie (Google/Apple Wallet)
+
+✅ **Rezerwacje:**
+- Potwierdzenie hotelu (wydruk/PDF)
+- Bilet powrotny (mogą sprawdzić na granicy!)
+
+📱 **W telefonie:**
+- Zdjęcie paszportu
+- Potwierdzenia rezerwacji
+- Numery alarmowe
+- Offline mapy
+
+💡 **Pro tip:** Zrób kopie wszystkiego i wyślij do siebie na email!`,
+        important: true,
+      },
+      {
+        category: 'Checklista',
+        title: 'Checklist przed wylotem',
+        markdown: `**3 miesiące przed:**
+- ☑️ Zarezerwuj loty
+- ☑️ Zarezerwuj hotel
+- ☑️ Sprawdź ważność paszportu
+
+**1 miesiąc przed:**
+- ☑️ Wykup ubezpieczenie
+- ☑️ Zamów Pocket WiFi/SIM card
+- ☑️ Zarezerwuj bilety na atrakcje (TeamLab!)
+- ☑️ Wymień część pieniędzy na JPY
+
+**1 tydzień przed:**
+- ☑️ Online check-in
+- ☑️ Pobierz offline mapy
+- ☑️ Zainstaluj apps: Google Translate, Google Maps, Suica
+- ☑️ Sprawdź prognozę pogody
+
+**Dzień przed:**
+- ☑️ Spakuj walizkę (max 23kg!)
+- ☑️ Naładuj wszystkie urządzenia
+- ☑️ Wydrukuj potwierdzenia
+- ☑️ Powiadom bank o wyjeździe
+
+**Na lotnisku:**
+- ☑️ Paszport + bilet
+- ☑️ Gotówka JPY (minimum 10,000¥)
+- ☑️ Suica card (kup na lotnisku Narita!)`,
+      },
+      ...(ratedAttractions.length > 0 ? [{
+        category: 'Atrakcje' as const,
+        title: '⭐ Zaakceptowane atrakcje',
+        markdown: ratedAttractions
+          .map(a => {
+            const stars = '⭐'.repeat(a.rating || 0);
+            const imgTag = a.imageUrl ? `\n![${a.title}](${a.imageUrl})` : '';
+            return `### ${a.title} ${stars}\n${a.description}${a.category ? ` *(${a.category})*` : ''}${imgTag}`;
+          })
+          .join('\n\n---\n\n'),
+        tags: ['Personalized', 'Your picks'],
       }] : []),
     ],
   };
