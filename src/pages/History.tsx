@@ -94,7 +94,7 @@ export default function History() {
               className="sm:px-4"
             >
               <UserPlus className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Join Project</span>
+              <span className="hidden sm:inline">Join Adventure</span>
             </Button>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
@@ -103,7 +103,7 @@ export default function History() {
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0 sm:px-4"
             >
               <Plus className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">New Project</span>
+              <span className="hidden sm:inline">New Adventure</span>
             </Button>
           </div>
         </div>
@@ -120,14 +120,14 @@ export default function History() {
             <div className="w-20 h-20 rounded-full bg-gradient-sunset flex items-center justify-center mb-4 mx-auto shadow-warm">
               <Palmtree className="w-10 h-10 text-white" />
             </div>
-            <p className="text-muted-foreground mb-4">You don't have any projects yet</p>
+            <p className="text-muted-foreground mb-4">You don't have any adventures yet</p>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
               disabled={createProjectMutation.isPending}
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Your First Project
+              Create Your First Adventure
             </Button>
           </Card>
         ) : (
@@ -198,7 +198,7 @@ export default function History() {
                             }}
                             className="hover:bg-warm-coral/10"
                           >
-                            Open
+                            Chat
                           </Button>
                           {isExpanded ? (
                             <ChevronDown className="w-5 h-5 text-muted-foreground" />
@@ -213,7 +213,7 @@ export default function History() {
                     <CollapsibleContent>
                       {projectTrips.length === 0 ? (
                         <div className="px-4 pb-4 pl-16 text-sm text-muted-foreground">
-                          No trips in this project yet
+                          No trips in this adventure yet
                         </div>
                       ) : (
                         <div className="px-4 pb-4 pl-16 space-y-2">

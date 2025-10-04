@@ -24,10 +24,10 @@ export function ProjectTypeDialog({
       <DialogContent className="sm:max-w-md max-w-[90vw]">
         <DialogHeader className="space-y-2">
           <DialogTitle className="text-xl sm:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
-            Create New Project
+            Create New Adventure
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Choose the type of project you want to create
+            Choose the type of adventure you want to create
           </DialogDescription>
         </DialogHeader>
 
@@ -42,7 +42,7 @@ export function ProjectTypeDialog({
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-warm-coral" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold text-sm sm:text-base">Private Project</div>
+                <div className="font-semibold text-sm sm:text-base">Private Adventure</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Only you can access</div>
               </div>
             </div>
@@ -58,7 +58,7 @@ export function ProjectTypeDialog({
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-warm-turquoise" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold text-sm sm:text-base">Shared Project</div>
+                <div className="font-semibold text-sm sm:text-base">Shared Adventure</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">
                   Collaborate with others via share code
                 </div>

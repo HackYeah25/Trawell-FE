@@ -63,7 +63,7 @@ export function Composer({
   return (
     <div
       className={cn(
-        'border-t border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex items-end gap-2',
+        'border-t border-warm-coral/20 bg-card/80 backdrop-blur-md p-3 flex items-end gap-2',
         isMobile && 'fixed bottom-0 left-0 right-0 z-50',
         className
       )}
