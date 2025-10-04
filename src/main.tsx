@@ -5,13 +5,21 @@ import "./index.css";
 // Enable MSW in development
 async function enableMocking() {
   if (import.meta.env.DEV) {
-    const { worker } = await import('./mocks/browser');
-    return worker.start({
-      onUnhandledRequest: 'bypass',
-    });
+    try {
+      const { worker } = await import('./mocks/browser');
+      return worker.start({
+        onUnhandledRequest: 'bypass',
+      });
+    } catch (error) {
+      console.warn('Failed to start MSW:', error);
+    }
   }
 }
 
-enableMocking().then(() => {
-  createRoot(document.getElementById("root")!).render(<App />);
-});
+enableMocking()
+  .catch(error => {
+    console.warn('MSW initialization failed:', error);
+  })
+  .finally(() => {
+    createRoot(document.getElementById("root")!).render(<App />);
+  });
