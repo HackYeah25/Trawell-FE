@@ -80,18 +80,20 @@ export default function History() {
             <Button 
               onClick={() => setShowJoinDialog(true)}
               variant="outline"
-              className="hidden sm:flex"
+              size="sm"
+              className="sm:px-4"
             >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Join Project
+              <UserPlus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Join Project</span>
             </Button>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
               disabled={createProjectMutation.isPending}
-              className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+              size="sm"
+              className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0 sm:px-4"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              New Project
+              <Plus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">New Project</span>
             </Button>
           </div>
         </div>

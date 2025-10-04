@@ -1,4 +1,4 @@
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -43,9 +43,9 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-gradient-ocean text-primary-foreground">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-warm-coral/10">
+          <Avatar className="h-10 w-10 border-2 border-warm-coral/20">
+            <AvatarFallback className="bg-gradient-sunset text-primary-foreground font-semibold">
               {getInitials(user.name)}
             </AvatarFallback>
           </Avatar>
@@ -61,6 +61,10 @@ export function UserMenu({ user }: UserMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate('/app/profile')} className="cursor-pointer">
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Profile Settings</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sign Out</span>
