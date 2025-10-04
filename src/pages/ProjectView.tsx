@@ -302,7 +302,7 @@ export default function ProjectView() {
         {/* Chat and Composer Container */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Chat Thread */}
-          <div className="flex-1 overflow-y-auto h-0">
+          <div className="flex-1 overflow-y-auto h-0 pb-6">
             <ChatThread
               messages={displayedMessages}
               isLoading={sendMessageMutation.isPending}

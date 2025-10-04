@@ -38,6 +38,19 @@ export const ChatThread = memo(function ChatThread({
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const previousMessagesLength = useRef(messages.length);
+  const hasScrolledToBottom = useRef(false);
+
+  // Initial scroll to bottom on mount
+  useEffect(() => {
+    if (!hasScrolledToBottom.current && messages.length > 0) {
+      requestAnimationFrame(() => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+          hasScrolledToBottom.current = true;
+        }
+      });
+    }
+  }, [messages.length]);
 
   // Auto-scroll to bottom only for NEW messages (not when loading more)
   useEffect(() => {
@@ -45,7 +58,7 @@ export const ChatThread = memo(function ChatThread({
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
     previousMessagesLength.current = messages.length;
 
-    if (isNewMessage) {
+    if (isNewMessage && hasScrolledToBottom.current) {
       const frameId = requestAnimationFrame(() => {
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -153,7 +166,7 @@ export const ChatThread = memo(function ChatThread({
           </div>
         )}
 
-        <div ref={bottomRef} />
+        <div ref={bottomRef} className="h-4" />
         </div>
       </div>
     </div>

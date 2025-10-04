@@ -273,7 +273,7 @@ export default function TripView() {
             chatContent={
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Chat Thread - Scrollable */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto pb-6">
                   <ChatThread
                     messages={displayedMessages}
                     isLoading={sendMessageMutation.isPending}
@@ -297,25 +297,20 @@ export default function TripView() {
             }
             summaryContent={
               summary ? (
-                <div className="overflow-y-auto h-full p-4">
-                  <div className="max-w-4xl mx-auto space-y-4">
-                    <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-6">
-                      Podsumowanie Podróży
-                    </h2>
-                    {summary.sections.map((section, index) => (
-                      <SummaryCard
-                        key={index}
-                        section={section}
-                        attractions={attractions}
-                      />
-                    ))}
-                  </div>
+                <div className="max-w-4xl mx-auto space-y-6 pb-6">
+                  {summary.sections.map((section, index) => (
+                    <SummaryCard
+                      key={index}
+                      section={section}
+                      attractions={attractions}
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center space-y-2">
                     <Loader2 className="w-8 h-8 animate-spin text-warm-coral mx-auto" />
-                    <p className="text-muted-foreground">Generuję podsumowanie...</p>
+                    <p className="text-muted-foreground">Generating summary...</p>
                   </div>
                 </div>
               )
