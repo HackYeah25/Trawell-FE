@@ -30,7 +30,7 @@ export default function Landing() {
             <Button
               size="lg"
               className="text-lg px-8 py-6 bg-gradient-ocean hover:opacity-90 transition-opacity"
-              onClick={() => navigate('/onboarding')}
+              onClick={() => navigate('/auth')}
             >
               <Sparkles className="w-5 h-5" />
               Rozpocznij planowanie
@@ -141,7 +141,7 @@ export default function Landing() {
               size="lg"
               variant="secondary"
               className="text-lg px-8 py-6"
-              onClick={() => navigate('/onboarding')}
+              onClick={() => navigate('/auth')}
             >
               <Sparkles className="w-5 h-5" />
               Rozpocznij teraz

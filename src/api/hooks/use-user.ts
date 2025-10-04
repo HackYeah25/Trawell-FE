@@ -1,23 +1,36 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-import type { User } from '@/types';
+import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  onboardingCompleted: boolean;
+}
 
 export function useUser() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('travelai_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   return useQuery({
-    queryKey: ['me'],
-    queryFn: () => apiClient.get<User>('/me'),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ['user'],
+    queryFn: () => user,
+    enabled: !!user,
+    initialData: user,
   });
 }
 
-export function useUpdateUser() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: Partial<User>) =>
-      apiClient.patch<User>('/me', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['me'] });
-    },
-  });
+export function updateUserOnboarding(completed: boolean) {
+  const storedUser = localStorage.getItem('travelai_user');
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+    user.onboardingCompleted = completed;
+    localStorage.setItem('travelai_user', JSON.stringify(user));
+  }
 }

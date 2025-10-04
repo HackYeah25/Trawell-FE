@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from "./api/hooks/use-user";
+import Auth from "./pages/Auth";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import History from "./pages/History";
@@ -42,30 +43,39 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={user ? <Navigate to="/app" replace /> : <Landing />} />
+      <Route path="/auth" element={user ? <Navigate to="/app" replace /> : <Auth />} />
       <Route
         path="/onboarding"
         element={
-          user && needsOnboarding ? <Onboarding /> : user && !needsOnboarding ? <Navigate to="/app" replace /> : <Navigate to="/" replace />
+          !user ? (
+            <Navigate to="/auth" replace />
+          ) : needsOnboarding ? (
+            <Onboarding />
+          ) : (
+            <Navigate to="/app" replace />
+          )
         }
       />
       <Route
         path="/app"
         element={
-          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <History /> : <Navigate to="/" replace />
+          !user ? (
+            <Navigate to="/auth" replace />
+          ) : needsOnboarding ? (
+            <Navigate to="/onboarding" replace />
+          ) : (
+            <History />
+          )
         }
       />
       <Route
         path="/app/projects/:projectId"
-        element={
-          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <ProjectView /> : <Navigate to="/" replace />
-        }
+        element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/auth" replace />}
       />
       <Route
         path="/app/trips/:tripId"
-        element={
-          user && needsOnboarding ? <Navigate to="/onboarding" replace /> : user ? <TripView /> : <Navigate to="/" replace />
-        }
+        element={user && !needsOnboarding ? <TripView /> : <Navigate to="/auth" replace />}
       />
       <Route path="*" element={<NotFound />} />
     </Routes>

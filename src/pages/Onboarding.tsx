@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { updateUserOnboarding } from '@/api/hooks/use-user';
 import { Plane, Loader2 } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -8,8 +9,6 @@ import {
   useAnswerQuestion,
   useCompleteOnboarding,
 } from '@/api/hooks/use-onboarding';
-import { useUpdateUser } from '@/api/hooks/use-user';
-import { toast } from 'sonner';
 import type { ChatMessage } from '@/types';
 
 export default function Onboarding() {
@@ -20,7 +19,6 @@ export default function Onboarding() {
   const { data: questions, isLoading: questionsLoading } = useOnboardingQuestions();
   const answerMutation = useAnswerQuestion();
   const completeMutation = useCompleteOnboarding();
-  const updateUserMutation = useUpdateUser();
 
   // Initialize with welcome message and first question
   useEffect(() => {
@@ -114,7 +112,7 @@ export default function Onboarding() {
           });
 
           // Mark user as onboarded
-          await updateUserMutation.mutateAsync({ onboardingCompleted: true });
+          updateUserOnboarding(true);
 
           // Redirect to first project
           navigate(`/app/projects/${result.projectId}`);

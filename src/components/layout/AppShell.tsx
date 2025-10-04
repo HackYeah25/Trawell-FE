@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { ArrowLeft, Plane } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { UserMenu } from './UserMenu';
+import { useUser } from '@/api/hooks/use-user';
 
 interface AppShellProps {
   children: ReactNode;
@@ -10,31 +12,38 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { data: user } = useUser();
   const showBackButton = location.pathname !== '/app';
 
   return (
     <div className="min-h-screen flex flex-col w-full">
       {/* Top bar */}
       <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="h-full px-4 flex items-center gap-4 max-w-7xl mx-auto">
-          {showBackButton && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate('/app')}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          )}
-          
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-ocean flex items-center justify-center">
-              <Plane className="w-5 h-5 text-primary-foreground" />
+        <div className="h-full px-4 flex items-center justify-between gap-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-4">
+            {showBackButton && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate('/app')}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            )}
+            
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-ocean flex items-center justify-center">
+                <Plane className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <h1 className="text-xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
+                TravelAI
+              </h1>
             </div>
-            <h1 className="text-xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
-              TravelAI
-            </h1>
           </div>
+
+          {user && (
+            <UserMenu user={{ name: user.name, email: user.email }} />
+          )}
         </div>
       </header>
 
