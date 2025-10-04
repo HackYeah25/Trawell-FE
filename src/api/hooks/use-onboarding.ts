@@ -6,7 +6,10 @@ import type { OnboardingQuestion, OnboardingAnswerResponse } from '@/types';
 export function useOnboardingQuestions() {
   return useQuery({
     queryKey: ['profiling', 'questions'],
-    queryFn: () => apiClient.get<OnboardingQuestion[]>('/profiling/questions'),
+    queryFn: async () => {
+      const response = await apiClient.get<OnboardingQuestion[]>('/profiling/questions');
+      return response;
+    },
     staleTime: Infinity, // Questions don't change
   });
 }
@@ -69,12 +72,31 @@ export function useProfilingWebSocket({
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
 
+  // Store callbacks in refs to avoid reconnections
+  const handlersRef = useRef({ onMessage, onToken, onProgress, onValidation, onComplete, onThinking });
+
+  useEffect(() => {
+    handlersRef.current = { onMessage, onToken, onProgress, onValidation, onComplete, onThinking };
+  }, [onMessage, onToken, onProgress, onValidation, onComplete, onThinking]);
+
   const connect = useCallback(() => {
-    if (!sessionId) return;
+    console.log('connect() called, sessionId:', sessionId);
+
+    if (!sessionId) {
+      console.warn('No sessionId, skipping WebSocket connection');
+      return;
+    }
+
+    // Don't create new connection if one already exists and is open
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      console.log('WebSocket already connected, skipping');
+      return;
+    }
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.hostname}:8000/api/profiling/ws/${sessionId}`;
 
+    console.log('Creating new WebSocket connection to:', wsUrl);
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
@@ -83,47 +105,61 @@ export function useProfilingWebSocket({
 
     ws.onmessage = (event) => {
       const data: WSMessage = JSON.parse(event.data);
+      const handlers = handlersRef.current;
+
+      // Debug log (skip tokens to avoid spam)
+      if (data.type !== 'profiling_token') {
+        console.log('WS message:', data.type, data);
+      }
 
       switch (data.type) {
+        case 'profiling_message':
         case 'message':
-          onMessage?.(data);
+          handlers.onMessage?.(data);
           break;
+        case 'profiling_token':
         case 'token':
-          if (data.token) onToken?.(data.token);
+          if (data.token) handlers.onToken?.(data.token);
           break;
+        case 'profiling_progress':
         case 'progress':
           if (
             data.current_question !== undefined &&
             data.total_questions !== undefined &&
             data.completeness !== undefined
           ) {
-            onProgress?.({
+            handlers.onProgress?.({
               current: data.current_question,
               total: data.total_questions,
               completeness: data.completeness,
             });
           }
           break;
+        case 'profiling_validation':
         case 'validation':
           if (data.question_id && data.status) {
-            onValidation?.({
+            handlers.onValidation?.({
               questionId: data.question_id,
               status: data.status,
               feedback: data.feedback,
             });
           }
           break;
+        case 'profiling_complete':
         case 'complete':
           if (data.profile_id !== undefined && data.completeness !== undefined) {
-            onComplete?.({
+            handlers.onComplete?.({
               profileId: data.profile_id,
               completeness: data.completeness,
             });
           }
           break;
+        case 'profiling_thinking':
         case 'thinking':
-          onThinking?.();
+          handlers.onThinking?.();
           break;
+        default:
+          console.warn('Unknown WS message type:', data.type);
       }
     };
 
@@ -131,15 +167,18 @@ export function useProfilingWebSocket({
       console.error('WebSocket error:', error);
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
+    ws.onclose = (event) => {
+      console.log('WebSocket disconnected', event.code, event.reason);
       wsRef.current = null;
-      // Auto-reconnect after 3 seconds
-      reconnectTimeoutRef.current = window.setTimeout(connect, 3000);
+      // Only auto-reconnect on unexpected disconnects (not 1000 normal closure or 1008 session not found)
+      if (event.code !== 1000 && event.code !== 1008) {
+        console.log('Will attempt reconnect in 3 seconds...');
+        reconnectTimeoutRef.current = window.setTimeout(() => connect(), 3000);
+      }
     };
 
     wsRef.current = ws;
-  }, [sessionId, onMessage, onToken, onProgress, onValidation, onComplete, onThinking]);
+  }, [sessionId]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -154,19 +193,28 @@ export function useProfilingWebSocket({
 
   const sendAnswer = useCallback((answer: string) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
+      console.log('Sending answer via WebSocket:', answer);
       wsRef.current.send(
         JSON.stringify({
           type: 'user_answer',
           answer,
         })
       );
+    } else {
+      console.error('WebSocket not ready. State:', wsRef.current?.readyState);
     }
   }, []);
 
   useEffect(() => {
-    connect();
-    return disconnect;
-  }, [connect, disconnect]);
+    console.log('useEffect triggered, sessionId:', sessionId);
+    if (sessionId) {
+      connect();
+    }
+    return () => {
+      disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]); // Only re-run when sessionId changes, not when connect/disconnect change
 
   return { sendAnswer, disconnect };
 }

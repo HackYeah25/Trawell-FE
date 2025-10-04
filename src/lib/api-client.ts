@@ -48,7 +48,9 @@ class ApiError extends Error {
   }
 }
 
-// API Client implementation with mocked data
+// API Client implementation with real backend
+const API_BASE_URL = 'http://localhost:8000/api';
+
 export const apiClient = {
   // User endpoints
   get: async <T>(endpoint: string): Promise<T> => {
@@ -57,9 +59,13 @@ export const apiClient = {
       return mockFetch(mockUser as T);
     }
 
-    // Onboarding questions
-    if (endpoint === '/onboarding/questions') {
-      return mockFetch(onboardingQuestions as T);
+    // Onboarding questions - use real backend
+    if (endpoint === '/profiling/questions') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
     }
 
     // Projects list
@@ -215,6 +221,21 @@ export const apiClient = {
   },
 
   post: async <T>(endpoint: string, data?: unknown): Promise<T> => {
+    // Start profiling session - use real backend
+    if (endpoint === '/profiling/start') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
     // Answer onboarding question
     if (endpoint === '/onboarding/answer') {
       await mockDelay(500);

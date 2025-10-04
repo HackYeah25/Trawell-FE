@@ -27,6 +27,24 @@ export default function Onboarding() {
   const startProfilingMutation = useStartProfiling();
   const completeMutation = useCompleteOnboarding();
 
+  // Handle successful session creation using mutation.data instead of onSuccess callback
+  useEffect(() => {
+    if (startProfilingMutation.isSuccess && startProfilingMutation.data && !sessionId) {
+      console.log('Setting up session from mutation data:', startProfilingMutation.data);
+      setSessionId(startProfilingMutation.data.session.session_id);
+      setTotalQuestions(questions?.length || 0);
+
+      // Add welcome message
+      const welcomeMessage: ChatMessage = {
+        id: 'welcome',
+        role: 'system',
+        markdown: startProfilingMutation.data.first_message,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [startProfilingMutation.isSuccess, startProfilingMutation.data, sessionId, questions?.length]);
+
   // WebSocket handlers
   const { sendAnswer } = useProfilingWebSocket({
     sessionId,
@@ -70,29 +88,23 @@ export default function Onboarding() {
     },
   });
 
-  // Start profiling session
+  // Start profiling session (only once)
   useEffect(() => {
-    if (!sessionId && !startProfilingMutation.isPending) {
-      startProfilingMutation.mutate(undefined, {
-        onSuccess: (data) => {
-          setSessionId(data.session.session_id);
-          setTotalQuestions(questions?.length || 0);
+    console.log('Start session check - sessionId:', sessionId, 'isPending:', startProfilingMutation.isPending, 'isSuccess:', startProfilingMutation.isSuccess);
 
-          // Add welcome message
-          const welcomeMessage: ChatMessage = {
-            id: 'welcome',
-            role: 'system',
-            markdown: data.first_message,
-            createdAt: new Date().toISOString(),
-          };
-          setMessages([welcomeMessage]);
-        },
-      });
+    if (!sessionId && !startProfilingMutation.isPending && !startProfilingMutation.isSuccess) {
+      console.log('Calling mutate to create session...');
+      startProfilingMutation.mutate(undefined);
     }
-  }, [sessionId, startProfilingMutation, questions]);
+  }, [sessionId, startProfilingMutation]);
 
   const handleSendMessage = async (text: string) => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      console.error('Cannot send message: no session ID');
+      return;
+    }
+
+    console.log('Sending answer:', text);
 
     // Add user message
     const userMessage: ChatMessage = {
