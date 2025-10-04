@@ -86,38 +86,49 @@ export const ChatMessage = memo(function ChatMessage({
 
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
+  const isOtherUser = isUser && message.userName; // Message from another user in group chat
 
   return (
     <div
       className={cn(
         'flex gap-3 mb-4',
-        isUser ? 'justify-end animate-slide-in-right' : 'justify-start animate-slide-in-left'
+        isUser && !isOtherUser ? 'justify-end animate-slide-in-right' : 'justify-start animate-slide-in-left'
       )}
       role="article"
       aria-label={`${message.role} message`}
     >
-      {!isUser && (
-        <div
-          className={cn(
-            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm',
-            isSystem ? 'bg-muted' : 'bg-gradient-sunset'
+      {(!isUser || isOtherUser) && (
+        <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div
+            className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center shadow-sm',
+              isOtherUser 
+                ? cn('text-white text-xs font-semibold', getAvatarColor(message.userName))
+                : isSystem 
+                  ? 'bg-muted' 
+                  : 'bg-gradient-sunset'
+            )}
+            aria-hidden="true"
+          >
+            {isOtherUser ? (
+              getInitials(message.userName!)
+            ) : (
+              <Bot className="w-4 h-4 text-white" />
+            )}
+          </div>
+          {isOtherUser && (
+            <p className="text-xs font-medium text-muted-foreground text-center max-w-[80px] truncate">
+              {message.userName}
+            </p>
           )}
-          aria-hidden="true"
-        >
-          <Bot className="w-4 h-4 text-white" />
         </div>
       )}
 
       <div className={cn('flex flex-col gap-2 max-w-[80%] md:max-w-[70%]')}>
-        {isUser && message.userName && (
-          <p className="text-xs font-medium text-muted-foreground px-1">
-            {message.userName}
-          </p>
-        )}
         <div
           className={cn(
             'rounded-2xl px-4 py-3 shadow-sm',
-            isUser
+            isUser && !isOtherUser
               ? 'bg-gradient-sunset text-white shadow-warm'
               : 'bg-card text-card-foreground border border-warm-coral/20'
           )}
@@ -188,15 +199,12 @@ export const ChatMessage = memo(function ChatMessage({
         ))}
       </div>
 
-      {isUser && (
+      {isUser && !isOtherUser && (
         <div
-          className={cn(
-            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-white text-xs font-semibold',
-            getAvatarColor(message.userName)
-          )}
+          className="flex-shrink-0 w-8 h-8 rounded-full bg-warm-turquoise flex items-center justify-center shadow-sm"
           aria-hidden="true"
         >
-          {message.userName ? getInitials(message.userName) : <User className="w-4 h-4" />}
+          <User className="w-4 h-4 text-white" />
         </div>
       )}
     </div>

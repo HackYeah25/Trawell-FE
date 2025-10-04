@@ -3,7 +3,6 @@ import { ChatMessage } from './ChatMessage';
 import { Loader2 } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ChatThreadProps {
   messages: ChatMessageType[];
@@ -35,9 +34,8 @@ export const ChatThread = memo(function ChatThread({
   }, [messages.length]);
 
   return (
-    <ScrollArea
-      ref={containerRef}
-      className={cn('flex-1', className)}
+    <div 
+      className={cn('flex-1 overflow-y-auto', className)}
       role="log"
       aria-live="polite"
       aria-label="Chat messages"
@@ -84,6 +82,6 @@ export const ChatThread = memo(function ChatThread({
         <div ref={bottomRef} />
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 });
