@@ -41,18 +41,23 @@ export default function ProjectView() {
 
   // Initialize with questions and flatten paginated messages
   useEffect(() => {
-    if (messagesData) {
+    if (messagesData && locationSuggestions !== undefined) {
       const allMessages =
         messagesData.pages.flatMap((page) => page.messages).reverse() || [];
       
-      // If no messages yet, show initial questions
-      if (allMessages.length === 0) {
+      // If project has location suggestions, skip chat and show locations directly
+      if (locationSuggestions && locationSuggestions.length > 0) {
+        setShowLocations(true);
+        setAnsweredQuestions(initialProjectQuestions.length);
+        setLocalMessages(allMessages);
+      } else if (allMessages.length === 0) {
+        // If no messages yet, show initial questions
         setLocalMessages(initialProjectQuestions.slice(0, 1)); // Start with first question
       } else {
         setLocalMessages(allMessages);
       }
     }
-  }, [messagesData]);
+  }, [messagesData, locationSuggestions]);
 
   const handleSaveTitle = async () => {
     if (!projectId || !editedTitle.trim()) {

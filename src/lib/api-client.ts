@@ -84,8 +84,18 @@ export const apiClient = {
 
     // Project location suggestions
     if (endpoint.match(/^\/projects\/[^/]+\/locations\/suggestions$/)) {
-      const allLocations = [...mockLocations, iguanaLocation];
-      return mockFetch(allLocations as T, 400);
+      const projectId = endpoint.split('/')[2];
+      
+      // Return locations for projects that have suggestions
+      const project = mockProjects.find(p => p.id === projectId);
+      if (project?.hasLocationSuggestions || 
+          projectId === 'default-proj-1' || 
+          projectId === 'shared-proj-abc123') {
+        const allLocations = [...mockLocations, iguanaLocation];
+        return mockFetch(allLocations as T, 400);
+      }
+      
+      return mockFetch([] as T, 400);
     }
 
     // Trips list

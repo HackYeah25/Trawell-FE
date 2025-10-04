@@ -90,6 +90,7 @@ export let mockProjects: Project[] = [
     createdAt: new Date('2025-01-15').toISOString(),
     lastMessagePreview: 'Planning an amazing summer getaway...',
     isShared: false,
+    hasLocationSuggestions: true, // Has location suggestions ready
   },
 ];
 
@@ -186,6 +187,7 @@ export const specialSharedProject: Project = {
   isShared: true,
   shareCode: 'ABC123',
   ownerId: 'other-user-123', // Not owned by current user
+  hasLocationSuggestions: true, // Has location suggestions ready
 };
 
 // Special shared project with complete trip (accessible via IGUANA code)

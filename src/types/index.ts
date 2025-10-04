@@ -62,6 +62,7 @@ export interface Project {
   isShared?: boolean;
   shareCode?: string;
   ownerId?: string; // Owner's user ID (for shared projects not owned by current user)
+  hasLocationSuggestions?: boolean; // Whether project has location suggestions ready
 }
 
 export interface ProjectParticipant {
