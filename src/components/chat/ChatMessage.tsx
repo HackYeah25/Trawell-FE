@@ -48,19 +48,42 @@ export const ChatMessage = memo(function ChatMessage({
   useEffect(() => {
     if (message.role === 'assistant' && message.markdown) {
       // Check if this message was just added by comparing its ID
-      const isNewMessage = !message.id.startsWith('initial-');
+      const isNewMessage = !message.id.startsWith('initial-') && !message.id.startsWith('iguana-');
       setShouldAnimate(isNewMessage);
     }
   }, [message.id, message.role, message.markdown]);
   
-  // Typing animation for assistant messages
+  // Typing animation for assistant messages - only one at a time
   useEffect(() => {
     if (message.role === 'assistant' && message.markdown && shouldAnimate) {
+      // Check if there's already a typing animation in progress
+      const existingTypingElements = document.querySelectorAll('[data-is-typing="true"]');
+      
+      if (existingTypingElements.length > 0) {
+        // Wait for existing animations to finish
+        const checkInterval = setInterval(() => {
+          const stillTyping = document.querySelectorAll('[data-is-typing="true"]');
+          if (stillTyping.length === 0) {
+            clearInterval(checkInterval);
+            startTyping();
+          }
+        }, 100);
+        
+        return () => clearInterval(checkInterval);
+      } else {
+        startTyping();
+      }
+    } else {
+      setDisplayedText(message.markdown || '');
+      setIsTyping(false);
+    }
+    
+    function startTyping() {
       setIsTyping(true);
       setDisplayedText('');
       
       let currentIndex = 0;
-      const text = message.markdown;
+      const text = message.markdown || '';
       const typingSpeed = 15; // ms per character
       
       const timer = setTimeout(() => {
@@ -78,9 +101,6 @@ export const ChatMessage = memo(function ChatMessage({
       }, 300); // Initial delay
       
       return () => clearTimeout(timer);
-    } else {
-      setDisplayedText(message.markdown || '');
-      setIsTyping(false);
     }
   }, [message.markdown, message.role, shouldAnimate]);
 
@@ -143,6 +163,7 @@ export const ChatMessage = memo(function ChatMessage({
                 ? 'bg-gradient-sunset text-white shadow-warm'
                 : 'bg-card text-card-foreground border border-warm-coral/20'
             )}
+            data-is-typing={isTyping ? 'true' : 'false'}
           >
           {message.markdown && (
             <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-ul:my-0 prose-ol:my-0">

@@ -153,7 +153,9 @@ export default function History() {
                         <div className="flex items-center gap-3 flex-1">
                           <div className={cn(
                             "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
-                            isSharedNotOwned ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80" : "bg-gradient-sunset"
+                            project.isShared 
+                              ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80" 
+                              : "bg-gradient-sunset"
                           )}>
                             {project.isShared ? (
                               <UsersIcon className="w-5 h-5 text-white" />
