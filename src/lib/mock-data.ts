@@ -82,12 +82,111 @@ export const postAttractionQuestions: OnboardingQuestion[] = [
   },
 ];
 
-// Projects and trips
-export let mockProjects: Project[] = [];
-export let mockTrips: Trip[] = [];
-export let mockProjectMessages: Record<string, ChatMessage[]> = {};
-export let mockTripMessages: Record<string, ChatMessage[]> = {};
-export let mockAttractions: Record<string, Attraction[]> = {};
+// Default projects and trips
+export let mockProjects: Project[] = [
+  {
+    id: 'default-proj-1',
+    title: 'My Summer Adventure 2025',
+    createdAt: new Date('2025-01-15').toISOString(),
+    lastMessagePreview: 'Planning an amazing summer getaway...',
+    isShared: false,
+  },
+];
+
+export let mockTrips: Trip[] = [
+  {
+    id: 'default-trip-1',
+    projectId: 'default-proj-1',
+    locationId: 'loc1',
+    locationName: 'Val Thorens, France',
+    title: 'Val Thorens Ski Trip',
+    createdAt: new Date('2025-01-16').toISOString(),
+  },
+  {
+    id: 'default-trip-2',
+    projectId: 'default-proj-1',
+    locationId: 'loc2',
+    locationName: 'Livigno, Italy',
+    title: 'Livigno Winter Escape',
+    createdAt: new Date('2025-01-17').toISOString(),
+  },
+];
+
+export let mockProjectMessages: Record<string, ChatMessage[]> = {
+  'default-proj-1': [
+    {
+      id: 'initial-msg-1',
+      role: 'assistant',
+      markdown: 'Welcome to your summer adventure planning! I\'ve prepared some great destinations for you.',
+      createdAt: new Date('2025-01-15').toISOString(),
+    },
+  ],
+};
+
+export let mockTripMessages: Record<string, ChatMessage[]> = {
+  'default-trip-1': [
+    {
+      id: 'trip-msg-1',
+      role: 'assistant',
+      markdown: 'Welcome to **Val Thorens**! 🎿\n\nThis is the highest ski resort in Europe. What activities interest you?',
+      createdAt: new Date('2025-01-16').toISOString(),
+    },
+  ],
+  'default-trip-2': [
+    {
+      id: 'trip-msg-2',
+      role: 'assistant',
+      markdown: 'Welcome to **Livigno**! 🏔️\n\nA duty-free paradise in the Alps. Let\'s plan your perfect trip!',
+      createdAt: new Date('2025-01-17').toISOString(),
+    },
+  ],
+};
+
+export let mockAttractions: Record<string, Attraction[]> = {
+  'default-trip-1': [
+    {
+      id: 'attr-vt-1',
+      title: 'Gondola Ride',
+      description: 'Spectacular views of the Alps on a modern gondola',
+      category: 'Transport',
+      imageUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80',
+    },
+    {
+      id: 'attr-vt-2',
+      title: 'Ski School (2 days)',
+      description: 'Professional courses for beginners and advanced skiers',
+      category: 'Activities',
+      imageUrl: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=80',
+    },
+  ],
+  'default-trip-2': [
+    {
+      id: 'attr-liv-1',
+      title: 'Duty-Free Shopping',
+      description: 'Explore the unique tax-free shopping opportunities',
+      category: 'Shopping',
+      imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80',
+    },
+    {
+      id: 'attr-liv-2',
+      title: 'Snowboarding Park',
+      description: 'World-class freestyle park with various difficulty levels',
+      category: 'Activities',
+      imageUrl: 'https://images.unsplash.com/photo-1519315901367-02a8e4b98e12?w=600&q=80',
+    },
+  ],
+};
+
+// Special shared project (only accessible via ABC123 code)
+export const specialSharedProject: Project = {
+  id: 'shared-proj-abc123',
+  title: 'Team Adventure - Alps Explorer',
+  createdAt: new Date('2025-01-10').toISOString(),
+  lastMessagePreview: 'Collaborative trip planning for the whole team',
+  isShared: true,
+  shareCode: 'ABC123',
+  ownerId: 'other-user-123', // Not owned by current user
+};
 
 // Available locations
 export const mockLocations: Location[] = [

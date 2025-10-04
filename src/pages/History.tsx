@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users, UserPlus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -15,6 +17,7 @@ import { toast } from 'sonner';
 
 export default function History() {
   const navigate = useNavigate();
+  const { data: user } = useUser();
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const { data: trips, isLoading: tripsLoading } = useTrips();
   const createProjectMutation = useCreateProject();
@@ -125,6 +128,7 @@ export default function History() {
             {projects.map((project) => {
               const projectTrips = getProjectTrips(project.id);
               const isExpanded = expandedProjects.has(project.id);
+              const isSharedNotOwned = project.isShared && project.ownerId && project.ownerId !== user?.id;
 
               return (
                 <Collapsible
@@ -132,12 +136,18 @@ export default function History() {
                   open={isExpanded}
                   onOpenChange={() => toggleProject(project.id)}
                 >
-                  <Card className="border-warm-coral/20 bg-card/80 backdrop-blur-sm">
+                  <Card className={cn(
+                    "border-warm-coral/20 bg-card/80 backdrop-blur-sm",
+                    isSharedNotOwned && "border-warm-turquoise/40 bg-warm-turquoise/5"
+                  )}>
                     {/* Project header */}
                     <CollapsibleTrigger asChild>
                       <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-warm-coral/5 transition-colors">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
+                          <div className={cn(
+                            "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
+                            isSharedNotOwned ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80" : "bg-gradient-sunset"
+                          )}>
                             {project.isShared ? (
                               <Users className="w-5 h-5 text-white" />
                             ) : (
@@ -148,8 +158,14 @@ export default function History() {
                             <div className="flex items-center gap-2">
                               <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
                               {project.isShared && (
-                                <Badge variant="secondary" className="text-xs flex-shrink-0">
-                                  Shared
+                                <Badge 
+                                  variant="secondary" 
+                                  className={cn(
+                                    "text-xs flex-shrink-0",
+                                    isSharedNotOwned && "bg-warm-turquoise/20 text-warm-turquoise border-warm-turquoise/30"
+                                  )}
+                                >
+                                  {isSharedNotOwned ? 'Joined' : 'Shared'}
                                 </Badge>
                               )}
                             </div>

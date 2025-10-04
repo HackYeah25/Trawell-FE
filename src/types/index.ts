@@ -61,6 +61,7 @@ export interface Project {
   updatedAt?: string;
   isShared?: boolean;
   shareCode?: string;
+  ownerId?: string; // Owner's user ID (for shared projects not owned by current user)
 }
 
 export interface ProjectParticipant {

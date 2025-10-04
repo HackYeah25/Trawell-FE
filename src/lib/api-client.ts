@@ -20,6 +20,7 @@ import {
   mockAttractions,
   mockLocations,
   getTripSummary,
+  specialSharedProject,
 } from './mock-data';
 
 // Simulate network delay
@@ -223,6 +224,24 @@ export const apiClient = {
     if (endpoint === '/projects/join') {
       await mockDelay(600);
       const body = data as { shareCode: string };
+
+      // Check for special shared project code
+      if (body.shareCode.toUpperCase() === 'ABC123') {
+        // Add the special shared project if not already added
+        const existingProject = mockProjects.find(p => p.id === specialSharedProject.id);
+        if (!existingProject) {
+          mockProjects.push({ ...specialSharedProject });
+          mockProjectMessages[specialSharedProject.id] = [
+            {
+              id: 'shared-msg-1',
+              role: 'assistant',
+              markdown: '👥 Welcome to the **Team Adventure**!\n\nThis is a collaborative project. You can see and contribute to the planning.',
+              createdAt: new Date().toISOString(),
+            },
+          ];
+        }
+        return { projectId: specialSharedProject.id } as T;
+      }
 
       const project = mockProjects.find((p) => p.shareCode === body.shareCode);
       if (!project) {
