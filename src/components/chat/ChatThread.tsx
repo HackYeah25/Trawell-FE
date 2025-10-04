@@ -56,18 +56,21 @@ export const ChatThread = memo(function ChatThread({
   useEffect(() => {
     // Only scroll if messages increased (new message added, not loaded)
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
-    previousMessagesLength.current = messages.length;
-
+    
     if (isNewMessage && hasScrolledToBottom.current) {
-      const frameId = requestAnimationFrame(() => {
+      // Small delay to ensure DOM is updated
+      const timeoutId = setTimeout(() => {
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-      });
+      }, 100);
       
-      return () => cancelAnimationFrame(frameId);
+      previousMessagesLength.current = messages.length;
+      return () => clearTimeout(timeoutId);
     }
-  }, [messages.length, isLoadingMore]);
+    
+    previousMessagesLength.current = messages.length;
+  }, [messages, isLoadingMore]);
 
   return (
     <div 

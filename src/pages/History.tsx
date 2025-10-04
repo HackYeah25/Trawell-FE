@@ -175,17 +175,7 @@ export default function History() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                              <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
-                              {project.isShared && (
-                                <Badge 
-                                  variant="secondary" 
-                                  className="text-xs flex-shrink-0"
-                                >
-                                  Shared
-                                </Badge>
-                              )}
-                            </div>
+                            <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
                              <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               {new Date(project.createdAt).toLocaleDateString('en-US')}
