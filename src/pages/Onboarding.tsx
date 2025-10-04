@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, Loader2 } from 'lucide-react';
+import { Plane, Loader2, SkipForward } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
+import { Button } from '@/components/ui/button';
 import {
   useOnboardingQuestions,
   useStartProfiling,
@@ -27,6 +28,20 @@ export default function Onboarding() {
   const startProfilingMutation = useStartProfiling();
   const completeMutation = useCompleteOnboarding();
 
+  const handleSkipOnboarding = useCallback(async () => {
+    try {
+      // Complete onboarding without answering questions
+      const result = await completeMutation.mutateAsync({
+        createInitialProject: true,
+      });
+
+      // Redirect to dashboard instead of specific project
+      navigate('/app');
+    } catch (error) {
+      console.error('Error skipping onboarding:', error);
+    }
+  }, [completeMutation, navigate]);
+
   // Check if user already has profile - skip onboarding
   useEffect(() => {
     if (profileStatus && profileStatus.has_profile && profileStatus.profile_completeness === 100) {
@@ -34,6 +49,9 @@ export default function Onboarding() {
       navigate('/app/brainstorm');
     }
   }, [profileStatus, navigate]);
+
+  // Note: Auto-skip removed to prevent interference with normal onboarding flow
+  // Developers can use the Skip button in the header when needed
 
   // Handle successful session creation using mutation.data instead of onSuccess callback
   useEffect(() => {
@@ -181,18 +199,34 @@ export default function Onboarding() {
       {/* Fixed Header */}
       <div className="flex-shrink-0 p-6 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm">
-              <Plane className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm">
+                <Plane className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
+                  Let's Plan Your Trip
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Question {Math.min(currentQuestion, totalQuestions)} of {totalQuestions}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
-                Let's Plan Your Trip
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Question {Math.min(currentQuestion, totalQuestions)} of {totalQuestions}
-              </p>
-            </div>
+            
+            {/* Skip Button - Only visible in dev mode */}
+            {localStorage.getItem('TRAWELL_DEV_MODE') === 'true' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSkipOnboarding}
+                disabled={completeMutation.isPending}
+                className="text-muted-foreground hover:text-foreground hover:bg-warm-coral/10"
+              >
+                <SkipForward className="w-4 h-4 mr-2" />
+                Skip
+              </Button>
+            )}
           </div>
         </div>
       </div>

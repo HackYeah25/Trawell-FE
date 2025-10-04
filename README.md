@@ -118,6 +118,35 @@ src/
    - CRUD for `/projects` and `/trips`
    - Attractions and summaries
 
+## 🛠️ Developer Mode
+
+For faster development and testing, the application includes a developer mode that provides a skip button in the onboarding process:
+
+### **Enable Developer Mode:**
+```javascript
+// In browser console:
+localStorage.setItem('TRAWELL_DEV_MODE', 'true');
+// Refresh the page - Skip button will appear in onboarding header
+```
+
+### **Disable Developer Mode:**
+```javascript
+// In browser console:
+localStorage.removeItem('TRAWELL_DEV_MODE');
+// or
+localStorage.setItem('TRAWELL_DEV_MODE', 'false');
+```
+
+### **Features in Developer Mode:**
+- ✅ **Skip button visible** - Shows "Skip" button in onboarding header
+- ✅ **Manual skip** - Click "Skip" to bypass profiling questions
+- ✅ **Direct access to app** - Goes straight to project creation
+- ✅ **Production safe** - Only works when explicitly enabled
+
+### **Production Behavior:**
+- ❌ No skip button visible to users
+- ✅ Normal onboarding flow for all users
+
 ## 🧪 Acceptance Tests (Checklist)
 
 - [x] New user lands on onboarding after login
