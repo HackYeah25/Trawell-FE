@@ -1,8 +1,10 @@
 import { useEffect, useRef, memo } from 'react';
 import { ChatMessage } from './ChatMessage';
+import { ChatMessageSkeleton } from './ChatMessageSkeleton';
 import { LocationProposalCard } from '@/components/projects/LocationProposalCard';
 import { AttractionProposalCard } from '@/components/trips/AttractionProposalCard';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +16,10 @@ interface ChatThreadProps {
   onLocationDecision?: (locationId: string, decision: 'reject' | 1 | 2 | 3) => void;
   onAttractionDecision?: (attractionId: string, decision: 'reject' | 1 | 2 | 3) => void;
   className?: string;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
+  remainingCount?: number;
 }
 
 export const ChatThread = memo(function ChatThread({
@@ -24,20 +30,31 @@ export const ChatThread = memo(function ChatThread({
   onLocationDecision,
   onAttractionDecision,
   className,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
+  remainingCount = 0,
 }: ChatThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const previousMessagesLength = useRef(messages.length);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom only for NEW messages (not when loading more)
   useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
-    });
-    
-    return () => cancelAnimationFrame(frameId);
-  }, [messages.length]);
+    // Only scroll if messages increased (new message added, not loaded)
+    const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
+    previousMessagesLength.current = messages.length;
+
+    if (isNewMessage) {
+      const frameId = requestAnimationFrame(() => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      });
+      
+      return () => cancelAnimationFrame(frameId);
+    }
+  }, [messages.length, isLoadingMore]);
 
   return (
     <div 
@@ -48,17 +65,47 @@ export const ChatThread = memo(function ChatThread({
     >
       <div className="px-4 py-6">
         <div className="max-w-4xl mx-auto">
-        {messages.map((message) => (
-          <div key={message.id} className="space-y-3">
-            <ChatMessage
-              message={message}
-              onQuickReply={onQuickReply}
-              onRetry={
-                message.status === 'error'
-                  ? () => onRetryMessage?.(message.id)
-                  : undefined
-              }
-            />
+        {/* Load More Button */}
+        {hasMore && !isLoadingMore && (
+          <div className="flex justify-center mb-6 animate-fade-in">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onLoadMore}
+              className="text-muted-foreground hover:text-foreground hover:bg-warm-coral/10"
+            >
+              <ChevronUp className="w-4 h-4 mr-2" />
+              Load more ({remainingCount} older message{remainingCount !== 1 ? 's' : ''})
+            </Button>
+          </div>
+        )}
+
+        {/* Loading Skeletons */}
+        {isLoadingMore && (
+          <div className="space-y-0">
+            <ChatMessageSkeleton width="75%" />
+            <ChatMessageSkeleton width="85%" />
+            <ChatMessageSkeleton width="65%" />
+          </div>
+        )}
+
+        {/* Messages */}
+        {messages.map((message, index) => {
+          // Determine if this is a historical message (loaded via pagination)
+          const isHistoricalMessage = hasMore || isLoadingMore || index < messages.length - 10;
+          
+          return (
+            <div key={message.id} className="space-y-3">
+              <ChatMessage
+                message={message}
+                onQuickReply={onQuickReply}
+                onRetry={
+                  message.status === 'error'
+                    ? () => onRetryMessage?.(message.id)
+                    : undefined
+                }
+                disableAnimation={isHistoricalMessage}
+              />
             
             {message.locationProposal && (
               <div className="max-w-md mx-auto">
@@ -77,9 +124,11 @@ export const ChatThread = memo(function ChatThread({
                 />
               </div>
             )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
 
+        {/* Typing Indicator - Only for new messages */}
         {isLoading && (
           <div
             className="flex gap-3 mb-4 animate-slide-in-left"

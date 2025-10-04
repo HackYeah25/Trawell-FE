@@ -8,6 +8,7 @@ import { TripTabs } from '@/components/trips/TripTabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useChatPagination } from '@/hooks/use-chat-pagination';
 import {
   useTrip,
   useTripMessages,
@@ -36,6 +37,18 @@ export default function TripView() {
   const sendMessageMutation = useSendTripMessage();
   const attractionDecisionMutation = useAttractionDecision();
   const renameMutation = useRenameTrip();
+
+  // Pagination for chat messages
+  const {
+    displayedMessages,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+    remainingCount,
+  } = useChatPagination({
+    allMessages: localMessages,
+    pageSize: 10,
+  });
 
   // Load chat history from localStorage or initialize with welcome message
   useEffect(() => {
@@ -262,9 +275,13 @@ export default function TripView() {
                 {/* Chat Thread - Scrollable */}
                 <div className="flex-1 overflow-y-auto">
                   <ChatThread
-                    messages={localMessages}
+                    messages={displayedMessages}
                     isLoading={sendMessageMutation.isPending}
                     onAttractionDecision={handleAttractionDecision}
+                    hasMore={hasMore}
+                    isLoadingMore={isLoadingMore}
+                    onLoadMore={loadMore}
+                    remainingCount={remainingCount}
                   />
                 </div>
 

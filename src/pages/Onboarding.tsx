@@ -4,6 +4,7 @@ import { Plane, Loader2, Sparkles } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
+import { useChatPagination } from '@/hooks/use-chat-pagination';
 import {
   useOnboardingQuestions,
   useAnswerQuestion,
@@ -20,6 +21,18 @@ export default function Onboarding() {
   const { data: questions, isLoading: questionsLoading } = useOnboardingQuestions();
   const answerMutation = useAnswerQuestion();
   const completeMutation = useCompleteOnboarding();
+
+  // Pagination for chat messages
+  const {
+    displayedMessages,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+    remainingCount,
+  } = useChatPagination({
+    allMessages: messages,
+    pageSize: 10,
+  });
 
   // Initialize with welcome message and first question
   useEffect(() => {
@@ -176,10 +189,14 @@ export default function Onboarding() {
         </div>
 
         <ChatThread
-          messages={messages}
+          messages={displayedMessages}
           isLoading={answerMutation.isPending || completeMutation.isPending}
           className="flex-1"
           onQuickReply={handleStartAdventure}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={loadMore}
+          remainingCount={remainingCount}
         />
 
         <Composer

@@ -10,12 +10,14 @@ interface ChatMessageProps {
   message: ChatMessageType;
   onQuickReply?: (payload: unknown) => void;
   onRetry?: () => void;
+  disableAnimation?: boolean;
 }
 
 export const ChatMessage = memo(function ChatMessage({
   message,
   onQuickReply,
   onRetry,
+  disableAnimation = false,
 }: ChatMessageProps) {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -46,16 +48,18 @@ export const ChatMessage = memo(function ChatMessage({
   
   // Track if this is a new message that should be animated
   useEffect(() => {
-    if (message.role === 'assistant' && message.markdown) {
+    if (message.role === 'assistant' && message.markdown && !disableAnimation) {
       // Check if this message was just added by comparing its ID
       const isNewMessage = !message.id.startsWith('initial-') && !message.id.startsWith('iguana-');
       setShouldAnimate(isNewMessage);
+    } else {
+      setShouldAnimate(false);
     }
-  }, [message.id, message.role, message.markdown]);
+  }, [message.id, message.role, message.markdown, disableAnimation]);
   
   // Typing animation for assistant messages - only one at a time
   useEffect(() => {
-    if (message.role === 'assistant' && message.markdown && shouldAnimate) {
+    if (message.role === 'assistant' && message.markdown && shouldAnimate && !disableAnimation) {
       // Check if there's already a typing animation in progress
       const existingTypingElements = document.querySelectorAll('[data-is-typing="true"]');
       

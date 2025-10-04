@@ -19,6 +19,7 @@ import { useTrips } from '@/api/hooks/use-trips';
 import { initialProjectQuestions } from '@/lib/mock-data';
 import { ShareCodeDialog } from '@/components/projects/ShareCodeDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useChatPagination } from '@/hooks/use-chat-pagination';
 import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
 import type { ChatMessage, Location } from '@/types';
 
@@ -39,6 +40,18 @@ export default function ProjectView() {
   const sendMessageMutation = useSendProjectMessage();
   const createTripMutation = useCreateTripFromLocation();
   const renameMutation = useRenameProject();
+
+  // Pagination for chat messages
+  const {
+    displayedMessages,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+    remainingCount,
+  } = useChatPagination({
+    allMessages: localMessages,
+    pageSize: 10,
+  });
 
   // Auto-redirect to trip if this shared project already has one
   useEffect(() => {
@@ -291,10 +304,14 @@ export default function ProjectView() {
           {/* Chat Thread */}
           <div className="flex-1 overflow-y-auto h-0">
             <ChatThread
-              messages={localMessages}
+              messages={displayedMessages}
               isLoading={sendMessageMutation.isPending}
               onLocationDecision={handleLocationDecision}
               onQuickReply={handleQuickReply}
+              hasMore={hasMore}
+              isLoadingMore={isLoadingMore}
+              onLoadMore={loadMore}
+              remainingCount={remainingCount}
               className={isMobile ? 'pb-24' : ''}
             />
           </div>
