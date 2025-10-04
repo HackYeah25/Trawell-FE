@@ -162,17 +162,14 @@ export default function History() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
                               <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
                               {project.isShared && (
                                 <Badge 
                                   variant="secondary" 
-                                  className={cn(
-                                    "text-xs flex-shrink-0",
-                                    isSharedNotOwned && "bg-warm-turquoise/20 text-warm-turquoise border-warm-turquoise/30"
-                                  )}
+                                  className="text-xs flex-shrink-0"
                                 >
-                                  {isSharedNotOwned ? 'Joined' : 'Shared'}
+                                  Shared
                                 </Badge>
                               )}
                             </div>

@@ -3,6 +3,7 @@ import { ChatMessage } from './ChatMessage';
 import { Loader2 } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ChatThreadProps {
   messages: ChatMessageType[];
@@ -24,10 +25,9 @@ export const ChatThread = memo(function ChatThread({
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    // Use requestAnimationFrame for better scroll timing
     const frameId = requestAnimationFrame(() => {
-      if (bottomRef.current && containerRef.current) {
-        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
     });
     
@@ -35,14 +35,15 @@ export const ChatThread = memo(function ChatThread({
   }, [messages.length]);
 
   return (
-    <div
+    <ScrollArea
       ref={containerRef}
-      className={cn('flex-1 overflow-y-auto px-4 py-6', className)}
+      className={cn('flex-1', className)}
       role="log"
       aria-live="polite"
       aria-label="Chat messages"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="px-4 py-6">
+        <div className="max-w-4xl mx-auto">
         {messages.map((message) => (
           <ChatMessage
             key={message.id}
@@ -81,7 +82,8 @@ export const ChatThread = memo(function ChatThread({
         )}
 
         <div ref={bottomRef} />
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 });

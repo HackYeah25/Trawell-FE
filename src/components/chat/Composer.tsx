@@ -3,6 +3,7 @@ import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ComposerProps {
   onSend: (message: string) => void;
@@ -21,6 +22,7 @@ export function Composer({
 }: ComposerProps) {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
   // Auto-focus on mount and when disabled changes to false
   useEffect(() => {
@@ -61,7 +63,8 @@ export function Composer({
   return (
     <div
       className={cn(
-        'flex items-end gap-2 p-4 border-t border-border bg-background',
+        'border-t border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex items-end gap-2',
+        isMobile && 'fixed bottom-0 left-0 right-0 z-50',
         className
       )}
     >

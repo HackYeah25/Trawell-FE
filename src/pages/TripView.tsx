@@ -7,6 +7,7 @@ import { Composer } from '@/components/chat/Composer';
 import { AttractionsPanel } from '@/components/trips/AttractionsPanel';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   useTrip,
   useTripMessages,
@@ -43,6 +44,7 @@ export default function TripView() {
   const [showSummary, setShowSummary] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const isMobile = useIsMobile();
 
   const { data: trip } = useTrip(tripId!);
   const { data: messagesData } = useTripMessages(tripId!);
@@ -272,16 +274,15 @@ export default function TripView() {
                 <ChatThread
                   messages={localMessages}
                   isLoading={sendMessageMutation.isPending}
+                  className={isMobile ? 'pb-24' : ''}
                 />
               </div>
               
-              <div className="flex-shrink-0">
-                <Composer
-                  onSend={handleSendMessage}
-                  disabled={sendMessageMutation.isPending}
-                  placeholder="Describe your preferences..."
-                />
-              </div>
+              <Composer
+                onSend={handleSendMessage}
+                disabled={sendMessageMutation.isPending}
+                placeholder="Describe your preferences..."
+              />
             </>
           )}
         </div>

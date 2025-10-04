@@ -34,6 +34,8 @@ export interface ChatMessage {
   quickReplies?: QuickReply[];
   uiHints?: UIHint[];
   status?: 'sending' | 'sent' | 'error';
+  userName?: string;
+  userAvatar?: string;
 }
 
 export interface User {

@@ -98,6 +98,51 @@ export const apiClient = {
       return mockFetch([] as T, 400);
     }
 
+    // Project participants
+    if (endpoint.match(/^\/projects\/[^/]+\/participants$/)) {
+      const projectId = endpoint.split('/')[2];
+      
+      if (projectId === 'shared-proj-iguana') {
+        return mockFetch([
+          {
+            id: 'participant-1',
+            projectId,
+            userId: 'user-sarah-456',
+            userName: 'Sarah Mitchell',
+            joinedAt: new Date('2025-01-08T09:00:00').toISOString(),
+          },
+          {
+            id: 'participant-2',
+            projectId,
+            userId: 'user-mark-789',
+            userName: 'Mark Johnson',
+            joinedAt: new Date('2025-01-08T09:30:00').toISOString(),
+          },
+          {
+            id: 'participant-3',
+            projectId,
+            userId: 'user-emma-321',
+            userName: 'Emma Rodriguez',
+            joinedAt: new Date('2025-01-08T10:00:00').toISOString(),
+          },
+        ] as T);
+      }
+      
+      if (projectId === 'shared-proj-abc123') {
+        return mockFetch([
+          {
+            id: 'participant-abc-1',
+            projectId,
+            userId: 'other-user-123',
+            userName: 'Alex Thompson',
+            joinedAt: new Date('2025-01-10T08:00:00').toISOString(),
+          },
+        ] as T);
+      }
+      
+      return mockFetch([] as T);
+    }
+
     // Trips list
     if (endpoint === '/trips') {
       return mockFetch(mockTrips as T);

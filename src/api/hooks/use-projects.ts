@@ -101,3 +101,11 @@ export function useJoinProject() {
     },
   });
 }
+
+export function useProjectParticipants(projectId: string, enabled: boolean = true) {
+  return useQuery({
+    queryKey: ['project', projectId, 'participants'],
+    queryFn: () => apiClient.get<any[]>(`/projects/${projectId}/participants`),
+    enabled: !!projectId && enabled,
+  });
+}

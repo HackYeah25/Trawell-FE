@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Loader2, Pencil, Check, X } from 'lucide-react';
+import { MapPin, Loader2, Pencil, Check, X, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
@@ -14,11 +14,13 @@ import {
   useSendProjectMessage,
   useProjectLocationSuggestions,
   useCreateTripFromLocation,
+  useProjectParticipants,
 } from '@/api/hooks/use-projects';
 import { useRenameProject } from '@/api/hooks/use-rename';
 import { useTrips } from '@/api/hooks/use-trips';
 import { initialProjectQuestions } from '@/lib/mock-data';
-import { ShareCodeDisplay } from '@/components/projects/ShareCodeDisplay';
+import { ShareCodeDialog } from '@/components/projects/ShareCodeDialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import type { ChatMessage } from '@/types';
 
 export default function ProjectView() {
@@ -28,6 +30,8 @@ export default function ProjectView() {
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
   const [showLocationButton, setShowLocationButton] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
 
@@ -35,6 +39,7 @@ export default function ProjectView() {
   const { data: messagesData } = useProjectMessages(projectId!);
   const { data: locationSuggestions } = useProjectLocationSuggestions(projectId!);
   const { data: trips } = useTrips();
+  const { data: participants } = useProjectParticipants(projectId!, !!project?.shareCode);
   const sendMessageMutation = useSendProjectMessage();
   const createTripMutation = useCreateTripFromLocation();
   const renameMutation = useRenameProject();
@@ -231,17 +236,22 @@ export default function ProjectView() {
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
+                  {project.shareCode && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:bg-warm-coral/10"
+                      onClick={() => setShareDialogOpen(true)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
               )}
               <p className="text-xs md:text-sm text-muted-foreground mt-1">
                 Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
               </p>
             </div>
-
-            {/* Share Code Display for Shared Projects */}
-            {project.isShared && project.shareCode && (
-              <ShareCodeDisplay shareCode={project.shareCode} />
-            )}
           </div>
         </div>
 
@@ -253,6 +263,7 @@ export default function ProjectView() {
               messages={localMessages}
               isLoading={sendMessageMutation.isPending}
               onQuickReply={() => setShowLocations(true)}
+              className={isMobile && shouldShowComposer ? 'pb-24' : ''}
             />
           </div>
 
@@ -346,16 +357,23 @@ export default function ProjectView() {
 
           {/* Composer - Only show during initial questions */}
           {shouldShowComposer && (
-            <div className="flex-shrink-0">
-              <Composer
-                onSend={handleSendMessage}
-                disabled={sendMessageMutation.isPending}
-                placeholder="Describe your expectations..."
-              />
-            </div>
+            <Composer
+              onSend={handleSendMessage}
+              disabled={sendMessageMutation.isPending}
+              placeholder="Describe your expectations..."
+            />
           )}
         </div>
       </div>
+
+      {project.shareCode && (
+        <ShareCodeDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          shareCode={project.shareCode}
+          participants={participants}
+        />
+      )}
     </AppShell>
   );
 }

@@ -20,6 +20,29 @@ export const ChatMessage = memo(function ChatMessage({
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  const getAvatarColor = (name?: string) => {
+    if (!name) return 'bg-warm-turquoise';
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colors = [
+      'bg-gradient-to-br from-warm-coral to-warm-coral/80',
+      'bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80',
+      'bg-gradient-to-br from-purple-500 to-purple-600',
+      'bg-gradient-to-br from-blue-500 to-blue-600',
+      'bg-gradient-to-br from-green-500 to-green-600',
+      'bg-gradient-to-br from-amber-500 to-amber-600',
+    ];
+    return colors[hash % colors.length];
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
   
   // Track if this is a new message that should be animated
   useEffect(() => {
@@ -86,6 +109,11 @@ export const ChatMessage = memo(function ChatMessage({
       )}
 
       <div className={cn('flex flex-col gap-2 max-w-[80%] md:max-w-[70%]')}>
+        {isUser && message.userName && (
+          <p className="text-xs font-medium text-muted-foreground px-1">
+            {message.userName}
+          </p>
+        )}
         <div
           className={cn(
             'rounded-2xl px-4 py-3 shadow-sm',
@@ -162,10 +190,13 @@ export const ChatMessage = memo(function ChatMessage({
 
       {isUser && (
         <div
-          className="flex-shrink-0 w-8 h-8 rounded-full bg-warm-turquoise flex items-center justify-center shadow-sm"
+          className={cn(
+            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-white text-xs font-semibold',
+            getAvatarColor(message.userName)
+          )}
           aria-hidden="true"
         >
-          <User className="w-4 h-4 text-white" />
+          {message.userName ? getInitials(message.userName) : <User className="w-4 h-4" />}
         </div>
       )}
     </div>
