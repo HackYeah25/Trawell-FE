@@ -199,18 +199,38 @@ export const apiClient = {
     // Create new project
     if (endpoint === '/projects') {
       await mockDelay(400);
-      const body = data as { title?: string };
+      const body = data as { title?: string; isShared?: boolean };
 
       const newProject: Project = {
         id: `proj-${Date.now()}`,
-        title: body.title || 'Nowy projekt',
+        title: body.title || 'New Project',
         createdAt: new Date().toISOString(),
+        isShared: body.isShared || false,
       };
+
+      if (body.isShared) {
+        const { generateShareCode } = await import('./utils');
+        newProject.shareCode = generateShareCode();
+      }
 
       mockProjects.push(newProject);
       mockProjectMessages[newProject.id] = [];
 
-      return { id: newProject.id } as T;
+      return { id: newProject.id, shareCode: newProject.shareCode } as T;
+    }
+
+    // Join shared project
+    if (endpoint === '/projects/join') {
+      await mockDelay(600);
+      const body = data as { shareCode: string };
+
+      const project = mockProjects.find((p) => p.shareCode === body.shareCode);
+      if (!project) {
+        throw new ApiError('Project not found with that share code', 404);
+      }
+
+      // In a real app, this would add the user to the project participants
+      return { projectId: project.id } as T;
     }
 
     // Send project message

@@ -82,8 +82,20 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { title?: string; seedFromOnboarding?: boolean }) =>
-      apiClient.post<{ id: string }>('/projects', data),
+    mutationFn: (data: { title?: string; seedFromOnboarding?: boolean; isShared?: boolean }) =>
+      apiClient.post<{ id: string; shareCode?: string }>('/projects', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+}
+
+export function useJoinProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { shareCode: string }) =>
+      apiClient.post<{ projectId: string }>('/projects/join', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },

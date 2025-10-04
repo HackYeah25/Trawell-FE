@@ -59,6 +59,16 @@ export interface Project {
   createdAt: string;
   lastMessagePreview?: string;
   updatedAt?: string;
+  isShared?: boolean;
+  shareCode?: string;
+}
+
+export interface ProjectParticipant {
+  id: ID;
+  projectId: ID;
+  userId: ID;
+  userName: string;
+  joinedAt: string;
 }
 
 export interface Location {

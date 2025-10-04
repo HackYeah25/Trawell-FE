@@ -16,6 +16,7 @@ import {
 } from '@/api/hooks/use-projects';
 import { useRenameProject } from '@/api/hooks/use-rename';
 import { initialProjectQuestions } from '@/lib/mock-data';
+import { ShareCodeDisplay } from '@/components/projects/ShareCodeDisplay';
 import type { ChatMessage } from '@/types';
 
 export default function ProjectView() {
@@ -159,47 +160,54 @@ export default function ProjectView() {
       <div className="h-[calc(100vh-4rem)] flex flex-col">
         {/* Header */}
         <div className="border-b border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex-shrink-0">
-          <div className="max-w-4xl mx-auto">
-            {isEditingTitle ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveTitle();
-                    if (e.key === 'Escape') handleCancelEdit();
-                  }}
-                  className="text-xl md:text-2xl font-bold"
-                  autoFocus
-                />
-                <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
-                  <Check className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 group">
-                <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
-                  {project.title}
-                </h1>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
-                  onClick={() => {
-                    setEditedTitle(project.title);
-                    setIsEditingTitle(true);
-                  }}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-              </div>
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div>
+              {isEditingTitle ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveTitle();
+                      if (e.key === 'Escape') handleCancelEdit();
+                    }}
+                    className="text-xl md:text-2xl font-bold"
+                    autoFocus
+                  />
+                  <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 group">
+                  <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                    {project.title}
+                  </h1>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
+                    onClick={() => {
+                      setEditedTitle(project.title);
+                      setIsEditingTitle(true);
+                    }}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
+              </p>
+            </div>
+
+            {/* Share Code Display for Shared Projects */}
+            {project.isShared && project.shareCode && (
+              <ShareCodeDisplay shareCode={project.shareCode} />
             )}
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">
-              Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
-            </p>
           </div>
         </div>
 

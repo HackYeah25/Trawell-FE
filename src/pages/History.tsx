@@ -1,28 +1,54 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree } from 'lucide-react';
+import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree, Users, UserPlus } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useProjects } from '@/api/hooks/use-projects';
+import { Badge } from '@/components/ui/badge';
+import { useProjects, useCreateProject, useJoinProject } from '@/api/hooks/use-projects';
 import { useTrips } from '@/api/hooks/use-trips';
-import { useCreateProject } from '@/api/hooks/use-projects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ProjectTypeDialog } from '@/components/projects/ProjectTypeDialog';
+import { JoinProjectDialog } from '@/components/projects/JoinProjectDialog';
+import { toast } from 'sonner';
 
 export default function History() {
   const navigate = useNavigate();
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const { data: trips, isLoading: tripsLoading } = useTrips();
   const createProjectMutation = useCreateProject();
+  const joinProjectMutation = useJoinProject();
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [showProjectTypeDialog, setShowProjectTypeDialog] = useState(false);
+  const [showJoinDialog, setShowJoinDialog] = useState(false);
 
-  const handleCreateProject = () => {
+  const handleSelectProjectType = (isShared: boolean) => {
+    setShowProjectTypeDialog(false);
     createProjectMutation.mutate(
-      { title: 'New Project' },
+      { title: 'New Project', isShared },
       {
-        onSuccess: (project) => {
-          navigate(`/app/projects/${project.id}`);
+        onSuccess: (result) => {
+          if (isShared && result.shareCode) {
+            toast.success(`Project created! Share code: ${result.shareCode}`);
+          }
+          navigate(`/app/projects/${result.id}`);
+        },
+      }
+    );
+  };
+
+  const handleJoinProject = (shareCode: string) => {
+    joinProjectMutation.mutate(
+      { shareCode },
+      {
+        onSuccess: (result) => {
+          setShowJoinDialog(false);
+          toast.success('Joined project successfully!');
+          navigate(`/app/projects/${result.projectId}`);
+        },
+        onError: () => {
+          toast.error('Invalid share code. Please check and try again.');
         },
       }
     );
@@ -48,16 +74,26 @@ export default function History() {
     <AppShell>
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1 className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">Your Trips</h1>
-          <Button 
-            onClick={handleCreateProject} 
-            disabled={createProjectMutation.isPending}
-            className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Project
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowJoinDialog(true)}
+              variant="outline"
+              className="hidden sm:flex"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Join Project
+            </Button>
+            <Button 
+              onClick={() => setShowProjectTypeDialog(true)}
+              disabled={createProjectMutation.isPending}
+              className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Project
+            </Button>
+          </div>
         </div>
 
         {/* Projects list */}
@@ -74,7 +110,7 @@ export default function History() {
             </div>
             <p className="text-muted-foreground mb-4">You don't have any projects yet</p>
             <Button 
-              onClick={handleCreateProject} 
+              onClick={() => setShowProjectTypeDialog(true)}
               disabled={createProjectMutation.isPending}
               className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
             >
@@ -100,10 +136,21 @@ export default function History() {
                       <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-warm-coral/5 transition-colors">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
-                            <FolderKanban className="w-5 h-5 text-white" />
+                            {project.isShared ? (
+                              <Users className="w-5 h-5 text-white" />
+                            ) : (
+                              <FolderKanban className="w-5 h-5 text-white" />
+                            )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate">{project.title}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold truncate">{project.title}</h3>
+                              {project.isShared && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Shared
+                                </Badge>
+                              )}
+                            </div>
                              <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               {new Date(project.createdAt).toLocaleDateString('en-US')}
@@ -173,6 +220,19 @@ export default function History() {
           </div>
         )}
       </div>
+
+      {/* Dialogs */}
+      <ProjectTypeDialog
+        open={showProjectTypeDialog}
+        onOpenChange={setShowProjectTypeDialog}
+        onSelectType={handleSelectProjectType}
+      />
+      <JoinProjectDialog
+        open={showJoinDialog}
+        onOpenChange={setShowJoinDialog}
+        onJoin={handleJoinProject}
+        isLoading={joinProjectMutation.isPending}
+      />
     </AppShell>
   );
 }
