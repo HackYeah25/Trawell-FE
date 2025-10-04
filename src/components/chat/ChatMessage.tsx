@@ -119,52 +119,69 @@ export const ChatMessage = memo(function ChatMessage({
     >
       <div 
         className={cn(
-          'flex gap-3 w-full max-w-2xl',
-          isUser && !isOtherUser && 'flex-row-reverse'
+          'flex flex-col gap-1 w-full',
+          isUser && !isOtherUser ? 'items-end max-w-[85%] sm:max-w-xl md:max-w-2xl' : 'max-w-[85%] sm:max-w-xl md:max-w-2xl'
         )}
       >
-        {/* Avatar */}
-        <div className="flex flex-col items-center gap-1 flex-shrink-0">
-          <div
-            className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center shadow-sm',
-              isOtherUser 
-                ? cn('text-white text-xs font-semibold', getAvatarColor(message.userName))
-                : isUser
-                  ? 'bg-warm-turquoise'
-                  : isSystem 
-                    ? 'bg-muted' 
-                    : 'bg-gradient-sunset'
-            )}
-            aria-hidden="true"
-          >
-            {isOtherUser ? (
-              getInitials(message.userName!)
-            ) : isUser ? (
-              <User className="w-4 h-4 text-white" />
-            ) : (
-              <Bot className="w-4 h-4 text-white" />
-            )}
-          </div>
-          {isOtherUser && (
-            <p className="text-xs font-medium text-muted-foreground text-center">
+        {/* Avatar + Username ABOVE bubble for other users */}
+        {isOtherUser && (
+          <div className="flex items-center gap-2 ml-1">
+            <div
+              className={cn(
+                'w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm text-white text-xs font-semibold',
+                getAvatarColor(message.userName)
+              )}
+              aria-hidden="true"
+            >
+              {getInitials(message.userName!)}
+            </div>
+            <p className="text-xs font-medium text-muted-foreground">
               {message.userName}
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Message content */}
-        <div className="flex-1 min-w-0">
-          
-          <div
-            className={cn(
-              'rounded-2xl px-4 py-3 shadow-sm',
-              isUser && !isOtherUser
-                ? 'bg-gradient-sunset text-white shadow-warm'
-                : 'bg-card text-card-foreground border border-warm-coral/20'
-            )}
-            data-is-typing={isTyping ? 'true' : 'false'}
-          >
+        {/* Message bubble with avatar for non-group messages */}
+        <div 
+          className={cn(
+            'flex gap-3 w-full',
+            isUser && !isOtherUser && 'flex-row-reverse'
+          )}
+        >
+          {/* Avatar for current user and assistant */}
+          {!isOtherUser && (
+            <div className="flex-shrink-0">
+              <div
+                className={cn(
+                  'w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm',
+                  isUser
+                    ? 'bg-warm-turquoise'
+                    : isSystem 
+                      ? 'bg-muted' 
+                      : 'bg-gradient-sunset'
+                )}
+                aria-hidden="true"
+              >
+                {isUser ? (
+                  <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                ) : (
+                  <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Message content */}
+          <div className="flex-1 min-w-0">
+            <div
+              className={cn(
+                'rounded-2xl px-4 py-3 shadow-sm',
+                isUser && !isOtherUser
+                  ? 'bg-gradient-sunset text-white shadow-warm'
+                  : 'bg-card text-card-foreground border border-warm-coral/20'
+              )}
+              data-is-typing={isTyping ? 'true' : 'false'}
+            >
           {message.markdown && (
             <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-ul:my-0 prose-ol:my-0">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -210,25 +227,26 @@ export const ChatMessage = memo(function ChatMessage({
           </div>
         )}
 
-        {message.uiHints?.map((hint, index) => (
-          <div key={index} className="mt-2">
-            {hint.type === 'choices' && (
-              <div className="flex flex-col gap-2">
-                {hint.options.map((option) => (
-                  <Button
-                    key={option.value}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onQuickReply?.(option.value)}
-                    className="justify-start bg-card hover:bg-warm-coral/10 border-warm-coral/20"
-                  >
-                    {option.label}
-                  </Button>
-                ))}
+            {message.uiHints?.map((hint, index) => (
+              <div key={index} className="mt-2">
+                {hint.type === 'choices' && (
+                  <div className="flex flex-col gap-2">
+                    {hint.options.map((option) => (
+                      <Button
+                        key={option.value}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onQuickReply?.(option.value)}
+                        className="justify-start bg-card hover:bg-warm-coral/10 border-warm-coral/20"
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
         </div>
       </div>
     </div>

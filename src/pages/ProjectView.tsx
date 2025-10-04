@@ -272,7 +272,11 @@ export default function ProjectView() {
             <ChatThread
               messages={localMessages}
               isLoading={sendMessageMutation.isPending}
-              onQuickReply={() => setShowLocations(true)}
+              onQuickReply={(payload) => {
+                if (payload === 'view') {
+                  setShowLocations(true);
+                }
+              }}
               className={isMobile && shouldShowComposer ? 'pb-24' : ''}
             />
           </div>
