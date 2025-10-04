@@ -118,9 +118,7 @@ export const ChatMessage = memo(function ChatMessage({
                   'w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm',
                   isUser
                     ? 'bg-warm-turquoise'
-                    : isSystem 
-                      ? 'bg-muted' 
-                      : 'bg-gradient-sunset'
+                    : 'bg-gradient-sunset'
                 )}
                 aria-hidden="true"
               >
