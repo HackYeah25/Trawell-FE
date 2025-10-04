@@ -27,6 +27,8 @@ export default function ProjectView() {
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [showLocationButton, setShowLocationButton] = useState(false);
+  const [showLocations, setShowLocations] = useState(false);
 
   const { data: project } = useProject(projectId!);
   const { data: messagesData } = useProjectMessages(projectId!);
@@ -97,8 +99,23 @@ export default function ProjectView() {
           if (nextIndex < initialProjectQuestions.length) {
             return [...filtered, userMsg, initialProjectQuestions[nextIndex]];
           } else {
-            // All questions answered, trigger location suggestions
-            return [...filtered, userMsg];
+            // All questions answered, show button to view locations
+            const completionMessage: ChatMessage = {
+              id: 'show-locations',
+              role: 'assistant',
+              markdown:
+                '✨ Great! Based on your preferences, I have some amazing destinations for you.\n\nReady to explore?',
+              createdAt: new Date().toISOString(),
+              quickReplies: [
+                {
+                  id: 'view-destinations',
+                  label: 'View Destinations',
+                  payload: 'view',
+                },
+              ],
+            };
+            setShowLocationButton(true);
+            return [...filtered, userMsg, completionMessage];
           }
         });
         setAnsweredQuestions(nextIndex);
@@ -152,6 +169,7 @@ export default function ProjectView() {
   }
 
   const showLocationSuggestions = 
+    showLocations &&
     answeredQuestions >= initialProjectQuestions.length && 
     locationSuggestions && 
     locationSuggestions.length > 0;
@@ -219,6 +237,7 @@ export default function ProjectView() {
             <ChatThread
               messages={localMessages}
               isLoading={sendMessageMutation.isPending}
+              onQuickReply={() => setShowLocations(true)}
             />
           </div>
 
@@ -291,7 +310,7 @@ export default function ProjectView() {
           <div className="flex-shrink-0">
             <Composer
               onSend={handleSendMessage}
-              disabled={sendMessageMutation.isPending}
+              disabled={sendMessageMutation.isPending || showLocationButton}
               placeholder="Describe your expectations..."
             />
           </div>

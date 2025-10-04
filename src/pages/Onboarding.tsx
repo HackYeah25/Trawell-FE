@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, Loader2 } from 'lucide-react';
+import { Plane, Loader2, Sparkles } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
+import { Button } from '@/components/ui/button';
 import {
   useOnboardingQuestions,
   useAnswerQuestion,
@@ -14,6 +15,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showStartButton, setShowStartButton] = useState(false);
 
   const { data: questions, isLoading: questionsLoading } = useOnboardingQuestions();
   const answerMutation = useAnswerQuestion();
@@ -95,23 +97,23 @@ export default function Onboarding() {
           setMessages((prev) => [...prev, nextQuestion]);
           setCurrentQuestionIndex(nextIndex);
         } else {
-          // All questions answered - complete onboarding
+          // All questions answered - show completion message with button
           const thankYouMessage: ChatMessage = {
             id: 'complete',
             role: 'assistant',
             markdown:
-              '✅ Perfect! I have everything I need.\n\nCreating your first travel project...',
+              '✅ Perfect! I have everything I need to help you plan amazing trips.\n\nReady to start your adventure?',
             createdAt: new Date().toISOString(),
+            quickReplies: [
+              {
+                id: 'start-adventure',
+                label: 'Start Adventure',
+                payload: 'start',
+              },
+            ],
           };
           setMessages((prev) => [...prev, thankYouMessage]);
-
-          // Complete onboarding - this will update localStorage and invalidate cache
-          const result = await completeMutation.mutateAsync({
-            createInitialProject: true,
-          });
-
-          // Redirect to first project
-          navigate(`/app/projects/${result.projectId}`);
+          setShowStartButton(true);
         }
       }
     } catch (error) {
@@ -122,6 +124,20 @@ export default function Onboarding() {
         )
       );
       console.error('Failed to send answer');
+    }
+  };
+
+  const handleStartAdventure = async () => {
+    try {
+      // Complete onboarding - this will update localStorage and invalidate cache
+      const result = await completeMutation.mutateAsync({
+        createInitialProject: true,
+      });
+
+      // Redirect to first project
+      navigate(`/app/projects/${result.projectId}`);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
     }
   };
 
@@ -163,6 +179,7 @@ export default function Onboarding() {
           messages={messages}
           isLoading={answerMutation.isPending || completeMutation.isPending}
           className="flex-1"
+          onQuickReply={handleStartAdventure}
         />
 
         <Composer
@@ -170,6 +187,7 @@ export default function Onboarding() {
           disabled={
             answerMutation.isPending ||
             completeMutation.isPending ||
+            showStartButton ||
             currentQuestionIndex >= (questions?.length || 0)
           }
           placeholder="Your answer..."
