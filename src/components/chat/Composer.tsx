@@ -9,6 +9,7 @@ interface ComposerProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
 }
 
 export function Composer({
@@ -16,9 +17,17 @@ export function Composer({
   disabled = false,
   placeholder = 'Type a message...',
   className,
+  autoFocus = true,
 }: ComposerProps) {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus on mount and when disabled changes to false
+  useEffect(() => {
+    if (autoFocus && !disabled && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [disabled, autoFocus]);
 
   // Auto-resize textarea
   useEffect(() => {

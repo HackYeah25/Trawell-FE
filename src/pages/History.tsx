@@ -144,9 +144,9 @@ export default function History() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold truncate">{project.title}</h3>
+                              <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
                               {project.isShared && (
-                                <Badge variant="secondary" className="text-xs">
+                                <Badge variant="secondary" className="text-xs flex-shrink-0">
                                   Shared
                                 </Badge>
                               )}

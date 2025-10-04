@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Bot, User, AlertCircle } from 'lucide-react';
@@ -17,6 +17,40 @@ export const ChatMessage = memo(function ChatMessage({
   onQuickReply,
   onRetry,
 }: ChatMessageProps) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  
+  // Typing animation for assistant messages
+  useEffect(() => {
+    if (message.role === 'assistant' && message.markdown) {
+      setIsTyping(true);
+      setDisplayedText('');
+      
+      let currentIndex = 0;
+      const text = message.markdown;
+      const typingSpeed = 15; // ms per character
+      
+      const timer = setTimeout(() => {
+        const interval = setInterval(() => {
+          if (currentIndex < text.length) {
+            setDisplayedText(text.slice(0, currentIndex + 1));
+            currentIndex++;
+          } else {
+            setIsTyping(false);
+            clearInterval(interval);
+          }
+        }, typingSpeed);
+        
+        return () => clearInterval(interval);
+      }, 300); // Initial delay
+      
+      return () => clearTimeout(timer);
+    } else {
+      setDisplayedText(message.markdown || '');
+      setIsTyping(false);
+    }
+  }, [message.markdown, message.role]);
+
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
 
@@ -53,8 +87,11 @@ export const ChatMessage = memo(function ChatMessage({
           {message.markdown && (
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {message.markdown}
+                {displayedText}
               </ReactMarkdown>
+              {isTyping && (
+                <span className="inline-block w-1 h-4 ml-1 bg-warm-coral animate-pulse" />
+              )}
             </div>
           )}
 
