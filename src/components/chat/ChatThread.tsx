@@ -35,7 +35,7 @@ export const ChatThread = memo(function ChatThread({
 
   return (
     <div 
-      className={cn('flex-1 overflow-y-auto', className)}
+      className={cn('flex-1', className)}
       role="log"
       aria-live="polite"
       aria-label="Chat messages"

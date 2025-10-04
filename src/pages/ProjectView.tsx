@@ -44,6 +44,16 @@ export default function ProjectView() {
   const createTripMutation = useCreateTripFromLocation();
   const renameMutation = useRenameProject();
 
+  // Auto-redirect to trip if this shared project already has one
+  useEffect(() => {
+    if (project?.isShared && trips && trips.length > 0) {
+      const existingTrip = trips.find(trip => trip.projectId === projectId);
+      if (existingTrip) {
+        navigate(`/app/trips/${existingTrip.id}`);
+      }
+    }
+  }, [project, trips, projectId, navigate]);
+
   // Initialize with questions and flatten paginated messages
   useEffect(() => {
     if (messagesData && locationSuggestions !== undefined) {
@@ -258,7 +268,7 @@ export default function ProjectView() {
         {/* Chat and Composer Container */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Chat Thread */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto h-0">
             <ChatThread
               messages={localMessages}
               isLoading={sendMessageMutation.isPending}

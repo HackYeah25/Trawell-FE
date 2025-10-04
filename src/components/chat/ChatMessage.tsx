@@ -146,15 +146,15 @@ export const ChatMessage = memo(function ChatMessage({
               <Bot className="w-4 h-4 text-white" />
             )}
           </div>
+          {isOtherUser && (
+            <p className="text-xs font-medium text-muted-foreground text-center">
+              {message.userName}
+            </p>
+          )}
         </div>
 
         {/* Message content */}
         <div className="flex-1 min-w-0">
-          {isOtherUser && (
-            <p className="text-xs font-medium text-muted-foreground mb-1 px-1">
-              {message.userName}
-            </p>
-          )}
           
           <div
             className={cn(
