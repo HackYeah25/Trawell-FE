@@ -27,11 +27,3 @@ export function useUser() {
   });
 }
 
-export function updateUserOnboarding(completed: boolean) {
-  const storedUser = localStorage.getItem('travelai_user');
-  if (storedUser) {
-    const user = JSON.parse(storedUser);
-    user.onboardingCompleted = completed;
-    localStorage.setItem('travelai_user', JSON.stringify(user));
-  }
-}

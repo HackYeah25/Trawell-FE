@@ -39,12 +39,12 @@ export const SummaryCard = memo(function SummaryCard({ section }: SummaryCardPro
   const Icon = categoryIcons[section.category] || FileText;
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg">
-      <CardHeader className="bg-gradient-sky border-b border-border">
+    <Card className="overflow-hidden transition-shadow hover:shadow-warm border-warm-coral/20">
+      <CardHeader className="bg-gradient-to-r from-warm-coral/10 to-warm-turquoise/10 border-b border-warm-coral/20">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
+              <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
               <CardTitle className="text-lg">{section.title}</CardTitle>
@@ -55,7 +55,7 @@ export const SummaryCard = memo(function SummaryCard({ section }: SummaryCardPro
           {section.important && (
             <Badge variant="destructive" className="flex-shrink-0">
               <AlertTriangle className="w-3 h-3 mr-1" />
-              Ważne
+              Important
             </Badge>
           )}
         </div>

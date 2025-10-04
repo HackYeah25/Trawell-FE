@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, FolderKanban, Plane, Calendar, ChevronDown, ChevronRight, Palmtree } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -49,8 +49,12 @@ export default function History() {
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Your Trips</h1>
-          <Button onClick={handleCreateProject} disabled={createProjectMutation.isPending}>
+          <h1 className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">Your Trips</h1>
+          <Button 
+            onClick={handleCreateProject} 
+            disabled={createProjectMutation.isPending}
+            className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Project
           </Button>
@@ -64,10 +68,16 @@ export default function History() {
             ))}
           </div>
         ) : !projects || projects.length === 0 ? (
-          <Card className="p-12 text-center">
-            <FolderKanban className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <Card className="p-12 text-center border-dashed border-warm-coral/30 bg-gradient-to-br from-warm-coral/5 to-warm-turquoise/5">
+            <div className="w-20 h-20 rounded-full bg-gradient-sunset flex items-center justify-center mb-4 mx-auto shadow-warm">
+              <Palmtree className="w-10 h-10 text-white" />
+            </div>
             <p className="text-muted-foreground mb-4">You don't have any projects yet</p>
-            <Button onClick={handleCreateProject} disabled={createProjectMutation.isPending}>
+            <Button 
+              onClick={handleCreateProject} 
+              disabled={createProjectMutation.isPending}
+              className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create Your First Project
             </Button>
@@ -84,13 +94,13 @@ export default function History() {
                   open={isExpanded}
                   onOpenChange={() => toggleProject(project.id)}
                 >
-                  <Card>
+                  <Card className="border-warm-coral/20 bg-card/80 backdrop-blur-sm">
                     {/* Project header */}
                     <CollapsibleTrigger asChild>
-                      <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-accent/5 transition-colors">
+                      <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-warm-coral/5 transition-colors">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <FolderKanban className="w-5 h-5 text-primary" />
+                          <div className="w-10 h-10 rounded-lg bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm">
+                            <FolderKanban className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold truncate">{project.title}</h3>
@@ -115,6 +125,7 @@ export default function History() {
                               e.stopPropagation();
                               navigate(`/app/projects/${project.id}`);
                             }}
+                            className="hover:bg-warm-coral/10"
                           >
                             Open
                           </Button>
@@ -139,10 +150,10 @@ export default function History() {
                             <div
                               key={trip.id}
                               onClick={() => navigate(`/app/trips/${trip.id}`)}
-                              className="p-3 rounded-lg border border-border hover:border-accent hover:bg-accent/5 cursor-pointer transition-all flex items-center gap-3"
+                              className="p-3 rounded-lg border border-warm-coral/20 hover:border-warm-coral hover:bg-warm-coral/5 cursor-pointer transition-all flex items-center gap-3"
                             >
-                              <div className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center flex-shrink-0">
-                                <Plane className="w-4 h-4 text-accent" />
+                              <div className="w-8 h-8 rounded bg-warm-turquoise/20 flex items-center justify-center flex-shrink-0">
+                                <Plane className="w-4 h-4 text-warm-turquoise" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm truncate">{trip.title}</p>

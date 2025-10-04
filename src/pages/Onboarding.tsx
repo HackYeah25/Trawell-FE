@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateUserOnboarding } from '@/api/hooks/use-user';
 import { Plane, Loader2 } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -23,11 +22,11 @@ export default function Onboarding() {
   // Initialize with welcome message and first question
   useEffect(() => {
     if (questions && questions.length > 0 && messages.length === 0) {
-      const welcomeMessage: ChatMessage = {
+        const welcomeMessage: ChatMessage = {
         id: 'welcome',
         role: 'system',
         markdown:
-          '# Welcome to TravelAI! 🌍\n\nI\'ll help you plan your dream trip. Before we start, answer a few questions to help me understand your preferences.',
+          '# Welcome to TravelAI! 🌴\n\nI\'ll help you plan your dream vacation. Let\'s start by understanding your travel preferences.',
         createdAt: new Date().toISOString(),
       };
 
@@ -101,18 +100,15 @@ export default function Onboarding() {
             id: 'complete',
             role: 'assistant',
             markdown:
-              '✅ Świetnie! Mam wszystko, czego potrzebuję.\n\nTworzę Twój pierwszy projekt podróży...',
+              '✅ Perfect! I have everything I need.\n\nCreating your first travel project...',
             createdAt: new Date().toISOString(),
           };
           setMessages((prev) => [...prev, thankYouMessage]);
 
-          // Complete onboarding
+          // Complete onboarding - this will update localStorage and invalidate cache
           const result = await completeMutation.mutateAsync({
             createInitialProject: true,
           });
-
-          // Mark user as onboarded
-          updateUserOnboarding(true);
 
           // Redirect to first project
           navigate(`/app/projects/${result.projectId}`);
@@ -131,30 +127,32 @@ export default function Onboarding() {
 
   if (questionsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-sky">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-ocean flex items-center justify-center">
-            <Plane className="w-8 h-8 text-primary-foreground animate-pulse" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-sunset flex items-center justify-center shadow-warm">
+            <Plane className="w-8 h-8 text-white animate-pulse" />
           </div>
-          <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Przygotowuję pytania...</p>
+          <Loader2 className="w-8 h-8 mx-auto animate-spin text-warm-coral" />
+          <p className="mt-4 text-muted-foreground">Preparing questions...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-sky">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
       <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto">
-        <div className="p-6 border-b border-border bg-card/50 backdrop-blur-sm">
+        <div className="p-6 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-ocean flex items-center justify-center">
-              <Plane className="w-6 h-6 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm">
+              <Plane className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Onboarding</h1>
+              <h1 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
+                Let's Plan Your Trip
+              </h1>
               <p className="text-sm text-muted-foreground">
-                Pytanie {Math.min(currentQuestionIndex + 1, questions?.length || 0)} z{' '}
+                Question {Math.min(currentQuestionIndex + 1, questions?.length || 0)} of{' '}
                 {questions?.length || 0}
               </p>
             </div>
@@ -174,7 +172,7 @@ export default function Onboarding() {
             completeMutation.isPending ||
             currentQuestionIndex >= (questions?.length || 0)
           }
-          placeholder="Twoja odpowiedź..."
+          placeholder="Your answer..."
         />
       </div>
     </div>

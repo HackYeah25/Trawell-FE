@@ -22,11 +22,11 @@ export const AttractionsPanel = memo(function AttractionsPanel({
   }
 
   return (
-    <div className="border-t border-border bg-muted/30 p-4">
+    <div className="border-t border-warm-coral/20 bg-gradient-to-br from-warm-sand/30 to-warm-turquoise/5 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-2 mb-4">
-          <MapPin className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold text-lg">Proponowane atrakcje</h3>
+          <MapPin className="w-5 h-5 text-warm-coral" />
+          <h3 className="font-semibold text-lg">Suggested Attractions</h3>
         </div>
 
         <div className="space-y-3">

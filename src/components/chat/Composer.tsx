@@ -14,7 +14,7 @@ interface ComposerProps {
 export function Composer({
   onSend,
   disabled = false,
-  placeholder = 'Napisz wiadomość...',
+  placeholder = 'Type a message...',
   className,
 }: ComposerProps) {
   const [message, setMessage] = useState('');
@@ -70,7 +70,7 @@ export function Composer({
         onClick={handleSend}
         disabled={disabled || !message.trim()}
         size="icon"
-        className="flex-shrink-0 h-11 w-11 rounded-full bg-gradient-ocean hover:opacity-90 transition-opacity"
+        className="flex-shrink-0 h-11 w-11 rounded-full bg-gradient-sunset hover:opacity-90 transition-opacity shadow-warm border-0 text-white"
         aria-label="Send message"
       >
         {disabled ? (

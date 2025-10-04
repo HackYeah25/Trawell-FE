@@ -46,7 +46,7 @@ export const AttractionCard = memo(function AttractionCard({
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-3">
           <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+            <MapPin className="w-4 h-4 text-warm-coral mt-1 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <CardTitle className="text-base break-words">{attraction.title}</CardTitle>
               {!attraction.imageUrl && attraction.category && (
@@ -72,12 +72,12 @@ export const AttractionCard = memo(function AttractionCard({
               {attraction.decision === 'accepted' ? (
                 <>
                   <Check className="w-3 h-3 mr-1" />
-                  Zaakceptowano
+                  Accepted
                 </>
               ) : (
                 <>
                   <X className="w-3 h-3 mr-1" />
-                  Odrzucono
+                  Rejected
                 </>
               )}
             </Badge>
@@ -88,20 +88,20 @@ export const AttractionCard = memo(function AttractionCard({
                 variant="outline"
                 onClick={() => onDecision(attraction.id, 'accept')}
                 disabled={disabled}
-                className="bg-success/10 border-success hover:bg-success hover:text-success-foreground w-full sm:w-auto"
+                className="bg-warm-turquoise/10 border-warm-turquoise hover:bg-warm-turquoise hover:text-white w-full sm:w-auto"
               >
                 <Check className="w-4 h-4 mr-1" />
-                Akceptuj
+                Accept
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => onDecision(attraction.id, 'reject')}
                 disabled={disabled}
-                className="w-full sm:w-auto"
+                className="hover:bg-warm-coral/10 w-full sm:w-auto"
               >
                 <X className="w-4 h-4 mr-1" />
-                Odrzuć
+                Reject
               </Button>
             </div>
           )}

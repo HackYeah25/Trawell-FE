@@ -32,12 +32,12 @@ export const ChatMessage = memo(function ChatMessage({
       {!isUser && (
         <div
           className={cn(
-            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-            isSystem ? 'bg-muted' : 'bg-gradient-ocean'
+            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm',
+            isSystem ? 'bg-muted' : 'bg-gradient-sunset'
           )}
           aria-hidden="true"
         >
-          <Bot className="w-4 h-4 text-primary-foreground" />
+          <Bot className="w-4 h-4 text-white" />
         </div>
       )}
 
@@ -46,8 +46,8 @@ export const ChatMessage = memo(function ChatMessage({
           className={cn(
             'rounded-2xl px-4 py-3 shadow-sm',
             isUser
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-card text-card-foreground border border-border'
+              ? 'bg-gradient-sunset text-white shadow-warm'
+              : 'bg-card text-card-foreground border border-warm-coral/20'
           )}
         >
           {message.markdown && (
@@ -61,15 +61,15 @@ export const ChatMessage = memo(function ChatMessage({
           {message.status === 'error' && (
             <div className="flex items-center gap-2 mt-2 text-destructive">
               <AlertCircle className="w-4 h-4" />
-              <span className="text-sm">Nie udało się wysłać wiadomości</span>
+              <span className="text-sm">Failed to send message</span>
               {onRetry && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onRetry}
-                  className="ml-auto"
+                  className="ml-auto hover:bg-warm-coral/10"
                 >
-                  Spróbuj ponownie
+                  Try again
                 </Button>
               )}
             </div>
@@ -115,10 +115,10 @@ export const ChatMessage = memo(function ChatMessage({
 
       {isUser && (
         <div
-          className="flex-shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center"
+          className="flex-shrink-0 w-8 h-8 rounded-full bg-warm-turquoise flex items-center justify-center shadow-sm"
           aria-hidden="true"
         >
-          <User className="w-4 h-4 text-accent-foreground" />
+          <User className="w-4 h-4 text-white" />
         </div>
       )}
     </div>

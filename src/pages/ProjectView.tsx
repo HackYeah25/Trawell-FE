@@ -143,7 +143,7 @@ export default function ProjectView() {
     return (
       <AppShell>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin text-warm-coral" />
         </div>
       </AppShell>
     );
@@ -158,7 +158,7 @@ export default function ProjectView() {
     <AppShell>
       <div className="h-[calc(100vh-4rem)] flex flex-col">
         {/* Header */}
-        <div className="border-b border-border bg-card/50 backdrop-blur-sm p-4 flex-shrink-0">
+        <div className="border-b border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
             {isEditingTitle ? (
               <div className="flex items-center gap-2">
@@ -181,11 +181,13 @@ export default function ProjectView() {
               </div>
             ) : (
               <div className="flex items-center gap-2 group">
-                <h1 className="text-xl md:text-2xl font-bold truncate">{project.title}</h1>
+                <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                  {project.title}
+                </h1>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
                   onClick={() => {
                     setEditedTitle(project.title);
                     setIsEditingTitle(true);
@@ -215,8 +217,8 @@ export default function ProjectView() {
           {showLocationSuggestions && (
             <div className="absolute inset-0 bg-background z-10 overflow-y-auto">
               <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <MapPin className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent flex items-center gap-2">
+                  <MapPin className="w-6 h-6 text-warm-coral" />
                   Suggested Destinations
                 </h2>
                 <p className="text-muted-foreground">
@@ -227,7 +229,7 @@ export default function ProjectView() {
                   {locationSuggestions.map((location) => (
                     <Card
                       key={location.id}
-                      className="cursor-pointer transition-all hover:shadow-lg overflow-hidden group"
+                      className="cursor-pointer transition-all hover:shadow-warm overflow-hidden group border-warm-coral/20"
                     >
                       {location.imageUrl && (
                         <div className="h-48 overflow-hidden">
@@ -250,7 +252,7 @@ export default function ProjectView() {
                         <Button
                           onClick={() => handleCreateTrip(location.id)}
                           disabled={createTripMutation.isPending}
-                          className="w-full"
+                          className="w-full bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
                         >
                           Create Trip
                         </Button>

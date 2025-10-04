@@ -18,7 +18,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen flex flex-col w-full">
       {/* Top bar */}
-      <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="h-16 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="h-full px-4 flex items-center justify-between gap-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
             {showBackButton && (
@@ -26,14 +26,15 @@ export function AppShell({ children }: AppShellProps) {
                 variant="ghost" 
                 size="icon"
                 onClick={() => navigate('/app')}
+                className="hover:bg-warm-coral/10"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             )}
             
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center">
-                <Plane className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center shadow-warm">
+                <Plane className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
                 TravelAI
