@@ -3,6 +3,33 @@ import { useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import type { OnboardingQuestion, OnboardingAnswerResponse } from '@/types';
 
+export function useProfileStatus() {
+  return useQuery({
+    queryKey: ['profiling', 'status'],
+    queryFn: async () => {
+      const response = await apiClient.get<{
+        has_profile: boolean;
+        profile_completeness: number;
+        user_id?: string;
+        message?: string;
+      }>('/profiling/status');
+      return response;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useResetProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiClient.delete('/profiling/profile/reset'),
+    onSuccess: () => {
+      // Invalidate profile status to refetch
+      queryClient.invalidateQueries({ queryKey: ['profiling', 'status'] });
+    },
+  });
+}
+
 export function useOnboardingQuestions() {
   return useQuery({
     queryKey: ['profiling', 'questions'],

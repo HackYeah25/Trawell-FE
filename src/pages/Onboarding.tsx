@@ -8,6 +8,7 @@ import {
   useStartProfiling,
   useProfilingWebSocket,
   useCompleteOnboarding,
+  useProfileStatus,
 } from '@/api/hooks/use-onboarding';
 import type { ChatMessage } from '@/types';
 
@@ -21,9 +22,18 @@ export default function Onboarding() {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
   const streamingMessageIdRef = useRef<string | null>(null);
 
+  const { data: profileStatus, isLoading: profileStatusLoading } = useProfileStatus();
   const { data: questions, isLoading: questionsLoading } = useOnboardingQuestions();
   const startProfilingMutation = useStartProfiling();
   const completeMutation = useCompleteOnboarding();
+
+  // Check if user already has profile - skip onboarding
+  useEffect(() => {
+    if (profileStatus && profileStatus.has_profile && profileStatus.profile_completeness === 100) {
+      console.log('User already has complete profile, redirecting to app...');
+      navigate('/app/brainstorm');
+    }
+  }, [profileStatus, navigate]);
 
   // Handle successful session creation using mutation.data instead of onSuccess callback
   useEffect(() => {
@@ -86,15 +96,21 @@ export default function Onboarding() {
     },
   });
 
-  // Start profiling session (only once)
+  // Start profiling session (only once, and only if user doesn't have profile)
   useEffect(() => {
     console.log('Start session check - sessionId:', sessionId, 'isPending:', startProfilingMutation.isPending, 'isSuccess:', startProfilingMutation.isSuccess);
+
+    // Don't start if user already has profile or profile is still loading
+    if (profileStatusLoading || (profileStatus?.has_profile && profileStatus?.profile_completeness === 100)) {
+      return;
+    }
 
     if (!sessionId && !startProfilingMutation.isPending && !startProfilingMutation.isSuccess) {
       console.log('Calling mutate to create session...');
       startProfilingMutation.mutate(undefined);
     }
-  }, [sessionId, startProfilingMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, startProfilingMutation.isPending, startProfilingMutation.isSuccess, profileStatus, profileStatusLoading]);
 
   const handleSendMessage = async (text: string) => {
     if (!sessionId) {
@@ -133,7 +149,7 @@ export default function Onboarding() {
     }
   };
 
-  if (questionsLoading || startProfilingMutation.isPending) {
+  if (profileStatusLoading || questionsLoading || startProfilingMutation.isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
         <div className="text-center">
@@ -141,7 +157,9 @@ export default function Onboarding() {
             <Plane className="w-8 h-8 text-white animate-pulse" />
           </div>
           <Loader2 className="w-8 h-8 mx-auto animate-spin text-warm-coral" />
-          <p className="mt-4 text-muted-foreground">Preparing your travel profile...</p>
+          <p className="mt-4 text-muted-foreground">
+            {profileStatusLoading ? 'Checking your profile...' : 'Preparing your travel profile...'}
+          </p>
         </div>
       </div>
     );
