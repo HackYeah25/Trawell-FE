@@ -36,17 +36,19 @@ export const ChatThread = memo(function ChatThread({
   remainingCount = 0,
 }: ChatThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousMessagesLength = useRef(messages.length);
   const hasScrolledToBottom = useRef(false);
+  const isUserScrolling = useRef(false);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Initial scroll to bottom on mount
   useEffect(() => {
     if (!hasScrolledToBottom.current && messages.length > 0) {
       // Use a longer delay to ensure the container is properly rendered
       const timeoutId = setTimeout(() => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
           hasScrolledToBottom.current = true;
         }
       }, 100);
@@ -55,24 +57,55 @@ export const ChatThread = memo(function ChatThread({
     }
   }, [messages.length]);
 
+  // Handle user scroll detection
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      isUserScrolling.current = true;
+      
+      // Clear existing timeout
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+      
+      // Set timeout to detect when user stops scrolling
+      scrollTimeout.current = setTimeout(() => {
+        isUserScrolling.current = false;
+        
+        // Check if user is near bottom (within 100px)
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        hasScrolledToBottom.current = isNearBottom;
+      }, 150);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, []);
+
   // Auto-scroll to bottom for NEW messages
   useEffect(() => {
     // Only scroll if messages increased (new message added, not loaded)
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
     
-    if (isNewMessage) {
-      // Always scroll to bottom for new messages, regardless of previous scroll position
-      hasScrolledToBottom.current = true;
-      
-      // Use a longer delay to ensure DOM is fully updated
-      const timeoutId = setTimeout(() => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    if (isNewMessage && !isUserScrolling.current) {
+      // Use requestAnimationFrame for smoother scrolling
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({
+            top: scrollContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
         }
-      }, 100);
+      });
       
       previousMessagesLength.current = messages.length;
-      return () => clearTimeout(timeoutId);
     }
     
     previousMessagesLength.current = messages.length;
@@ -85,7 +118,7 @@ export const ChatThread = memo(function ChatThread({
       aria-live="polite"
       aria-label="Chat messages"
     >
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto">{/* Reduced from max-w-4xl to max-w-3xl for better desktop width */}
         {/* Load More Button */}
         {hasMore && !isLoadingMore && (
