@@ -32,10 +32,10 @@ export function AppShell({ children }: AppShellProps) {
             )}
             
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-ocean flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center">
                 <Plane className="w-5 h-5 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
+              <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
                 TravelAI
               </h1>
             </div>

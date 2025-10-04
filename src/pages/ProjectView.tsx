@@ -196,7 +196,7 @@ export default function ProjectView() {
               </div>
             )}
             <p className="text-xs md:text-sm text-muted-foreground mt-1">
-              Projekt podróży · {new Date(project.createdAt).toLocaleDateString('pl-PL')}
+              Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
             </p>
           </div>
         </div>
@@ -217,10 +217,10 @@ export default function ProjectView() {
               <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                   <MapPin className="w-6 h-6 text-primary" />
-                  Proponowane lokalizacje
+                  Suggested Destinations
                 </h2>
                 <p className="text-muted-foreground">
-                  Wybierz lokalizację, aby rozpocząć planowanie podróży
+                  Choose a destination to start planning your trip
                 </p>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -252,7 +252,7 @@ export default function ProjectView() {
                           disabled={createTripMutation.isPending}
                           className="w-full"
                         >
-                          Utwórz podróż
+                          Create Trip
                         </Button>
                       </CardContent>
                     </Card>
@@ -267,7 +267,7 @@ export default function ProjectView() {
             <Composer
               onSend={handleSendMessage}
               disabled={sendMessageMutation.isPending}
-              placeholder="Opisz swoje oczekiwania..."
+              placeholder="Describe your expectations..."
             />
           </div>
         </div>

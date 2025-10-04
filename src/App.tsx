@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from "./api/hooks/use-user";
-import Auth from "./pages/Auth";
+
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import History from "./pages/History";
@@ -27,12 +27,12 @@ function AppRoutes() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-sky">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-warm">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-ocean flex items-center justify-center animate-pulse">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center animate-pulse">
             <span className="text-2xl">✈️</span>
           </div>
-          <p className="text-muted-foreground">Ładowanie...</p>
+          <p className="text-white/80">Loading...</p>
         </div>
       </div>
     );
@@ -44,12 +44,11 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={user ? <Navigate to="/app" replace /> : <Landing />} />
-      <Route path="/auth" element={user ? <Navigate to="/app" replace /> : <Auth />} />
       <Route
         path="/onboarding"
         element={
           !user ? (
-            <Navigate to="/auth" replace />
+            <Navigate to="/" replace />
           ) : needsOnboarding ? (
             <Onboarding />
           ) : (
@@ -61,7 +60,7 @@ function AppRoutes() {
         path="/app"
         element={
           !user ? (
-            <Navigate to="/auth" replace />
+            <Navigate to="/" replace />
           ) : needsOnboarding ? (
             <Navigate to="/onboarding" replace />
           ) : (
@@ -71,11 +70,11 @@ function AppRoutes() {
       />
       <Route
         path="/app/projects/:projectId"
-        element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/auth" replace />}
+        element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/" replace />}
       />
       <Route
         path="/app/trips/:tripId"
-        element={user && !needsOnboarding ? <TripView /> : <Navigate to="/auth" replace />}
+        element={user && !needsOnboarding ? <TripView /> : <Navigate to="/" replace />}
       />
       <Route path="*" element={<NotFound />} />
     </Routes>

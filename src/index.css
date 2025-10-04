@@ -8,121 +8,127 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Base colors - ocean blue theme */
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* Base colors - warm, sandy tones */
+    --background: 40 50% 97%;
+    --foreground: 25 30% 15%;
 
-    /* Cards */
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    /* Cards and surfaces */
+    --card: 40 100% 99%;
+    --card-foreground: 25 30% 15%;
 
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 40 100% 99%;
+    --popover-foreground: 25 30% 15%;
 
-    /* Primary - Deep Ocean Blue */
-    --primary: 210 85% 42%;
+    /* Primary - Coral/Sunset */
+    --primary: 16 90% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 210 85% 55%;
+    --primary-glow: 16 90% 68%;
 
-    /* Secondary - Soft Sky */
-    --secondary: 205 45% 94%;
-    --secondary-foreground: 210 85% 42%;
+    /* Secondary - Warm Sand */
+    --secondary: 40 35% 88%;
+    --secondary-foreground: 25 30% 15%;
 
-    /* Accent - Warm Coral/Sunset */
-    --accent: 16 85% 60%;
+    /* Accent - Turquoise/Ocean */
+    --accent: 180 65% 55%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 16 95% 70%;
+    --accent-glow: 180 65% 65%;
 
     /* Muted */
-    --muted: 210 20% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 40 30% 92%;
+    --muted-foreground: 25 15% 45%;
 
     /* Destructive */
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Success */
-    --success: 142 71% 45%;
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Border & Input */
-    --border: 214 20% 88%;
-    --input: 214 20% 88%;
-    --ring: 210 85% 42%;
+    /* Borders and inputs */
+    --border: 40 25% 88%;
+    --input: 40 25% 88%;
+    --ring: 16 90% 58%;
 
     /* Radius */
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Gradients */
-    --gradient-ocean: linear-gradient(135deg, hsl(210 85% 42%) 0%, hsl(195 85% 48%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(16 85% 60%) 0%, hsl(35 95% 62%) 100%);
-    --gradient-sky: linear-gradient(180deg, hsl(205 45% 94%) 0%, hsl(210 20% 98%) 100%);
+    /* Gradients - warm vacation vibes */
+    --gradient-ocean: linear-gradient(135deg, hsl(180, 65%, 55%) 0%, hsl(200, 80%, 60%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(16, 90%, 58%) 0%, hsl(340, 82%, 52%) 100%);
+    --gradient-sky: linear-gradient(180deg, hsl(40, 100%, 97%) 0%, hsl(180, 65%, 95%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(35, 100%, 65%) 0%, hsl(16, 90%, 58%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px hsl(210 25% 15% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(210 25% 15% / 0.08), 0 2px 4px -1px hsl(210 25% 15% / 0.04);
-    --shadow-lg: 0 10px 15px -3px hsl(210 25% 15% / 0.08), 0 4px 6px -2px hsl(210 25% 15% / 0.04);
-    --shadow-xl: 0 20px 25px -5px hsl(210 25% 15% / 0.08), 0 10px 10px -5px hsl(210 25% 15% / 0.04);
-    --shadow-glow: 0 0 30px hsl(210 85% 55% / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(16 90% 58% / 0.3);
+    --shadow-glow: 0 0 40px hsl(16 90% 68% / 0.4);
 
-    /* Animations */
+    /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 25% 15%;
-    --sidebar-primary: 210 85% 42%;
+    --sidebar-background: 40 50% 98%;
+    --sidebar-foreground: 25 30% 15%;
+    --sidebar-primary: 16 90% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 205 45% 94%;
-    --sidebar-accent-foreground: 210 85% 42%;
-    --sidebar-border: 214 20% 88%;
-    --sidebar-ring: 210 85% 42%;
+    --sidebar-accent: 40 30% 92%;
+    --sidebar-accent-foreground: 25 30% 15%;
+    --sidebar-border: 40 25% 88%;
+    --sidebar-ring: 16 90% 58%;
   }
 
   .dark {
-    --background: 215 30% 8%;
-    --foreground: 210 20% 95%;
+    /* Base colors - warm dark tones */
+    --background: 25 25% 12%;
+    --foreground: 40 50% 95%;
 
-    --card: 215 25% 12%;
-    --card-foreground: 210 20% 95%;
+    /* Cards and surfaces */
+    --card: 25 25% 16%;
+    --card-foreground: 40 50% 95%;
 
-    --popover: 215 25% 12%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 25 25% 16%;
+    --popover-foreground: 40 50% 95%;
 
-    --primary: 210 85% 55%;
-    --primary-foreground: 215 30% 8%;
-    --primary-glow: 210 85% 65%;
+    /* Primary - Coral/Sunset (brighter for dark) */
+    --primary: 16 90% 62%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 16 90% 72%;
 
-    --secondary: 215 25% 18%;
-    --secondary-foreground: 210 20% 95%;
+    /* Secondary */
+    --secondary: 25 20% 20%;
+    --secondary-foreground: 40 50% 95%;
 
-    --accent: 16 85% 62%;
-    --accent-foreground: 215 30% 8%;
-    --accent-glow: 16 95% 72%;
+    /* Accent - Turquoise/Ocean */
+    --accent: 180 65% 60%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 180 65% 70%;
 
-    --muted: 215 25% 15%;
-    --muted-foreground: 215 15% 60%;
+    /* Muted */
+    --muted: 25 20% 20%;
+    --muted-foreground: 40 20% 65%;
 
+    /* Destructive */
     --destructive: 0 62% 50%;
-    --destructive-foreground: 210 20% 95%;
+    --destructive-foreground: 40 50% 95%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 210 20% 95%;
+    /* Success */
+    --success: 142 70% 45%;
+    --success-foreground: 40 50% 95%;
 
-    --border: 215 25% 20%;
-    --input: 215 25% 20%;
-    --ring: 210 85% 55%;
+    /* Borders and inputs */
+    --border: 25 20% 24%;
+    --input: 25 20% 24%;
+    --ring: 16 90% 62%;
 
-    --sidebar-background: 215 30% 10%;
-    --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 210 85% 55%;
-    --sidebar-primary-foreground: 215 30% 8%;
-    --sidebar-accent: 215 25% 18%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 25% 20%;
-    --sidebar-ring: 210 85% 55%;
+    /* Sidebar */
+    --sidebar-background: 25 25% 10%;
+    --sidebar-foreground: 40 50% 95%;
+    --sidebar-primary: 16 90% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 25 20% 18%;
+    --sidebar-accent-foreground: 40 50% 95%;
+    --sidebar-border: 25 20% 18%;
+    --sidebar-ring: 16 90% 62%;
   }
 }
 
@@ -132,8 +138,12 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased font-poppins;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins;
   }
 
   /* Smooth scrolling */
@@ -234,5 +244,9 @@ All colors MUST be HSL.
 
   .bg-gradient-sky {
     background: var(--gradient-sky);
+  }
+
+  .bg-gradient-warm {
+    background: var(--gradient-warm);
   }
 }

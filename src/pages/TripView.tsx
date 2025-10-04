@@ -24,13 +24,13 @@ const postAttractionQuestions: ChatMessage[] = [
   {
     id: 'paq1',
     role: 'assistant',
-    markdown: '**Pytanie 1/2:** Czy masz preferencje dotyczące lokalizacji noclegu? (Przykład: blisko centrum, na uboczu, z widokiem na góry)',
+    markdown: '**Question 1/2:** Do you have preferences for accommodation location? (Example: near city center, secluded, with mountain views)',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'paq2',
     role: 'assistant',
-    markdown: '**Pytanie 2/2:** Jakie są Twoje oczekiwania dotyczące wyżywienia? (Przykład: all inclusive, śniadania, samodzielne gotowanie)',
+    markdown: '**Question 2/2:** What are your food preferences? (Example: all inclusive, breakfast only, self-catering)',
     createdAt: new Date().toISOString(),
   },
 ];
@@ -237,7 +237,7 @@ export default function TripView() {
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                {new Date(trip.createdAt).toLocaleDateString('pl-PL')}
+                {new Date(trip.createdAt).toLocaleDateString('en-US')}
               </span>
             </div>
           </div>
@@ -256,7 +256,7 @@ export default function TripView() {
           ) : showSummary && summary ? (
             <div className="flex-1 overflow-y-auto p-4">
               <div className="max-w-4xl mx-auto space-y-4">
-                <h2 className="text-2xl font-bold mb-6">Podsumowanie podróży</h2>
+                <h2 className="text-2xl font-bold mb-6">Trip Summary</h2>
                 {summary.sections.map((section, index) => (
                   <SummaryCard key={index} section={section} />
                 ))}
@@ -275,7 +275,7 @@ export default function TripView() {
                 <Composer
                   onSend={handleSendMessage}
                   disabled={sendMessageMutation.isPending}
-                  placeholder="Opisz swoje preferencje..."
+                  placeholder="Describe your preferences..."
                 />
               </div>
             </>

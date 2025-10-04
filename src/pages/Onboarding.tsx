@@ -27,7 +27,7 @@ export default function Onboarding() {
         id: 'welcome',
         role: 'system',
         markdown:
-          '# Witaj w TravelAI! 🌍\n\nPomogę Ci zaplanować wymarzoną podróż. Zanim zaczniemy, odpowiedz na kilka pytań, które pozwolą mi lepiej poznać Twoje preferencje.',
+          '# Welcome to TravelAI! 🌍\n\nI\'ll help you plan your dream trip. Before we start, answer a few questions to help me understand your preferences.',
         createdAt: new Date().toISOString(),
       };
 
