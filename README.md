@@ -1,73 +1,159 @@
-# Welcome to your Lovable project
+# TravelAI - Aplikacja Podróżnicza MVP
 
-## Project info
+Nowoczesna aplikacja webowa do planowania podróży z asystentem AI, czatem i zarządzaniem projektami.
 
-**URL**: https://lovable.dev/projects/44092eef-7b6f-4129-9785-54cb75415fc9
+## 🚀 Funkcjonalności
 
-## How can I edit this code?
+### ✅ Jednorazowy Onboarding
+- Czat z 4 pytaniami o preferencje podróżnicze
+- Automatyczne utworzenie pierwszego projektu
+- Inteligentna walidacja odpowiedzi z możliwością doprecyzowania
 
-There are several ways of editing your application.
+### ✅ Projekty Podróży
+- Chat-first interface do doprecyzowania wymagań
+- Propozycje lokalizacji od AI
+- Tworzenie wielu podróży z jednego projektu
 
-**Use Lovable**
+### ✅ Szczegółowe Podróże
+- Interaktywny czat dla konkretnej lokalizacji
+- Panel atrakcji z możliwością akceptacji/odrzucenia
+- Kompleksowe podsumowanie (pogoda, bezpieczeństwo, budżet, transport, etc.)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/44092eef-7b6f-4129-9785-54cb75415fc9) and start prompting.
+### ✅ Responsywny Design
+- Mobile-first approach
+- Gradient ocean/sunset theme
+- Płynne animacje i przejścia
+- Dark mode ready
 
-Changes made via Lovable will be committed automatically to this repo.
+### ✅ Dostępność
+- WCAG 2.2 AA compliance
+- Aria-live dla czatu
+- Focus states i keyboard navigation
+- Screen reader friendly
 
-**Use your preferred IDE**
+## 🛠️ Stack Technologiczny
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **React 18** + **TypeScript** + **Vite**
+- **React Router** - routing
+- **TanStack Query (React Query)** - data fetching & caching
+- **Zustand** - lightweight UI state
+- **Tailwind CSS** - styling z custom design system
+- **shadcn/ui** + **Radix UI** - accessible components
+- **react-markdown** + **remark-gfm** - markdown rendering
+- **MSW (Mock Service Worker)** - mock backend dla developmentu
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📦 Instalacja i uruchomienie
 
-Follow these steps:
+```bash
+# Instalacja zależności
+npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Uruchomienie dev servera (z mock backendem)
 npm run dev
+
+# Build produkcyjny
+npm run build
+
+# Preview buildu
+npm run preview
 ```
 
-**Edit a file directly in GitHub**
+Aplikacja będzie dostępna pod adresem: http://localhost:8080
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🎨 Design System
 
-**Use GitHub Codespaces**
+### Kolory
+- **Primary (Ocean Blue):** HSL(210, 85%, 42%) - główny kolor brandowy
+- **Accent (Coral/Sunset):** HSL(16, 85%, 60%) - akcenty i CTA
+- **Success:** HSL(142, 71%, 45%) - pozytywne akcje
+- **Gradienty:** ocean, sunset, sky - dla hero sections i kart
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Komponenty
+Wszystkie style są definiowane w design systemie (`index.css` + `tailwind.config.ts`).
+**Nigdy** nie używamy ad-hoc klas jak `text-white` czy `bg-blue-500`.
 
-## What technologies are used for this project?
+## 📁 Struktura Projektu
 
-This project is built with:
+```
+src/
+├── api/
+│   └── hooks/          # React Query hooks dla API
+├── components/
+│   ├── ui/             # shadcn/ui components
+│   ├── chat/           # ChatThread, ChatMessage, Composer
+│   ├── trips/          # AttractionsPanel, SummaryCard
+│   └── layout/         # AppShell, Navigation
+├── pages/
+│   ├── Onboarding.tsx  # 4 pytania onboardingowe
+│   ├── History.tsx     # Lista projektów i podróży
+│   ├── ProjectView.tsx # Czat projektu + lokalizacje
+│   └── TripView.tsx    # Czat podróży + atrakcje + podsumowanie
+├── mocks/
+│   ├── handlers.ts     # MSW request handlers
+│   └── browser.ts      # MSW setup
+├── store/
+│   └── ui-store.ts     # Zustand store dla UI state
+├── types/
+│   └── index.ts        # TypeScript types
+└── lib/
+    ├── api-client.ts   # Fetch wrapper z error handling
+    └── utils.ts        # Utilities (cn, etc.)
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔌 Integracja z Realnym Backendem
 
-## How can I deploy this project?
+1. **Ustaw zmienną środowiskową:**
+   ```bash
+   VITE_API_URL=https://your-backend.com/api
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/44092eef-7b6f-4129-9785-54cb75415fc9) and click on Share -> Publish.
+2. **Wyłącz MSW w produkcji:**
+   Mock Service Worker jest automatycznie wyłączony w production builds.
 
-## Can I connect a custom domain to my Lovable project?
+3. **Kontrakt API:**
+   Backend musi implementować endpointy opisane w pliku `src/mocks/handlers.ts`:
+   - GET/PATCH `/me`
+   - GET `/onboarding/questions`
+   - POST `/onboarding/answer`, `/onboarding/complete`
+   - CRUD dla `/projects` i `/trips`
+   - Atrakcje i podsumowania
 
-Yes, you can!
+## 🧪 Testy Akceptacyjne (Checklist)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- [x] Nowy user trafia na onboarding po zalogowaniu
+- [x] 4 pytania z możliwością doprecyzowania
+- [x] Automatyczne utworzenie projektu po zakończeniu
+- [x] Tworzenie podróży z proponowanych lokalizacji
+- [x] Akceptacja/odrzucanie atrakcji z optimistic updates
+- [x] Wyświetlanie kart podsumowania w 10 kategoriach
+- [x] Responsywność mobile/desktop
+- [x] Dostępność z klawiatury i screen readers
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🌍 i18n (Przyszłość)
+
+Aplikacja jest gotowa na internationalizację:
+- Wszystkie teksty są w zmiennych (łatwe do wyciągnięcia)
+- Struktura wspiera tłumaczenia
+- Na MVP: polska wersja językowa
+
+## 📝 Notatki
+
+- **Error Handling:** Wszystkie API calle mają retry (2x), error states i toasty
+- **Loading States:** Skeletony, spinners, optimistic updates
+- **Accessibility:** Aria-labels, focus management, semantic HTML
+- **Performance:** React Query caching, lazy loading, code splitting ready
+
+## 🎯 Roadmap
+
+- [ ] Integracja z realnym backendem AI
+- [ ] Eksport podróży do PDF
+- [ ] Współdzielenie podróży z innymi użytkownikami
+- [ ] Kalendarz i rezerwacje
+- [ ] Mapa interaktywna
+- [ ] Multi-language support
+
+---
+
+**Autor:** Generated by Lovable AI  
+**Licencja:** MIT  
+**Kontakt:** Dodaj swoje dane kontaktowe
