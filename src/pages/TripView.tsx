@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { MapPin, Calendar, Loader2, Pencil, Check, X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
-import { AttractionsPanel } from '@/components/trips/AttractionsPanel';
+import { TripTabs } from '@/components/trips/TripTabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,30 +18,13 @@ import {
 } from '@/api/hooks/use-trips';
 import { useRenameTrip } from '@/api/hooks/use-rename';
 import { SummaryCard } from '@/components/trips/SummaryCard';
+import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
 import type { ChatMessage } from '@/types';
-
-// Define the post-attraction questions (2 hardcoded questions for trips)
-const postAttractionQuestions: ChatMessage[] = [
-  {
-    id: 'paq1',
-    role: 'assistant',
-    markdown: '**Question 1/2:** Do you have preferences for accommodation location? (Example: near city center, secluded, with mountain views)',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'paq2',
-    role: 'assistant',
-    markdown: '**Question 2/2:** What are your food preferences? (Example: all inclusive, breakfast only, self-catering)',
-    createdAt: new Date().toISOString(),
-  },
-];
 
 export default function TripView() {
   const { tripId } = useParams<{ tripId: string }>();
-  const navigate = useNavigate();
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
-  const [answeredPostQuestions, setAnsweredPostQuestions] = useState(0);
-  const [showSummary, setShowSummary] = useState(false);
+  const [activeTab, setActiveTab] = useState<'chat' | 'summary'>('chat');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const isMobile = useIsMobile();
@@ -54,33 +37,31 @@ export default function TripView() {
   const attractionDecisionMutation = useAttractionDecision();
   const renameMutation = useRenameTrip();
 
-  // Flatten paginated messages and detect post-attraction phase
+  // Load chat history from localStorage or initialize with welcome message
   useEffect(() => {
-    if (messagesData) {
-      const allMessages =
-        messagesData.pages.flatMap((page) => page.messages).reverse() || [];
-      
-      // Check if we've entered post-attraction questions phase
-      const hasAllDecisions = attractions?.every(a => a.decision);
-      const lastMessage = allMessages[allMessages.length - 1];
-      
-      if (hasAllDecisions && allMessages.length > 0) {
-        // Check if we need to start post-attraction questions
-        const hasPostQuestions = postAttractionQuestions.some(q => 
-          allMessages.some(m => m.id === q.id)
-        );
-        
-        if (!hasPostQuestions) {
-          // Add first post-attraction question
-          setLocalMessages([...allMessages, postAttractionQuestions[0]]);
-          return;
-        }
+    if (tripId) {
+      const stored = loadChatHistory(`trip-${tripId}`);
+      if (stored && stored.length > 0) {
+        setLocalMessages(stored);
+      } else {
+        // Initialize with welcome message
+        const welcomeMessage: ChatMessage = {
+          id: 'welcome',
+          role: 'assistant',
+          markdown: `Witaj w planowaniu podróży! 🌟 Pomogę Ci stworzyć idealny plan. Powiedz mi, czego szukasz?`,
+          createdAt: new Date().toISOString(),
+        };
+        setLocalMessages([welcomeMessage]);
       }
-      
-      setLocalMessages(allMessages);
     }
-  }, [messagesData, attractions]);
+  }, [tripId]);
 
+  // Save to localStorage on every message change
+  useEffect(() => {
+    if (tripId && localMessages.length > 0) {
+      saveChatHistory(`trip-${tripId}`, localMessages);
+    }
+  }, [tripId, localMessages]);
 
   const handleSaveTitle = async () => {
     if (!tripId || !editedTitle.trim()) {
@@ -117,64 +98,91 @@ export default function TripView() {
 
     setLocalMessages((prev) => [...prev, tempMessage]);
 
-    // If still showing post-attraction questions, add next question
-    if (answeredPostQuestions < postAttractionQuestions.length) {
-      const nextIndex = answeredPostQuestions + 1;
-      
-      setTimeout(() => {
-        setLocalMessages((prev) => {
-          const filtered = prev.filter((m) => m.id !== tempMessage.id);
-          const userMsg = { ...tempMessage, status: undefined };
-          
-          if (nextIndex < postAttractionQuestions.length) {
-            return [...filtered, userMsg, postAttractionQuestions[nextIndex]];
-          } else {
-            // All post-attraction questions answered, show summary
-            setShowSummary(true);
-            return [...filtered, userMsg];
-          }
-        });
-        setAnsweredPostQuestions(nextIndex);
-      }, 500);
-      
-      return;
-    }
-
     try {
-      const newMessages = await sendMessageMutation.mutateAsync({
-        tripId,
-        text,
-      });
+      // Mock API call with delay
+      await new Promise(resolve => setTimeout(resolve, 800));
 
+      // Update with successful message
       setLocalMessages((prev) =>
-        prev.filter((m) => m.id !== tempMessage.id).concat(newMessages)
+        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: undefined } : m))
       );
+
+      // Add AI response
+      const aiResponse: ChatMessage = {
+        id: `ai-${Date.now()}`,
+        role: 'assistant',
+        markdown: 'Rozumiem! Szukam dla Ciebie najlepszych atrakcji. 🎯',
+        createdAt: new Date().toISOString(),
+      };
+
+      setTimeout(() => {
+        setLocalMessages((prev) => [...prev, aiResponse]);
+      }, 500);
+
+      // Every 4 user messages, add an attraction proposal
+      const userMessageCount = localMessages.filter(m => m.role === 'user').length + 1;
+      if (attractions && userMessageCount % 4 === 0) {
+        const unusedAttractions = attractions.filter(attr =>
+          !localMessages.some(msg => msg.attractionProposal?.id === attr.id)
+        );
+
+        if (unusedAttractions.length > 0) {
+          const nextAttraction = unusedAttractions[0];
+          const proposalMessage: ChatMessage = {
+            id: `attr-proposal-${Date.now()}`,
+            role: 'assistant',
+            markdown: 'Sprawdź tę atrakcję! 🎯',
+            attractionProposal: { ...nextAttraction, status: 'pending' },
+            createdAt: new Date().toISOString(),
+          };
+
+          setTimeout(() => {
+            setLocalMessages((prev) => [...prev, proposalMessage]);
+          }, 1500);
+        }
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setLocalMessages((prev) =>
         prev.map((m) => (m.id === tempMessage.id ? { ...m, status: 'error' } : m))
       );
-      console.error('Failed to send message');
     }
   };
 
-  const handleAttractionDecision = async (
-    attractionId: string,
-    decision: 'accept' | 'reject'
-  ) => {
-    if (!tripId) return;
+  const handleAttractionDecision = (attractionId: string, decision: 'reject' | 1 | 2 | 3) => {
+    setLocalMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.attractionProposal?.id === attractionId) {
+          return {
+            ...msg,
+            attractionProposal: {
+              ...msg.attractionProposal,
+              rating: decision === 'reject' ? null : decision,
+              status: decision === 'reject' ? 'rejected' : 'rated',
+            },
+          };
+        }
+        return msg;
+      })
+    );
 
-    try {
-      await attractionDecisionMutation.mutateAsync({
-        tripId,
-        attractionId,
-        decision,
-      });
+    // Mock API call
+    console.log(`Attraction ${attractionId} decision: ${decision}`);
 
-      // Decision saved successfully
-    } catch (error) {
-      console.error('Error making decision:', error);
-    }
+    // Add AI acknowledgment
+    const acknowledgment = decision === 'reject' 
+      ? 'Rozumiem, poszukam innych opcji. 👍'
+      : `Świetnie! Oceniłeś to na ${decision} gwiazdki. ⭐`;
+
+    setTimeout(() => {
+      const ackMessage: ChatMessage = {
+        id: `ack-${Date.now()}`,
+        role: 'assistant',
+        markdown: acknowledgment,
+        createdAt: new Date().toISOString(),
+      };
+      setLocalMessages((prev) => [...prev, ackMessage]);
+    }, 600);
   };
 
   if (!tripId || !trip) {
@@ -186,9 +194,6 @@ export default function TripView() {
       </AppShell>
     );
   }
-
-  // Check if there are pending attractions (without decisions)
-  const hasPendingAttractions = attractions?.some(a => !a.decision) || false;
 
   return (
     <AppShell>
@@ -247,49 +252,54 @@ export default function TripView() {
           </div>
         </div>
 
-        {/* Content - Attractions, Summary or Chat */}
-        <div className="flex-1 flex flex-col min-h-0">
-          {hasPendingAttractions ? (
-            <div className="flex-1 overflow-y-auto">
-              <AttractionsPanel
-                attractions={attractions || []}
-                onDecision={handleAttractionDecision}
-                disabled={attractionDecisionMutation.isPending}
-              />
-            </div>
-          ) : showSummary && summary ? (
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="max-w-4xl mx-auto space-y-4">
-                <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-6">
-                  Trip Summary
-                </h2>
-                {summary.sections.map((section, index) => (
-                  <SummaryCard 
-                    key={index} 
-                    section={section} 
-                    attractions={attractions}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
+        {/* Tabs and Content */}
+        <TripTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          chatContent={
             <>
               <div className="flex-1 overflow-y-auto h-0">
                 <ChatThread
                   messages={localMessages}
                   isLoading={sendMessageMutation.isPending}
+                  onAttractionDecision={handleAttractionDecision}
                   className={isMobile ? 'pb-24' : ''}
                 />
               </div>
-              
+
               <Composer
                 onSend={handleSendMessage}
                 disabled={sendMessageMutation.isPending}
-                placeholder="Describe your preferences..."
+                placeholder="Opisz swoje preferencje..."
               />
             </>
-          )}
-        </div>
+          }
+          summaryContent={
+            summary ? (
+              <div className="p-4">
+                <div className="max-w-4xl mx-auto space-y-4">
+                  <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-6">
+                    Podsumowanie Podróży
+                  </h2>
+                  {summary.sections.map((section, index) => (
+                    <SummaryCard
+                      key={index}
+                      section={section}
+                      attractions={attractions}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center space-y-2">
+                  <Loader2 className="w-8 h-8 animate-spin text-warm-coral mx-auto" />
+                  <p className="text-muted-foreground">Generuję podsumowanie...</p>
+                </div>
+              </div>
+            )
+          }
+        />
       </div>
     </AppShell>
   );

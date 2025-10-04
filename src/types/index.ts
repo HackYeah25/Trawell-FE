@@ -36,6 +36,8 @@ export interface ChatMessage {
   status?: 'sending' | 'sent' | 'error';
   userName?: string;
   userAvatar?: string;
+  locationProposal?: Location;
+  attractionProposal?: Attraction;
 }
 
 export interface User {
@@ -81,6 +83,8 @@ export interface Location {
   country: string;
   teaser: string;
   imageUrl?: string;
+  rating?: 1 | 2 | 3 | null;
+  status?: 'pending' | 'rejected' | 'rated';
 }
 
 export interface Trip {
@@ -100,7 +104,8 @@ export interface Attraction {
   description: string;
   imageUrl?: string;
   category?: string;
-  decision?: 'accepted' | 'rejected' | null;
+  rating?: 1 | 2 | 3 | null;
+  status?: 'pending' | 'rejected' | 'rated';
 }
 
 export type SummaryCategory =

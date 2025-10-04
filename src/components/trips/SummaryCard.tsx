@@ -44,7 +44,7 @@ interface SummaryCardProps {
 export const SummaryCard = memo(function SummaryCard({ section, attractions }: SummaryCardProps) {
   const Icon = categoryIcons[section.category] || FileText;
   const isAttractionsSection = section.category === 'Attractions';
-  const acceptedAttractions = attractions?.filter(a => a.decision === 'accepted') || [];
+  const acceptedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-warm border-warm-coral/20">

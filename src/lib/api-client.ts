@@ -353,7 +353,8 @@ export const apiClient = {
               description: 'Skip-the-line guided tour of Gaudí\'s masterpiece basilica',
               category: 'Architecture',
               imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80',
-              decision: 'accepted',
+              rating: 3,
+              status: 'rated',
             },
             {
               id: 'attr-bcn-2',
@@ -361,7 +362,8 @@ export const apiClient = {
               description: 'Explore the colorful mosaic park with panoramic city views',
               category: 'Parks',
               imageUrl: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80',
-              decision: 'accepted',
+              rating: 3,
+              status: 'rated',
             },
             {
               id: 'attr-bcn-3',
@@ -369,7 +371,8 @@ export const apiClient = {
               description: 'Discover medieval streets, hidden squares, and Roman ruins',
               category: 'Culture',
               imageUrl: 'https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=600&q=80',
-              decision: 'accepted',
+              rating: 2,
+              status: 'rated',
             },
             {
               id: 'attr-bcn-4',
@@ -377,7 +380,8 @@ export const apiClient = {
               description: 'Relax at the famous urban beach with beachside restaurants',
               category: 'Beach',
               imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80',
-              decision: 'accepted',
+              rating: 3,
+              status: 'rated',
             },
             {
               id: 'attr-bcn-5',
@@ -385,7 +389,8 @@ export const apiClient = {
               description: 'Taste authentic Catalan cuisine at local tapas bars',
               category: 'Food',
               imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80',
-              decision: 'accepted',
+              rating: 3,
+              status: 'rated',
             },
           ];
           
@@ -530,18 +535,19 @@ export const apiClient = {
       await mockDelay(400);
       const tripId = endpoint.split('/')[2];
       const attractionId = endpoint.split('/')[4];
-      const body = data as { decision: 'accept' | 'reject' };
+      const body = data as { rating: 1 | 2 | 3 | null };
 
-      // Update attraction decision in mock data
+      // Update attraction rating in mock data
       if (mockAttractions[tripId]) {
         const attraction = mockAttractions[tripId].find((a) => a.id === attractionId);
         if (attraction) {
-          attraction.decision = body.decision === 'accept' ? 'accepted' : 'rejected';
+          attraction.rating = body.rating;
+          attraction.status = body.rating ? 'rated' : 'rejected';
         }
       }
 
-      // Check if all attractions have been decided
-      const allDecided = mockAttractions[tripId]?.every((a) => a.decision);
+      // Check if all attractions have been rated
+      const allDecided = mockAttractions[tripId]?.every((a) => a.status === 'rated' || a.status === 'rejected');
       
       if (allDecided && mockTripMessages[tripId]) {
         // Add post-attraction questions after all decisions are made

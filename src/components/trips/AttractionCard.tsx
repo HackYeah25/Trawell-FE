@@ -21,8 +21,8 @@ export const AttractionCard = memo(function AttractionCard({
     <Card
       className={cn(
         'overflow-hidden transition-all',
-        attraction.decision === 'accepted' && 'border-success bg-success/5',
-        attraction.decision === 'rejected' && 'opacity-50'
+        attraction.status === 'rated' && attraction.rating && attraction.rating >= 2 && 'border-success bg-success/5',
+        attraction.status === 'rejected' && 'opacity-50'
       )}
     >
       {attraction.imageUrl && (
@@ -61,18 +61,18 @@ export const AttractionCard = memo(function AttractionCard({
             {attraction.description}
           </CardDescription>
 
-          {attraction.decision ? (
+          {attraction.status !== 'pending' ? (
             <Badge
-              variant={attraction.decision === 'accepted' ? 'default' : 'secondary'}
+              variant={attraction.status === 'rated' && attraction.rating ? 'default' : 'secondary'}
               className={cn(
                 'w-fit',
-                attraction.decision === 'accepted' && 'bg-success text-success-foreground'
+                attraction.status === 'rated' && attraction.rating && 'bg-success text-success-foreground'
               )}
             >
-              {attraction.decision === 'accepted' ? (
+              {attraction.status === 'rated' && attraction.rating ? (
                 <>
                   <Check className="w-3 h-3 mr-1" />
-                  Accepted
+                  Rated {attraction.rating}★
                 </>
               ) : (
                 <>

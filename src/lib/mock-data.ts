@@ -317,7 +317,8 @@ export let mockAttractions: Record<string, Attraction[]> = (() => {
       description: "Gaudí's masterpiece - iconic unfinished basilica",
       category: 'Architecture',
       imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80',
-      decision: 'accepted',
+      rating: 3,
+      status: 'rated',
     },
     {
       id: 'attr-bcn-2',
@@ -325,7 +326,8 @@ export let mockAttractions: Record<string, Attraction[]> = (() => {
       description: 'Colorful mosaic park with stunning city views',
       category: 'Parks',
       imageUrl: 'https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=600&q=80',
-      decision: 'accepted',
+      rating: 3,
+      status: 'rated',
     },
     {
       id: 'attr-bcn-3',
@@ -333,7 +335,8 @@ export let mockAttractions: Record<string, Attraction[]> = (() => {
       description: 'Famous tree-lined pedestrian street',
       category: 'Streets',
       imageUrl: 'https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=600&q=80',
-      decision: 'accepted',
+      rating: 2,
+      status: 'rated',
     },
     {
       id: 'attr-bcn-4',
@@ -341,7 +344,8 @@ export let mockAttractions: Record<string, Attraction[]> = (() => {
       description: 'Relax at Barceloneta Beach',
       category: 'Beach',
       imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80',
-      decision: 'accepted',
+      rating: 3,
+      status: 'rated',
     },
   ],
   };
@@ -421,7 +425,7 @@ export const mockLocations: Location[] = [
 
 // Trip summary template
 export const getTripSummary = (attractions?: Attraction[]): TripSummary => {
-  const acceptedAttractions = attractions?.filter(a => a.decision === 'accepted') || [];
+  const acceptedAttractions = attractions?.filter(a => a.status === 'rated' && a.rating && a.rating >= 2) || [];
   
   return {
     sections: [

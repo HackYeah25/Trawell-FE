@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Loader2, Pencil, Check, X, Share2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Loader2, Pencil, Check, X, Share2 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   useProject,
@@ -21,19 +19,17 @@ import { useTrips } from '@/api/hooks/use-trips';
 import { initialProjectQuestions } from '@/lib/mock-data';
 import { ShareCodeDialog } from '@/components/projects/ShareCodeDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
-import type { ChatMessage } from '@/types';
+import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
+import type { ChatMessage, Location } from '@/types';
 
 export default function ProjectView() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
-  const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const isMobile = useIsMobile();
-  const [showLocationButton, setShowLocationButton] = useState(false);
-  const [showLocations, setShowLocations] = useState(false);
 
   const { data: project } = useProject(projectId!);
   const { data: messagesData } = useProjectMessages(projectId!);
@@ -54,25 +50,25 @@ export default function ProjectView() {
     }
   }, [project, trips, projectId, navigate]);
 
-  // Initialize with questions and flatten paginated messages
+  // Load chat history from localStorage or initialize with first question
   useEffect(() => {
-    if (messagesData && locationSuggestions !== undefined) {
-      const allMessages =
-        messagesData.pages.flatMap((page) => page.messages).reverse() || [];
-      
-      // If project has location suggestions, skip chat and show locations directly
-      if (locationSuggestions && locationSuggestions.length > 0) {
-        setShowLocations(true);
-        setAnsweredQuestions(initialProjectQuestions.length);
-        setLocalMessages(allMessages);
-      } else if (allMessages.length === 0) {
-        // If no messages yet, show initial questions
-        setLocalMessages(initialProjectQuestions.slice(0, 1)); // Start with first question
+    if (projectId) {
+      const stored = loadChatHistory(`project-${projectId}`);
+      if (stored && stored.length > 0) {
+        setLocalMessages(stored);
       } else {
-        setLocalMessages(allMessages);
+        // Initialize with first question
+        setLocalMessages([initialProjectQuestions[0]]);
       }
     }
-  }, [messagesData, locationSuggestions]);
+  }, [projectId]);
+
+  // Save to localStorage on every message change
+  useEffect(() => {
+    if (projectId && localMessages.length > 0) {
+      saveChatHistory(`project-${projectId}`, localMessages);
+    }
+  }, [projectId, localMessages]);
 
   const handleSaveTitle = async () => {
     if (!projectId || !editedTitle.trim()) {
@@ -109,59 +105,98 @@ export default function ProjectView() {
 
     setLocalMessages((prev) => [...prev, tempMessage]);
 
-    // If still showing initial questions, add next question
-    if (answeredQuestions < initialProjectQuestions.length) {
-      const nextIndex = answeredQuestions + 1;
-      
-      setTimeout(() => {
-        setLocalMessages((prev) => {
-          const filtered = prev.filter((m) => m.id !== tempMessage.id);
-          const userMsg = { ...tempMessage, status: undefined };
-          
-          if (nextIndex < initialProjectQuestions.length) {
-            return [...filtered, userMsg, initialProjectQuestions[nextIndex]];
-          } else {
-            // All questions answered, show button to view locations
-            const completionMessage: ChatMessage = {
-              id: 'show-locations',
-              role: 'assistant',
-              markdown:
-                '✨ Great! Based on your preferences, I have some amazing destinations for you.\n\nReady to explore?',
-              createdAt: new Date().toISOString(),
-              quickReplies: [
-                {
-                  id: 'view-destinations',
-                  label: 'View Destinations',
-                  payload: 'view',
-                },
-              ],
-            };
-            setShowLocationButton(true);
-            return [...filtered, userMsg, completionMessage];
-          }
-        });
-        setAnsweredQuestions(nextIndex);
-      }, 500);
-      
-      return;
-    }
-
-    // Regular message flow
     try {
-      const newMessages = await sendMessageMutation.mutateAsync({
-        projectId,
-        text,
-      });
-
+      // Mock API call with delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Update with successful message
       setLocalMessages((prev) =>
-        prev.filter((m) => m.id !== tempMessage.id).concat(newMessages)
+        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: undefined } : m))
       );
+
+      // Add AI response
+      const aiResponse: ChatMessage = {
+        id: `ai-${Date.now()}`,
+        role: 'assistant',
+        markdown: 'Świetnie! Rozumiem Twoje preferencje. Pracuję nad znalezieniem idealnych miejsc dla Ciebie. ✨',
+        createdAt: new Date().toISOString(),
+      };
+
+      setTimeout(() => {
+        setLocalMessages((prev) => [...prev, aiResponse]);
+      }, 500);
+
+      // Every 3 user messages, add a location proposal
+      const userMessageCount = localMessages.filter(m => m.role === 'user').length + 1;
+      if (locationSuggestions && userMessageCount % 3 === 0) {
+        const unusedLocations = locationSuggestions.filter(loc => 
+          !localMessages.some(msg => msg.locationProposal?.id === loc.id)
+        );
+
+        if (unusedLocations.length > 0) {
+          const nextLocation = unusedLocations[0];
+          const proposalMessage: ChatMessage = {
+            id: `loc-proposal-${Date.now()}`,
+            role: 'assistant',
+            markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
+            locationProposal: { ...nextLocation, status: 'pending' },
+            createdAt: new Date().toISOString(),
+          };
+
+          setTimeout(() => {
+            setLocalMessages((prev) => [...prev, proposalMessage]);
+          }, 1500);
+        }
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setLocalMessages((prev) =>
         prev.map((m) => (m.id === tempMessage.id ? { ...m, status: 'error' } : m))
       );
-      console.error('Failed to send message');
+    }
+  };
+
+  const handleLocationDecision = (locationId: string, decision: 'reject' | 1 | 2 | 3) => {
+    setLocalMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.locationProposal?.id === locationId) {
+          return {
+            ...msg,
+            locationProposal: {
+              ...msg.locationProposal,
+              rating: decision === 'reject' ? null : decision,
+              status: decision === 'reject' ? 'rejected' : 'rated',
+            },
+          };
+        }
+        return msg;
+      })
+    );
+
+    // Mock API call
+    console.log(`Location ${locationId} decision: ${decision}`);
+
+    // If rated with 3 stars, offer to create trip
+    if (decision === 3) {
+      setTimeout(() => {
+        const confirmMessage: ChatMessage = {
+          id: `create-trip-${Date.now()}`,
+          role: 'assistant',
+          markdown: '🎉 Świetny wybór! Czy chcesz stworzyć podróż do tego miejsca?',
+          quickReplies: [
+            { id: 'create-yes', label: 'Tak, utwórz podróż!', payload: locationId },
+          ],
+          createdAt: new Date().toISOString(),
+        };
+        setLocalMessages((prev) => [...prev, confirmMessage]);
+      }, 800);
+    }
+  };
+
+  const handleQuickReply = (payload: unknown) => {
+    if (typeof payload === 'string') {
+      // Create trip from location ID
+      handleCreateTrip(payload);
     }
   };
 
@@ -189,20 +224,6 @@ export default function ProjectView() {
       </AppShell>
     );
   }
-
-  const showLocationSuggestions = 
-    showLocations &&
-    answeredQuestions >= initialProjectQuestions.length && 
-    locationSuggestions && 
-    locationSuggestions.length > 0;
-
-  // Get existing trip locations for this project
-  const existingTripLocationIds = trips
-    ?.filter(trip => trip.projectId === projectId)
-    .map(trip => trip.locationId) || [];
-
-  // Hide composer when conversation ends (all questions answered)
-  const shouldShowComposer = answeredQuestions < initialProjectQuestions.length && !showLocationButton;
 
   return (
     <AppShell>
@@ -272,111 +293,18 @@ export default function ProjectView() {
             <ChatThread
               messages={localMessages}
               isLoading={sendMessageMutation.isPending}
-              onQuickReply={(payload) => {
-                if (payload === 'view') {
-                  setShowLocations(true);
-                }
-              }}
-              className={isMobile && shouldShowComposer ? 'pb-24' : ''}
+              onLocationDecision={handleLocationDecision}
+              onQuickReply={handleQuickReply}
+              className={isMobile ? 'pb-24' : ''}
             />
           </div>
 
-          {/* Location Suggestions - Full Screen */}
-          {showLocationSuggestions && (
-            <div className="absolute inset-0 bg-background z-10 overflow-y-auto">
-              <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
-                <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent flex items-center gap-2">
-                  <MapPin className="w-6 h-6 text-warm-coral" />
-                  Suggested Destinations
-                </h2>
-                <p className="text-muted-foreground">
-                  Choose a destination to start planning your trip
-                </p>
-
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {locationSuggestions
-                    .sort((a, b) => {
-                      // Sort locations without trips first
-                      const aHasTrip = existingTripLocationIds.includes(a.id);
-                      const bHasTrip = existingTripLocationIds.includes(b.id);
-                      if (aHasTrip && !bHasTrip) return 1;
-                      if (!aHasTrip && bHasTrip) return -1;
-                      return 0;
-                    })
-                    .map((location) => {
-                    const hasTrip = existingTripLocationIds.includes(location.id);
-                    const isCreating = createTripMutation.isPending && createTripMutation.variables?.selectedLocationId === location.id;
-                    
-                    return (
-                      <Card
-                        key={location.id}
-                        className={cn(
-                          "transition-all overflow-hidden group border-warm-coral/20",
-                          hasTrip && "opacity-50 cursor-not-allowed",
-                          !hasTrip && "cursor-pointer hover:shadow-warm",
-                          isCreating && "opacity-50"
-                        )}
-                      >
-                        {location.imageUrl && (
-                          <div className="h-48 overflow-hidden">
-                            <img
-                              src={location.imageUrl}
-                              alt={location.name}
-                              className={cn(
-                                "w-full h-full object-cover transition-transform duration-300",
-                                !hasTrip && "group-hover:scale-105",
-                                hasTrip && "grayscale"
-                              )}
-                            />
-                          </div>
-                        )}
-                        <CardHeader className="p-4">
-                          <CardTitle className={cn("text-lg", hasTrip && "text-muted-foreground")}>
-                            {location.name}, {location.country}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0 space-y-3">
-                          <p className={cn("text-sm line-clamp-2", hasTrip ? "text-muted-foreground/70" : "text-muted-foreground")}>
-                            {location.teaser}
-                          </p>
-                          <Button
-                            onClick={() => !hasTrip && handleCreateTrip(location.id)}
-                            disabled={createTripMutation.isPending || hasTrip}
-                            className={cn(
-                              "w-full shadow-warm border-0",
-                              hasTrip 
-                                ? "bg-muted text-muted-foreground cursor-not-allowed" 
-                                : "bg-gradient-sunset hover:opacity-90 text-white"
-                            )}
-                          >
-                            {hasTrip ? (
-                              'Trip Created'
-                            ) : isCreating ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Creating...
-                              </>
-                            ) : (
-                              'Create Trip'
-                            )}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Composer - Only show during initial questions */}
-          {shouldShowComposer && (
-            <Composer
-              onSend={handleSendMessage}
-              disabled={sendMessageMutation.isPending}
-              placeholder="Describe your expectations..."
-            />
-          )}
+          {/* Composer - Always visible */}
+          <Composer
+            onSend={handleSendMessage}
+            disabled={sendMessageMutation.isPending}
+            placeholder="Opisz swoje oczekiwania..."
+          />
         </div>
       </div>
 

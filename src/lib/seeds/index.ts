@@ -52,7 +52,8 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: 'Najstarsze buddyjskie sanktuarium w Tokio. Spektakularna brama Kaminarimon i tłumy turystów na Nakamise Street.',
       imageUrl: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
       category: 'Culture',
-      decision: 'accepted'
+      rating: 3,
+      status: 'rated'
     },
     {
       id: 'attr-tokyo-002',
@@ -60,7 +61,8 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: 'Słynny rynek rybny z najświeższymi sushi i sashimi. Must dla foodie lovers!',
       imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800',
       category: 'Food',
-      decision: 'accepted'
+      rating: 3,
+      status: 'rated'
     },
     {
       id: 'attr-tokyo-003',
@@ -68,7 +70,8 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: '70-hektarowy las w centrum Tokio z tradycyjną świątynią. Relaksujący 2h spacer wśród natury.',
       imageUrl: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800',
       category: 'Nature',
-      decision: 'accepted'
+      rating: 2,
+      status: 'rated'
     },
     {
       id: 'attr-tokyo-004',
@@ -76,7 +79,8 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: 'Interaktywne digital art museum z immersive instalacjami. Instagram heaven!',
       imageUrl: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=800',
       category: 'Art',
-      decision: 'accepted'
+      rating: 3,
+      status: 'rated'
     },
     {
       id: 'attr-tokyo-005',
@@ -84,7 +88,8 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: 'Centrum kawaii culture, vintage shopping i indie fashion. Plus Togo Shrine trail dla aktywnych.',
       imageUrl: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800',
       category: 'Shopping',
-      decision: 'accepted'
+      rating: 2,
+      status: 'rated'
     },
     {
       id: 'attr-tokyo-006',
@@ -92,7 +97,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       description: 'Najbardziej ruchliwy skrzyżowanie świata. Najlepszy widok z Starbucks na 2. piętrze!',
       imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
       category: 'Landmarks',
-      decision: null
+      status: 'pending'
     }
   ]
 };

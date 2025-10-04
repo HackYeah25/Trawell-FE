@@ -14,8 +14,8 @@ export const AttractionsPanel = memo(function AttractionsPanel({
   onDecision,
   disabled = false,
 }: AttractionsPanelProps) {
-  // Only show attractions without decisions
-  const pendingAttractions = attractions.filter(a => !a.decision);
+  // Only show attractions without ratings
+  const pendingAttractions = attractions.filter(a => a.status === 'pending');
 
   if (pendingAttractions.length === 0) {
     return null;
