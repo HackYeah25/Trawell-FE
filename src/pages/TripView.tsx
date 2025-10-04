@@ -198,7 +198,7 @@ export default function TripView() {
   return (
     <AppShell>
       <div className="h-[calc(100vh-4rem)] flex flex-col">
-        {/* Header */}
+        {/* Header - Fixed */}
         <div className="border-b border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
             {isEditingTitle ? (
@@ -252,54 +252,59 @@ export default function TripView() {
           </div>
         </div>
 
-        {/* Tabs and Content */}
-        <TripTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          chatContent={
-            <>
-              <div className="flex-1 overflow-y-auto h-0">
-                <ChatThread
-                  messages={localMessages}
-                  isLoading={sendMessageMutation.isPending}
-                  onAttractionDecision={handleAttractionDecision}
-                  className={isMobile ? 'pb-24' : ''}
-                />
-              </div>
+        {/* Tabs and Content - Flex container */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <TripTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            chatContent={
+              <div className="flex-1 flex flex-col min-h-0">
+                {/* Chat Thread - Scrollable */}
+                <div className="flex-1 overflow-y-auto">
+                  <ChatThread
+                    messages={localMessages}
+                    isLoading={sendMessageMutation.isPending}
+                    onAttractionDecision={handleAttractionDecision}
+                  />
+                </div>
 
-              <Composer
-                onSend={handleSendMessage}
-                disabled={sendMessageMutation.isPending}
-                placeholder="Opisz swoje preferencje..."
-              />
-            </>
-          }
-          summaryContent={
-            summary ? (
-              <div className="p-4">
-                <div className="max-w-4xl mx-auto space-y-4">
-                  <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-6">
-                    Podsumowanie Podróży
-                  </h2>
-                  {summary.sections.map((section, index) => (
-                    <SummaryCard
-                      key={index}
-                      section={section}
-                      attractions={attractions}
-                    />
-                  ))}
+                {/* Composer - Fixed at bottom */}
+                <div className="flex-shrink-0">
+                  <Composer
+                    onSend={handleSendMessage}
+                    disabled={sendMessageMutation.isPending}
+                    placeholder="Opisz swoje preferencje..."
+                  />
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center space-y-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-warm-coral mx-auto" />
-                  <p className="text-muted-foreground">Generuję podsumowanie...</p>
+            }
+            summaryContent={
+              summary ? (
+                <div className="overflow-y-auto h-full p-4">
+                  <div className="max-w-4xl mx-auto space-y-4">
+                    <h2 className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-6">
+                      Podsumowanie Podróży
+                    </h2>
+                    {summary.sections.map((section, index) => (
+                      <SummaryCard
+                        key={index}
+                        section={section}
+                        attractions={attractions}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )
-          }
-        />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center space-y-2">
+                    <Loader2 className="w-8 h-8 animate-spin text-warm-coral mx-auto" />
+                    <p className="text-muted-foreground">Generuję podsumowanie...</p>
+                  </div>
+                </div>
+              )
+            }
+          />
+        </div>
       </div>
     </AppShell>
   );

@@ -18,7 +18,7 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
   return (
     <Card
       className={cn(
-        'overflow-hidden transition-all duration-300 animate-fade-in',
+        'overflow-hidden transition-all duration-300 animate-fade-in my-4',
         isRejected && 'opacity-50 grayscale',
         isRated && 'border-warm-turquoise shadow-warm ring-1 ring-warm-turquoise/20',
         !isDisabled && 'hover:scale-[1.02]'
@@ -51,12 +51,12 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
       )}
 
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 sm:p-5 space-y-3">
         <h3 className="font-semibold text-lg">{attraction.title}</h3>
         <p className="text-sm line-clamp-2">{attraction.description}</p>
 
         {/* Bottom Bar */}
-        <div className="grid grid-cols-4 gap-2 pt-2">
+        <div className="grid grid-cols-4 gap-2 pt-3">
           <Button
             variant="outline"
             size="sm"
