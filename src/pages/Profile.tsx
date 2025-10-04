@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // Mock profile data collected during onboarding
 const mockProfileData = {
+  displayName: '',
   travelPreferences: {
     type: 'Beach relaxation, city exploration',
     budget: 'Medium',
@@ -53,11 +54,13 @@ export default function Profile() {
   if (!user) return null;
 
   const handleSavePreferences = (data: {
+    displayName?: string;
     preferences: typeof mockProfileData.travelPreferences;
     interests: string[];
     destinations: string[];
   }) => {
     setProfileData({
+      displayName: data.displayName || profileData.displayName,
       travelPreferences: data.preferences,
       interests: data.interests,
       favoriteDestinations: data.destinations,
@@ -96,12 +99,12 @@ export default function Profile() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <Avatar className="h-24 w-24 border-4 border-warm-coral/20 shadow-warm">
                 <AvatarFallback className="bg-gradient-sunset text-primary-foreground text-3xl font-bold">
-                  {getInitials(user.name)}
+                  {getInitials(profileData.displayName || user.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 text-center sm:text-left">
                 <CardTitle className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent mb-2">
-                  {user.name}
+                  {profileData.displayName || user.name}
                 </CardTitle>
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-muted-foreground">
                   <span className="flex items-center gap-1.5">
@@ -259,6 +262,7 @@ export default function Profile() {
       <EditPreferencesDialog
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
+        displayName={profileData.displayName || user.name}
         preferences={profileData.travelPreferences}
         interests={profileData.interests}
         destinations={profileData.favoriteDestinations}

@@ -85,12 +85,12 @@ export const ChatMessage = memo(function ChatMessage({
           )}
         >
           {message.markdown && (
-            <div className="prose prose-sm max-w-none dark:prose-invert">
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-ul:my-0 prose-ol:my-0">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {displayedText}
               </ReactMarkdown>
               {isTyping && (
-                <span className="inline-block w-1 h-4 ml-1 bg-warm-coral animate-pulse" />
+                <span className="inline-block w-1 h-4 ml-1 bg-warm-coral animate-pulse align-middle" />
               )}
             </div>
           )}

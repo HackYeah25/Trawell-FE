@@ -17,6 +17,7 @@ import { X } from 'lucide-react';
 interface EditPreferencesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  displayName: string;
   preferences: {
     type: string;
     budget: string;
@@ -26,6 +27,7 @@ interface EditPreferencesDialogProps {
   interests: string[];
   destinations: string[];
   onSave: (data: {
+    displayName?: string;
     preferences: {
       type: string;
       budget: string;
@@ -40,11 +42,13 @@ interface EditPreferencesDialogProps {
 export function EditPreferencesDialog({
   open,
   onOpenChange,
+  displayName,
   preferences,
   interests,
   destinations,
   onSave,
 }: EditPreferencesDialogProps) {
+  const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [editedPreferences, setEditedPreferences] = useState(preferences);
   const [editedInterests, setEditedInterests] = useState(interests);
   const [editedDestinations, setEditedDestinations] = useState(destinations);
@@ -53,6 +57,7 @@ export function EditPreferencesDialog({
 
   const handleSave = () => {
     onSave({
+      displayName: editedDisplayName,
       preferences: editedPreferences,
       interests: editedInterests,
       destinations: editedDestinations,
@@ -93,6 +98,17 @@ export function EditPreferencesDialog({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Display Name */}
+          <div className="space-y-2">
+            <Label htmlFor="displayName">Display Name</Label>
+            <Input
+              id="displayName"
+              value={editedDisplayName}
+              onChange={(e) => setEditedDisplayName(e.target.value)}
+              placeholder="Enter your display name"
+            />
+          </div>
+
           {/* Travel Preferences */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Travel Preferences</h3>

@@ -21,12 +21,12 @@ export function ProjectTypeDialog({
 }: ProjectTypeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
+      <DialogContent className="sm:max-w-md max-w-[90vw]">
+        <DialogHeader className="space-y-2">
+          <DialogTitle className="text-xl sm:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">
             Create New Project
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             Choose the type of project you want to create
           </DialogDescription>
         </DialogHeader>
@@ -35,15 +35,15 @@ export function ProjectTypeDialog({
           <Button
             onClick={() => onSelectType(false)}
             variant="outline"
-            className="h-auto flex-col items-start p-4 gap-2 hover:border-warm-coral"
+            className="h-auto flex-col items-start p-3 sm:p-4 gap-2 hover:border-warm-coral"
           >
-            <div className="flex items-center gap-2 w-full">
-              <div className="w-10 h-10 rounded-lg bg-warm-sand/30 flex items-center justify-center">
-                <Lock className="w-5 h-5 text-warm-coral" />
+            <div className="flex items-center gap-2 sm:gap-3 w-full">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-warm-sand/30 flex items-center justify-center flex-shrink-0">
+                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-warm-coral" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold">Private Project</div>
-                <div className="text-sm text-muted-foreground">Only you can access</div>
+                <div className="font-semibold text-sm sm:text-base">Private Project</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Only you can access</div>
               </div>
             </div>
           </Button>
@@ -51,15 +51,15 @@ export function ProjectTypeDialog({
           <Button
             onClick={() => onSelectType(true)}
             variant="outline"
-            className="h-auto flex-col items-start p-4 gap-2 hover:border-warm-coral"
+            className="h-auto flex-col items-start p-3 sm:p-4 gap-2 hover:border-warm-coral"
           >
-            <div className="flex items-center gap-2 w-full">
-              <div className="w-10 h-10 rounded-lg bg-warm-turquoise/30 flex items-center justify-center">
-                <Users className="w-5 h-5 text-warm-turquoise" />
+            <div className="flex items-center gap-2 sm:gap-3 w-full">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-warm-turquoise/30 flex items-center justify-center flex-shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-warm-turquoise" />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold">Shared Project</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="font-semibold text-sm sm:text-base">Shared Project</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">
                   Collaborate with others via share code
                 </div>
               </div>
