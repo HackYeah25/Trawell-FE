@@ -1,10 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, Loader2, Sparkles } from 'lucide-react';
+import { Plane, Loader2 } from 'lucide-react';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
-import { Button } from '@/components/ui/button';
-import { useChatPagination } from '@/hooks/use-chat-pagination';
 import {
   useOnboardingQuestions,
   useStartProfiling,
@@ -121,6 +119,20 @@ export default function Onboarding() {
     sendAnswer(text);
   };
 
+  const handleStartAdventure = async () => {
+    try {
+      // Complete onboarding - this will update localStorage and invalidate cache
+      const result = await completeMutation.mutateAsync({
+        createInitialProject: true,
+      });
+
+      // Redirect to first project
+      navigate(`/app/projects/${result.projectId}`);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+    }
+  };
+
   if (questionsLoading || startProfilingMutation.isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
@@ -170,10 +182,6 @@ export default function Onboarding() {
           isLoading={isThinking || completeMutation.isPending}
           className="flex-1"
           onQuickReply={handleStartAdventure}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          onLoadMore={loadMore}
-          remainingCount={remainingCount}
         />
 
         <Composer
