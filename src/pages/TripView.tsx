@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
+import { cn } from '@/lib/utils';
 import {
   useTrip,
   useTripMessages,
@@ -347,35 +348,45 @@ export default function TripView() {
         <div 
           className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60] relative"
           style={{
-            backgroundImage: trip.imageUrl ? `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(${trip.imageUrl})` : undefined,
+            backgroundImage: trip.imageUrl ? `url(${trip.imageUrl})` : undefined,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
           }}
         >
+          {/* Dark overlay for better text visibility */}
+          {trip.imageUrl && (
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30" />
+          )}
           <div className="max-w-4xl mx-auto relative z-10">
             <div className="flex items-center gap-3 mb-2">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/app')}
-                className="flex-shrink-0"
+                className={cn(
+                  "flex-shrink-0",
+                  trip.imageUrl ? "text-white hover:bg-white/20" : "text-foreground hover:bg-muted"
+                )}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
               <div>
                 <h3 className="font-pacifico text-lg bg-gradient-sunset bg-clip-text text-transparent leading-tight">
                   {trip?.title || 'Trip Details'}
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className={cn(
+                  "text-xs",
+                  trip.imageUrl ? "text-white/90" : "text-muted-foreground"
+                )}>
                   {trip?.locationName || 'Your amazing journey'}
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <div className={cn(
+              "flex flex-wrap items-center gap-2 text-xs",
+              trip.imageUrl ? "text-white/80" : "text-muted-foreground"
+            )}>
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3 md:w-4 md:h-4 text-warm-coral" />
                 {trip.locationName}
