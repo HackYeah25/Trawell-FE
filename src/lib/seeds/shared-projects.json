@@ -36,7 +36,7 @@
     "participants": ["user-tomasz-002"]
   },
   {
-    "id": "proj-krakow-iguana",
+    "id": "shared-proj-iguana",
     "title": "Krakow Iguana Squad",
     "createdAt": "2025-01-10T10:00:00Z",
     "updatedAt": "2025-01-10T10:30:00Z",
@@ -44,7 +44,7 @@
     "isShared": true,
     "shareCode": "iguana",
     "ownerId": "user-anna",
-    "hasLocationSuggestions": false,
+    "hasLocationSuggestions": true,
     "participants": ["user-anna", "user-kasia", "user-marek", "user-tomek"]
   }
 ]

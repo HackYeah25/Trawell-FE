@@ -24,6 +24,7 @@ import {
   iguanaSharedProject,
   iguanaTrip,
   iguanaLocation,
+  krakowLocationSuggestions,
 } from './mock-data';
 import { getSeedConversation, getSeedTripConversation, getSeedAttractions } from './seeds';
 
@@ -144,6 +145,11 @@ export const apiClient = {
           projectId === 'shared-proj-abc123') {
         const allLocations = [...mockLocations, iguanaLocation];
         return mockFetch(allLocations as T, 400);
+      }
+      
+      // Special case for iguana project - return Krakow-specific locations
+      if (projectId === 'shared-proj-iguana') {
+        return mockFetch(krakowLocationSuggestions as T, 400);
       }
       
       return mockFetch([] as T, 400);
@@ -450,7 +456,7 @@ export const apiClient = {
           mockTrips.push({ ...iguanaTrip });
           
           // Add project messages from seed data
-          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('proj-krakow-iguana');
+          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('shared-proj-iguana');
           
           // Multi-user conversation from seed data
           mockTripMessages[iguanaTrip.id] = getSeedTripConversation('trip-iguana-bcn');
@@ -458,7 +464,7 @@ export const apiClient = {
           // Attractions for Krakow trip from seed data
           mockAttractions[iguanaTrip.id] = getSeedAttractions('trip-iguana-bcn');
           
-          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('proj-krakow-iguana');
+          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('shared-proj-iguana');
         }
         return { projectId: iguanaSharedProject.id } as T;
       }

@@ -393,26 +393,41 @@ export default function ProjectView() {
       );
     }
 
-    // Every 3 user messages, add a location proposal
+    // Add location proposals based on project type
     const userMessageCount = messages.filter(m => m.role === 'user').length;
-    if (locationSuggestions && userMessageCount % 3 === 0) {
-      const unusedLocations = locationSuggestions.filter(loc => 
-        !messages.some(msg => msg.locationProposal?.id === loc.id)
-      );
+    const currentUserMessageCount = messages.filter(m => m.role === 'user' && !m.userName).length;
+    
+    if (locationSuggestions) {
+      let shouldAddProposal = false;
+      
+      // For iguana project, add proposals after first current user message
+      if (actualId === 'shared-proj-iguana' && currentUserMessageCount === 1) {
+        shouldAddProposal = true;
+      }
+      // For other projects, add proposals every 3 user messages
+      else if (actualId !== 'shared-proj-iguana' && userMessageCount % 3 === 0) {
+        shouldAddProposal = true;
+      }
+      
+      if (shouldAddProposal) {
+        const unusedLocations = locationSuggestions.filter(loc => 
+          !messages.some(msg => msg.locationProposal?.id === loc.id)
+        );
 
-      if (unusedLocations.length > 0) {
-        const nextLocation = unusedLocations[0];
-        const proposalMessage: ChatMessage = {
-          id: `loc-proposal-${Date.now()}`,
-          role: 'assistant',
-          markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
-          locationProposal: { ...nextLocation, status: 'pending' },
-          createdAt: new Date().toISOString(),
-        };
+        if (unusedLocations.length > 0) {
+          const nextLocation = unusedLocations[0];
+          const proposalMessage: ChatMessage = {
+            id: `loc-proposal-${Date.now()}`,
+            role: 'assistant',
+            markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
+            locationProposal: { ...nextLocation, status: 'pending' },
+            createdAt: new Date().toISOString(),
+          };
 
-        setTimeout(() => {
-          setMessages((prev) => [...prev, proposalMessage]);
-        }, 1500);
+          setTimeout(() => {
+            setMessages((prev) => [...prev, proposalMessage]);
+          }, 1500);
+        }
       }
     }
   };

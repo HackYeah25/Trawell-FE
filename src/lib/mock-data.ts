@@ -304,12 +304,43 @@ export const iguanaTrip: Trip = {
 };
 
 export const iguanaLocation: Location = {
-  id: 'loc-barcelona',
-  name: 'Barcelona',
-  country: 'Spain',
-  teaser: 'Vibrant Mediterranean city with stunning architecture, beaches, and culture',
-  imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80',
+  id: 'loc-krakow',
+  name: 'Kraków',
+  country: 'Poland',
+  teaser: 'Historic royal city with medieval architecture, vibrant culture, and amazing food scene',
+  imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
 };
+
+export const krakowLocationSuggestions: Location[] = [
+  {
+    id: 'loc-krakow-main',
+    name: 'Kraków',
+    country: 'Poland',
+    teaser: 'Historic royal city with medieval architecture, vibrant culture, and amazing food scene',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  },
+  {
+    id: 'loc-wieliczka',
+    name: 'Wieliczka',
+    country: 'Poland',
+    teaser: 'Famous salt mine with underground chambers, chapels, and unique salt sculptures',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  },
+  {
+    id: 'loc-auschwitz',
+    name: 'Oświęcim (Auschwitz)',
+    country: 'Poland',
+    teaser: 'Important historical site and memorial, UNESCO World Heritage',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  },
+  {
+    id: 'loc-zakopane',
+    name: 'Zakopane',
+    country: 'Poland',
+    teaser: 'Mountain resort town in the Tatra Mountains, perfect for winter sports',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  },
+];
 
 // Available locations
 export const mockLocations: Location[] = [

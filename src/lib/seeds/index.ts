@@ -38,7 +38,7 @@ export const seedProjects: SeedProject[] = sharedProjectsData as SeedProject[];
 export const seedConversations: Record<string, ChatMessage[]> = {
   'proj-alpine-2025': alpineConversation as ChatMessage[],
   'proj-japan-dream': japanConversation as ChatMessage[],
-  'proj-krakow-iguana': krakowConversation as ChatMessage[],
+  'shared-proj-iguana': krakowConversation as ChatMessage[],
 };
 
 // Trip conversations
