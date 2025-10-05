@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => ({
   preview: {
     host: "0.0.0.0",
     port: 5000,
+    allowedHosts: ["app.trawell.dev"],
   },
   plugins: [
     react(),
