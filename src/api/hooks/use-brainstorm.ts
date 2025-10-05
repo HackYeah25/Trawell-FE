@@ -89,12 +89,23 @@ export function useDeleteBrainstormSession() {
 
 // WebSocket message types
 export interface BrainstormWSMessage {
-  type: 'message' | 'token' | 'thinking' | 'complete' | 'error';
+  type: 'message' | 'token' | 'thinking' | 'complete' | 'error' | 'locations';
   conversation_id?: string;
   role?: 'user' | 'assistant';
   content?: string;
   token?: string;
   message?: string;
+  locations?: LocationProposal[];
+}
+
+export interface LocationProposal {
+  id: string;
+  name: string;
+  country: string;
+  teaser: string;
+  imageUrl?: string;
+  rating?: 1 | 2 | 3 | null;
+  status?: 'pending' | 'rejected' | 'rated';
 }
 
 interface UseBrainstormWebSocketOptions {
@@ -104,6 +115,7 @@ interface UseBrainstormWebSocketOptions {
   onThinking?: () => void;
   onComplete?: () => void;
   onError?: (error: string) => void;
+  onLocations?: (locations: LocationProposal[]) => void;
 }
 
 export function useBrainstormWebSocket({
@@ -113,6 +125,7 @@ export function useBrainstormWebSocket({
   onThinking,
   onComplete,
   onError,
+  onLocations,
 }: UseBrainstormWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
@@ -125,11 +138,11 @@ export function useBrainstormWebSocket({
   }, [sessionId]);
 
   // Store callbacks in refs to avoid reconnections
-  const handlersRef = useRef({ onMessage, onToken, onThinking, onComplete, onError });
+  const handlersRef = useRef({ onMessage, onToken, onThinking, onComplete, onError, onLocations });
 
   useEffect(() => {
-    handlersRef.current = { onMessage, onToken, onThinking, onComplete, onError };
-  }, [onMessage, onToken, onThinking, onComplete, onError]);
+    handlersRef.current = { onMessage, onToken, onThinking, onComplete, onError, onLocations };
+  }, [onMessage, onToken, onThinking, onComplete, onError, onLocations]);
 
   const connect = useCallback(() => {
     const currentSessionId = sessionIdRef.current;
@@ -187,6 +200,9 @@ export function useBrainstormWebSocket({
         case 'complete':
           handlers.onComplete?.();
           break;
+        case 'locations':
+          if (data.locations) handlers.onLocations?.(data.locations);
+          break;
         case 'error':
           handlers.onError?.(data.message || 'Unknown error');
           break;
@@ -205,10 +221,17 @@ export function useBrainstormWebSocket({
       wsRef.current = null;
       isConnectingRef.current = false;
       
-      // Only auto-reconnect on unexpected disconnects
-      if (event.code !== 1000 && event.code !== 1008) {
+      // Don't reconnect on:
+      // 1000 = Normal closure
+      // 1008 = Session not found (permanent error)
+      // 1011 = Internal server error (should be fixed, but don't spam reconnects)
+      if (event.code !== 1000 && event.code !== 1008 && event.code !== 1011) {
         console.log('Will attempt reconnect in 3 seconds...');
         reconnectTimeoutRef.current = window.setTimeout(() => connect(), 3000);
+      } else if (event.code === 1008) {
+        console.error('Session not found - cannot reconnect');
+      } else if (event.code === 1011) {
+        console.error('Server error during connection - check backend logs');
       }
     };
 

@@ -7,10 +7,16 @@ import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+<<<<<<< HEAD
 import { useBrainstormSession, useBrainstormWebSocket } from '@/api/hooks/use-brainstorm';
 import { useProject, useProjectMessages, useProjectLocationSuggestions, useCreateTripFromLocation, useSendProjectMessage } from '@/api/hooks/use-projects';
+=======
+import { useBrainstormSession, useBrainstormWebSocket, type LocationProposal } from '@/api/hooks/use-brainstorm';
+import { useProjectLocationSuggestions, useCreateTripFromLocation } from '@/api/hooks/use-projects';
+>>>>>>> 31e5b9a (now only me and god knows what is happening soon it will be god only)
 import { useTrips } from '@/api/hooks/use-trips';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
+import { LocationProposalCard } from '@/components/projects/LocationProposalCard';
 import type { ChatMessage, Location } from '@/types';
 import { toast } from 'sonner';
 
@@ -22,6 +28,9 @@ export default function ProjectView() {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
   const streamingMessageIdRef = useRef<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Location proposals state
+  const [locationProposals, setLocationProposals] = useState<LocationProposal[]>([]);
   
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -111,6 +120,9 @@ export default function ProjectView() {
   // WebSocket handlers - wrapped in useCallback to prevent reconnections
   const handleMessage = useCallback((wsMessage: { content?: string; role?: string }) => {
     if (wsMessage.content && wsMessage.role === 'assistant') {
+      // Debug: log raw response
+      console.log('📜 RAW MESSAGE FROM BACKEND:', wsMessage.content);
+      
       // Clear streaming message and add final message
       const newMessage: ChatMessage = {
         id: streamingMessageIdRef.current || `ws-${Date.now()}`,
@@ -148,6 +160,12 @@ export default function ProjectView() {
     setIsSending(false);
   }, []);
 
+  const handleLocations = useCallback((locations: LocationProposal[]) => {
+    console.log('Received location proposals:', locations);
+    setLocationProposals(locations);
+    toast.success(`${locations.length} destination${locations.length > 1 ? 's' : ''} proposed!`);
+  }, []);
+
   const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
     sessionId: isBrainstorm ? actualId : null,
     onMessage: handleMessage,
@@ -155,44 +173,47 @@ export default function ProjectView() {
     onThinking: handleThinking,
     onComplete: handleComplete,
     onError: handleError,
+    onLocations: handleLocations,
   });
 
-  const handleLocationDecision = (locationId: string, decision: 'reject' | 1 | 2 | 3) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.locationProposal?.id === locationId) {
+  const handleLocationProposalDecision = useCallback((decision: 'reject' | 1 | 2 | 3, locationId?: string) => {
+    if (!locationId) return;
+    
+    // Update location proposal status
+    setLocationProposals((prev) =>
+      prev.map((loc) => {
+        if (loc.id === locationId) {
           return {
-            ...msg,
-            locationProposal: {
-              ...msg.locationProposal,
-              rating: decision === 'reject' ? null : decision,
-              status: decision === 'reject' ? 'rejected' : 'rated',
-            },
+            ...loc,
+            rating: decision === 'reject' ? null : decision,
+            status: decision === 'reject' ? 'rejected' : 'rated',
           };
         }
-        return msg;
+        return loc;
       })
     );
 
-    // Mock API call
     console.log(`Location ${locationId} decision: ${decision}`);
 
-    // If rated with 3 stars, offer to create trip
-    if (decision === 3) {
-      setTimeout(() => {
-        const confirmMessage: ChatMessage = {
-          id: `create-trip-${Date.now()}`,
-          role: 'assistant',
-          markdown: '🎉 Świetny wybór! Czy chcesz stworzyć podróż do tego miejsca?',
-          quickReplies: [
-            { id: 'create-yes', label: 'Tak, utwórz podróż!', payload: locationId },
-          ],
-          createdAt: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, confirmMessage]);
-      }, 800);
+    // If rated with stars, send message about planning
+    if (decision !== 'reject') {
+      const location = locationProposals.find(l => l.id === locationId);
+      if (location) {
+        const message = `Great! You've shown interest in ${location.name}. ${
+          decision === 3 
+            ? "I can tell you're really excited about it! 🌟" 
+            : decision === 2
+            ? "Nice choice! 👍"
+            : "Interesting option! ✨"
+        } Tell me more about what you'd like to do there, and I'll help you plan the details.`;
+        
+        // Send follow-up message via WebSocket
+        setTimeout(() => {
+          sendWSMessage(message);
+        }, 500);
+      }
     }
-  };
+  }, [locationProposals, sendWSMessage]);
 
   const handleQuickReply = (payload: unknown) => {
     if (typeof payload === 'string') {
@@ -455,17 +476,34 @@ export default function ProjectView() {
           ref={chatContainerRef}
           className="flex-1 overflow-y-auto min-h-0"
         >
-          <div className="max-w-4xl mx-auto p-4">
+          <div className="max-w-4xl mx-auto p-4 space-y-4">
             <ChatThread
               messages={displayMessages}
               isLoading={isSending}
-              onLocationDecision={handleLocationDecision}
               onQuickReply={handleQuickReply}
               hasMore={hasMore}
               isLoadingMore={isLoadingMore}
               onLoadMore={loadMore}
               remainingCount={remainingCount}
             />
+            
+            {/* Location Proposals */}
+            {locationProposals.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-warm-coral/20"></div>
+                  <p className="text-sm text-warm-coral font-medium">✨ Destination Proposals</p>
+                  <div className="h-px flex-1 bg-warm-coral/20"></div>
+                </div>
+                {locationProposals.map((location) => (
+                  <LocationProposalCard
+                    key={location.id}
+                    location={location}
+                    onDecision={(decision) => handleLocationProposalDecision(decision, location.id)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
