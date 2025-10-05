@@ -301,7 +301,7 @@ export const iguanaTrip: Trip = {
   locationName: 'Kraków, Poland',
   title: 'Krakow Winter Escape',
   createdAt: new Date('2025-01-10T10:00:00Z').toISOString(),
-  imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
   startDate: '2025-02-14T00:00:00Z',
   endDate: '2025-02-17T23:59:59Z',
   status: 'active',
@@ -316,7 +316,7 @@ export const iguanaTripProposals: Trip[] = [
     locationName: 'Kraków, Poland',
     title: 'Krakow Cultural Discovery',
     createdAt: new Date('2025-01-10T10:00:00Z').toISOString(),
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
     startDate: '2025-02-14T00:00:00Z',
     endDate: '2025-02-17T23:59:59Z',
     status: 'pending',
@@ -329,7 +329,7 @@ export const iguanaTripProposals: Trip[] = [
     locationName: 'Wieliczka, Poland',
     title: 'Wieliczka Salt Mine Adventure',
     createdAt: new Date('2025-01-10T10:00:00Z').toISOString(),
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
     startDate: '2025-02-15T00:00:00Z',
     endDate: '2025-02-16T23:59:59Z',
     status: 'pending',
@@ -342,7 +342,7 @@ export const iguanaLocation: Location = {
   name: 'Kraków',
   country: 'Poland',
   teaser: 'Historic royal city with medieval architecture, vibrant culture, and amazing food scene',
-  imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
 };
 
 export const krakowLocationSuggestions: Location[] = [
@@ -351,7 +351,7 @@ export const krakowLocationSuggestions: Location[] = [
     name: 'Kraków',
     country: 'Poland',
     teaser: 'Historic royal city with medieval architecture, vibrant culture, and amazing food scene',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
   },
   {
     id: 'loc-wieliczka',

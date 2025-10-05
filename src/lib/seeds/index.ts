@@ -54,7 +54,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-001',
       title: 'Wawel Castle & Cathedral',
       description: 'Najważniejszy zamek w Polsce z katedrą i smoczą jamą. Absolutna podstawa wizyty w Krakowie.',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
       category: 'History',
       rating: 3,
       status: 'rated'
@@ -195,7 +195,7 @@ export const seedTrips: Trip[] = [
     lastMessagePreview: 'Tomek: Sunrise na Błoniach - genialne! 🌅',
     startDate: '2025-02-14T00:00:00Z',
     endDate: '2025-02-17T23:59:59Z',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
     status: 'active',
     rating: 3
   },
@@ -210,7 +210,7 @@ export const seedTrips: Trip[] = [
     lastMessagePreview: 'Ania: Idealnie! Marek, zajmiesz się rezerwacjami?',
     startDate: '2025-02-14T00:00:00Z',
     endDate: '2025-02-17T23:59:59Z',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
     status: 'pending',
     rating: 3
   },
@@ -225,7 +225,7 @@ export const seedTrips: Trip[] = [
     lastMessagePreview: 'Marek: Wieliczka to must-see! Kopalnia soli z XIII wieku.',
     startDate: '2025-02-15T00:00:00Z',
     endDate: '2025-02-16T23:59:59Z',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center',
     status: 'pending',
     rating: 2
   }

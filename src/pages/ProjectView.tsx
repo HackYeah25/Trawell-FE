@@ -87,21 +87,22 @@ export default function ProjectView() {
   useEffect(() => {
     if (isBrainstorm && brainstormSession?.messages && !hasLoadedInitialMessages.current) {
       // Brainstorm session messages
-      const chatMessages: ChatMessage[] = brainstormSession.messages.map((msg: any, idx) => {
+      const chatMessages: ChatMessage[] = brainstormSession.messages.map((msg, idx) => {
         const baseMessage: ChatMessage = {
           id: `msg-${idx}`,
-          role: msg.role,
-          markdown: msg.content,
-          createdAt: msg.timestamp,
+          role: msg.role as 'user' | 'assistant',
+          markdown: msg.content as string,
+          createdAt: msg.timestamp as string,
         };
         
         // Check if message has trip_created metadata
-        if (msg.metadata && msg.metadata.type === 'trip_created') {
+        if (msg.metadata && (msg.metadata as Record<string, unknown>).type === 'trip_created') {
+          const metadata = msg.metadata as Record<string, unknown>;
           baseMessage.tripCreated = {
-            tripId: msg.metadata.tripId,
-            title: msg.metadata.title,
-            locationName: msg.metadata.locationName,
-            createdAt: msg.timestamp,
+            tripId: metadata.tripId as string,
+            title: metadata.title as string,
+            locationName: metadata.locationName as string,
+            createdAt: metadata.createdAt as string,
           };
         }
         
@@ -178,9 +179,42 @@ export default function ProjectView() {
   }, [toast]);
 
   const handleLocations = useCallback((locations: LocationProposal[]) => {
-    console.log('Received location proposals:', locations);
-    setLocationProposals(locations);
-    toast.success('Nowe propozycje!', `${locations.length} destynacj${locations.length > 1 ? 'i' : 'a'} do sprawdzenia`);
+    // Add fallback images for locations that don't have them
+    const locationsWithImages = locations.map(location => {
+      if (!location.imageUrl) {
+        // Add fallback image based on location name
+        let fallbackImageUrl = '';
+        if (location.name.toLowerCase().includes('krakow') || location.name.toLowerCase().includes('kraków')) {
+          // Use different Krakow images based on location ID or name for variety
+          const krakowImages = [
+            'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop&crop=center', // Wawel Castle
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center', // Main Square
+            'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&h=600&fit=crop&crop=center', // Kazimierz
+            'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&h=600&fit=crop&crop=center'  // Planty Park
+          ];
+          // Use location ID to pick consistent image for same location
+          const imageIndex = location.id ? location.id.charCodeAt(0) % krakowImages.length : 0;
+          fallbackImageUrl = krakowImages[imageIndex];
+        } else if (location.name.toLowerCase().includes('warsaw') || location.name.toLowerCase().includes('warszawa')) {
+          fallbackImageUrl = 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&q=80';
+        } else if (location.name.toLowerCase().includes('gdansk') || location.name.toLowerCase().includes('gdańsk')) {
+          fallbackImageUrl = 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&q=80';
+        } else {
+          // Generic fallback
+          fallbackImageUrl = 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80';
+        }
+        
+        return {
+          ...location,
+          imageUrl: fallbackImageUrl
+        };
+      }
+      return location;
+    });
+    
+    
+    setLocationProposals(locationsWithImages);
+    toast.success('Nowe propozycje!', `${locationsWithImages.length} destynacj${locationsWithImages.length > 1 ? 'i' : 'a'} do sprawdzenia`);
   }, [toast]);
 
   const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
