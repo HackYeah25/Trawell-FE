@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, Grid3X3, MapPin } from 'lucide-react';
+import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, MapPin, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -13,7 +13,6 @@ import { useBrainstormTrips } from '@/api/hooks/use-brainstorm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { ProjectTypeDialog } from '@/components/projects/ProjectTypeDialog';
-import { JoinProjectDialog } from '@/components/projects/JoinProjectDialog';
 import { AdventureTrips } from '@/components/adventures/AdventureTrips';
 import { useToast } from '@/hooks/use-custom-toast';
 
@@ -27,7 +26,6 @@ export default function History() {
   const createBrainstormMutation = useCreateBrainstormSession();
   const joinProjectMutation = useJoinProject();
   const [showProjectTypeDialog, setShowProjectTypeDialog] = useState(false);
-  const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [expandedAdventures, setExpandedAdventures] = useState<Set<string>>(new Set());
 
   const handleSelectProjectType = (isShared: boolean) => {
@@ -67,8 +65,8 @@ export default function History() {
       { shareCode },
       {
         onSuccess: () => {
-          setShowJoinDialog(false);
-          // Project will appear in the list automatically due to query invalidation
+          setShowProjectTypeDialog(false);
+          toast.success('Dołączono do przygody!', 'Przygoda została dodana do Twojej listy');
         },
         onError: () => {
           toast.error('Nieprawidłowy kod', 'Sprawdź kod i spróbuj ponownie');
@@ -110,8 +108,8 @@ export default function History() {
     <AppShell>
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between gap-2">
-          <h1 className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">Your Trips</h1>
+        <div className="flex items-center justify-between gap-2 py-2">
+          <h1 className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent leading-normal pb-2">Your Adventures</h1>
           <div className="flex gap-2">
             <Button 
               onClick={() => navigate('/app/gallery')}
@@ -120,16 +118,7 @@ export default function History() {
               className="sm:px-4"
             >
               <Grid3X3 className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Trip Gallery</span>
-            </Button>
-            <Button 
-              onClick={() => setShowJoinDialog(true)}
-              variant="outline"
-              size="sm"
-              className="sm:px-4"
-            >
-              <UserPlus className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Join Adventure</span>
+              <span className="hidden sm:inline">All Trips</span>
             </Button>
             <Button 
               onClick={() => setShowProjectTypeDialog(true)}
@@ -305,12 +294,8 @@ export default function History() {
         open={showProjectTypeDialog}
         onOpenChange={setShowProjectTypeDialog}
         onSelectType={handleSelectProjectType}
-      />
-      <JoinProjectDialog
-        open={showJoinDialog}
-        onOpenChange={setShowJoinDialog}
-        onJoin={handleJoinProject}
-        isLoading={joinProjectMutation.isPending}
+        onJoinProject={handleJoinProject}
+        isJoining={joinProjectMutation.isPending}
       />
     </AppShell>
   );

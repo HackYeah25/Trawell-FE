@@ -59,7 +59,6 @@ export function useBrainstormSession(sessionId: string | null) {
     enabled: !!sessionId,
   });
 }
-
 // Get trips for brainstorm session (recommendations)
 export function useBrainstormTrips(sessionId: string | null) {
   return useQuery({

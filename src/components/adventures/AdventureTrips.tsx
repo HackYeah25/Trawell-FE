@@ -83,8 +83,18 @@ export function AdventureTrips({
       {/* Trips list with better grouping */}
       {isExpanded && (
         <div className="mt-3 ml-4 border-l-2 border-warm-coral/20 pl-4 space-y-3">
-          <div className="text-xs font-medium text-warm-coral uppercase tracking-wide mb-2">
-            Your Trips
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-medium text-warm-coral uppercase tracking-wide">
+              Your Adventures
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/app/gallery')}
+              className="h-6 px-2 text-xs text-warm-coral hover:text-warm-coral/80 hover:bg-warm-coral/10"
+            >
+              View All
+            </Button>
           </div>
           <div className="space-y-2">
             {trips?.map((trip: any, index: number) => (
