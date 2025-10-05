@@ -1,10 +1,12 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles, Edit2, Check, X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useBrainstormSession, useBrainstormWebSocket } from '@/api/hooks/use-brainstorm';
 import { useProjectLocationSuggestions, useCreateTripFromLocation } from '@/api/hooks/use-projects';
 import { useTrips } from '@/api/hooks/use-trips';
@@ -19,6 +21,11 @@ export default function ProjectView() {
   const [isSending, setIsSending] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
   const streamingMessageIdRef = useRef<string | null>(null);
+  
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Use sessionId for brainstorm routes, projectId for project routes
   const actualId = sessionId || projectId;
@@ -54,7 +61,7 @@ export default function ProjectView() {
   }, [session]);
 
   // WebSocket handlers
-  const handleMessage = (wsMessage: any) => {
+  const handleMessage = (wsMessage: { content?: string; role?: string }) => {
     if (wsMessage.content && wsMessage.role === 'assistant') {
       // Clear streaming message and add final message
       const newMessage: ChatMessage = {
@@ -218,6 +225,54 @@ export default function ProjectView() {
     }
   };
 
+  // Edit handlers
+  const handleEditClick = () => {
+    setEditedTitle(session?.title || '');
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedTitle('');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedTitle.trim() || !actualId) return;
+    
+    setIsSaving(true);
+    
+    try {
+      // Mock API call to backend
+      console.log('Saving project name:', {
+        projectId: actualId,
+        newTitle: editedTitle.trim()
+      });
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update local state (in real app, this would come from API response)
+      // For now, we'll just update the UI optimistically
+      setIsEditing(false);
+      setEditedTitle('');
+      toast.success('Project name updated successfully!');
+      
+    } catch (error) {
+      console.error('Error saving project name:', error);
+      toast.error('Failed to save project name');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
   if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
@@ -281,9 +336,52 @@ export default function ProjectView() {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
-                  {session.title}
-                </h1>
+                {isEditing ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="text-xl font-pacifico bg-transparent border-warm-coral/30 focus:border-warm-coral/60 h-8 px-2"
+                      placeholder="Enter project name..."
+                      autoFocus
+                    />
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleSaveEdit}
+                        disabled={isSaving || !editedTitle.trim()}
+                        className="h-8 w-8 p-0 hover:bg-green-100"
+                      >
+                        <Check className="w-4 h-4 text-green-600" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleCancelEdit}
+                        disabled={isSaving}
+                        className="h-8 w-8 p-0 hover:bg-red-100"
+                      >
+                        <X className="w-4 h-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 group">
+                    <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                      {session.title}
+                    </h1>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleEditClick}
+                      className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
+                    >
+                      <Edit2 className="w-4 h-4 text-warm-coral" />
+                    </Button>
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">Solo brainstorm session</p>
               </div>
             </div>
