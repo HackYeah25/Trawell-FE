@@ -1,17 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Grid, List, MapPin, Calendar, Star, Eye, Loader2 } from 'lucide-react';
+import { ArrowLeft, Grid, List, MapPin, Calendar, Star, Eye } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useTrips } from '@/api/hooks/use-trips';
 import { useBrainstormSessions, useAllRecommendations } from '@/api/hooks/use-brainstorm';
 import { toast } from 'sonner';
 
 type ViewMode = 'grid' | 'list';
+
+// Skeleton Components
+const TripCardSkeleton = ({ viewMode }: { viewMode: ViewMode }) => {
+  if (viewMode === 'grid') {
+    return (
+      <Card className="overflow-hidden">
+        <Skeleton className="aspect-[4/3] w-full" />
+        <div className="p-4 space-y-2">
+          <Skeleton className="h-5 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-3 w-1/3" />
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="flex items-center gap-4 p-4">
+      <Skeleton className="w-16 h-16 rounded-lg flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-3 w-1/3" />
+      </div>
+      <Skeleton className="h-8 w-16" />
+    </Card>
+  );
+};
+
+const GallerySkeleton = ({ viewMode }: { viewMode: ViewMode }) => (
+  <div className={cn(
+    "mt-6",
+    viewMode === 'grid' 
+      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      : "space-y-4"
+  )}>
+    {Array.from({ length: 8 }).map((_, i) => (
+      <TripCardSkeleton key={i} viewMode={viewMode} />
+    ))}
+  </div>
+);
 
 export default function TripGallery() {
   const navigate = useNavigate();
@@ -70,13 +112,30 @@ export default function TripGallery() {
   if (tripsLoading || recommendationsLoading) {
     return (
       <AppShell>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-sunset flex items-center justify-center shadow-warm">
-              <MapPin className="w-8 h-8 text-white animate-pulse" />
+        <div className="min-h-screen bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
+          {/* Header Skeleton */}
+          <div className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-warm-coral/20">
+            <div className="max-w-6xl mx-auto p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-10 h-10 rounded-lg" />
+                  <Skeleton className="w-10 h-10 rounded-xl" />
+                  <div>
+                    <Skeleton className="h-8 w-32 mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-10 w-64" />
+                  <Skeleton className="h-10 w-20" />
+                </div>
+              </div>
             </div>
-            <Loader2 className="w-8 h-8 mx-auto animate-spin text-warm-coral" />
-            <p className="mt-4 text-muted-foreground">Loading your trips...</p>
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="max-w-6xl mx-auto p-4">
+            <GallerySkeleton viewMode={viewMode} />
           </div>
         </div>
       </AppShell>
