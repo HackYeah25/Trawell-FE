@@ -224,7 +224,7 @@ export default function TripView() {
 
   return (
     <AppShell>
-      <div className="h-[calc(100vh-4rem)] flex flex-col">
+      <div className="h-screen flex flex-col">
         {/* Header - Fixed */}
         <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60]">
           <div className="max-w-4xl mx-auto">
@@ -350,20 +350,11 @@ export default function TripView() {
                     remainingCount={remainingCount}
                   />
                 </div>
-
-                {/* Composer - Fixed at bottom */}
-                <div className="flex-shrink-0">
-                  <Composer
-                    onSend={handleSendMessage}
-                    disabled={isAIResponding || !isConnected}
-                    placeholder={isConnected ? "Opisz swoje preferencje..." : "Łączenie..."}
-                  />
-                </div>
               </div>
             }
             summaryContent={
               summary ? (
-                <div className="max-w-4xl mx-auto space-y-6">
+                <div className="max-w-4xl mx-auto space-y-6 pb-6 min-h-full">
                   {summary.sections.map((section, index) => (
                     <SummaryCard
                       key={index}
@@ -383,6 +374,19 @@ export default function TripView() {
             }
           />
         </div>
+
+        {/* Fixed Composer - Only for chat tab */}
+        {activeTab === 'chat' && (
+          <div className="flex-shrink-0 border-t border-warm-coral/20 bg-card/80 backdrop-blur-md sticky bottom-0 z-10">
+            <div className="max-w-4xl mx-auto p-4">
+              <Composer
+                onSend={handleSendMessage}
+                disabled={isAIResponding || !isConnected}
+                placeholder={isConnected ? "Opisz swoje preferencje..." : "Łączenie..."}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

@@ -26,7 +26,7 @@ export function TripTabs({ activeTab, onTabChange, chatContent, summaryContent }
         {chatContent}
       </TabsContent>  }
 
-      {activeTab === 'summary' && <TabsContent value="summary" className="flex-1 mt-0 overflow-auto p-4">
+      {activeTab === 'summary' && <TabsContent value="summary" className="flex-1 mt-0 overflow-y-auto p-4 min-h-0">
         {summaryContent}
       </TabsContent>}
     </Tabs>
