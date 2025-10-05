@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Sparkles, Edit2, Check, X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
@@ -58,9 +58,10 @@ export default function ProjectView() {
     }
   };
 
-  // Load messages from session data
+  // Load messages from session data (only on initial load)
+  const hasLoadedInitialMessages = useRef(false);
   useEffect(() => {
-    if (session?.messages) {
+    if (session?.messages && !hasLoadedInitialMessages.current) {
       const chatMessages: ChatMessage[] = session.messages.map((msg, idx) => ({
         id: `msg-${idx}`,
         role: msg.role,
@@ -68,8 +69,15 @@ export default function ProjectView() {
         createdAt: msg.timestamp,
       }));
       setMessages(chatMessages);
+      hasLoadedInitialMessages.current = true;
+      console.log('Loaded initial messages:', chatMessages.length);
     }
   }, [session]);
+
+  // Reset the loaded flag when session ID changes
+  useEffect(() => {
+    hasLoadedInitialMessages.current = false;
+  }, [actualId]);
 
   // Auto-scroll when messages change
   useEffect(() => {
@@ -81,8 +89,8 @@ export default function ProjectView() {
     return () => clearTimeout(timeoutId);
   }, [messages, currentStreamingMessage]);
 
-  // WebSocket handlers
-  const handleMessage = (wsMessage: { content?: string; role?: string }) => {
+  // WebSocket handlers - wrapped in useCallback to prevent reconnections
+  const handleMessage = useCallback((wsMessage: { content?: string; role?: string }) => {
     if (wsMessage.content && wsMessage.role === 'assistant') {
       // Clear streaming message and add final message
       const newMessage: ChatMessage = {
@@ -96,40 +104,30 @@ export default function ProjectView() {
       streamingMessageIdRef.current = null;
       setIsSending(false);
     }
-  };
+  }, []);
 
-  const handleToken = (token: string) => {
+  const handleToken = useCallback((token: string) => {
     if (!streamingMessageIdRef.current) {
       streamingMessageIdRef.current = `streaming-${Date.now()}`;
     }
     setCurrentStreamingMessage((prev) => prev + token);
-  };
+  }, []);
 
-  const handleThinking = () => {
+  const handleThinking = useCallback(() => {
     console.log('Agent is thinking...');
-  };
+  }, []);
 
-  const handleComplete = () => {
-    // Finalize the streaming message
-    if (currentStreamingMessage && streamingMessageIdRef.current) {
-      const finalMessage: ChatMessage = {
-        id: streamingMessageIdRef.current,
-        role: 'assistant',
-        markdown: currentStreamingMessage,
-        createdAt: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, finalMessage]);
-      setCurrentStreamingMessage('');
-      streamingMessageIdRef.current = null;
-    }
+  const handleComplete = useCallback(() => {
+    // Note: We don't finalize here because the backend sends a final 'message' event
+    // after all tokens are sent, which already contains the complete message
     setIsSending(false);
-  };
+  }, []);
 
-  const handleError = (error: string) => {
+  const handleError = useCallback((error: string) => {
     console.error('Brainstorm error:', error);
     toast.error(error);
     setIsSending(false);
-  };
+  }, []);
 
   const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
     sessionId: actualId || null,

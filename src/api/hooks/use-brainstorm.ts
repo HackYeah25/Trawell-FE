@@ -116,6 +116,13 @@ export function useBrainstormWebSocket({
 }: UseBrainstormWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
+  const isConnectingRef = useRef<boolean>(false);
+  const sessionIdRef = useRef<string | null>(sessionId);
+
+  // Update sessionId ref when it changes
+  useEffect(() => {
+    sessionIdRef.current = sessionId;
+  }, [sessionId]);
 
   // Store callbacks in refs to avoid reconnections
   const handlersRef = useRef({ onMessage, onToken, onThinking, onComplete, onError });
@@ -125,27 +132,37 @@ export function useBrainstormWebSocket({
   }, [onMessage, onToken, onThinking, onComplete, onError]);
 
   const connect = useCallback(() => {
-    console.log('Brainstorm WS connect() called, sessionId:', sessionId);
+    const currentSessionId = sessionIdRef.current;
+    console.log('Brainstorm WS connect() called, sessionId:', currentSessionId);
 
-    if (!sessionId) {
+    if (!currentSessionId) {
       console.warn('No sessionId, skipping WebSocket connection');
       return;
     }
 
-    // Don't create new connection if one already exists and is open
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      console.log('WebSocket already connected, skipping');
+    // Don't create new connection if one already exists and is open or connecting
+    if (wsRef.current?.readyState === WebSocket.OPEN || wsRef.current?.readyState === WebSocket.CONNECTING) {
+      console.log('WebSocket already connected or connecting, skipping');
       return;
     }
 
+    // Prevent concurrent connection attempts
+    if (isConnectingRef.current) {
+      console.log('Already connecting, skipping');
+      return;
+    }
+
+    isConnectingRef.current = true;
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.hostname}:8000/api/brainstorm/ws/${sessionId}`;
+    const wsUrl = `${protocol}//${window.location.hostname}:8000/api/brainstorm/ws/${currentSessionId}`;
 
     console.log('Creating new WebSocket connection to:', wsUrl);
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('Brainstorm WebSocket connected');
+      isConnectingRef.current = false;
     };
 
     ws.onmessage = (event) => {
@@ -180,11 +197,14 @@ export function useBrainstormWebSocket({
 
     ws.onerror = (error) => {
       console.error('Brainstorm WebSocket error:', error);
+      isConnectingRef.current = false;
     };
 
     ws.onclose = (event) => {
       console.log('Brainstorm WebSocket disconnected', event.code, event.reason);
       wsRef.current = null;
+      isConnectingRef.current = false;
+      
       // Only auto-reconnect on unexpected disconnects
       if (event.code !== 1000 && event.code !== 1008) {
         console.log('Will attempt reconnect in 3 seconds...');
@@ -193,17 +213,19 @@ export function useBrainstormWebSocket({
     };
 
     wsRef.current = ws;
-  }, [sessionId]);
+  }, []); // No dependencies - uses sessionIdRef which is stable
 
   const disconnect = useCallback(() => {
+    console.log('Disconnecting WebSocket...');
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
     if (wsRef.current) {
-      wsRef.current.close();
+      wsRef.current.close(1000, 'Client closing connection');
       wsRef.current = null;
     }
+    isConnectingRef.current = false;
   }, []);
 
   const sendMessage = useCallback((text: string) => {
@@ -222,14 +244,21 @@ export function useBrainstormWebSocket({
 
   useEffect(() => {
     console.log('useBrainstormWebSocket useEffect triggered, sessionId:', sessionId);
-    if (sessionId) {
-      connect();
+    
+    if (!sessionId) {
+      console.log('No sessionId, skipping connection');
+      return;
     }
+
+    // Connect to the new session
+    connect();
+
+    // Cleanup: disconnect when component unmounts or sessionId changes
     return () => {
+      console.log('useBrainstormWebSocket cleanup - unmounting or sessionId changed to:', sessionId);
       disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId]);
+  }, [sessionId, connect, disconnect]);
 
   return { sendMessage, disconnect };
 }
