@@ -73,31 +73,17 @@ export default function TripGallery() {
       type: 'trip' as const,
       rating: undefined,
     })),
-    ...(recommendations?.recommendations || []).map((rec: any) => ({
-      id: rec.recommendation_id,
-      title: rec.destination?.name || rec.destination?.city || 'Trip',
-      locationName: rec.destination?.city || rec.destination?.name || 'Unknown',
-      imageUrl: rec.url, // ✅ Use rec.url from Google Places API
-      createdAt: rec.created_at,
+    ...(recommendations?.recommendations || []).map((rec: Record<string, unknown>) => ({
+      id: (rec.recommendation_id as string) || 'unknown',
+      title: ((rec.destination as Record<string, unknown>)?.name as string) || ((rec.destination as Record<string, unknown>)?.city as string) || 'Trip',
+      locationName: ((rec.destination as Record<string, unknown>)?.city as string) || ((rec.destination as Record<string, unknown>)?.name as string) || 'Unknown',
+      imageUrl: rec.url as string, // ✅ Use rec.url from Google Places API
+      createdAt: rec.created_at as string,
       type: 'recommendation' as const,
-      rating: rec.destination?.rating,
+      rating: (rec.destination as Record<string, unknown>)?.rating as number,
     })),
   ];
 
-  // Debug logging
-  console.log('Trips data:', trips);
-  console.log('Recommendations data:', recommendations);
-  console.log('All trips combined:', allTrips);
-  
-  // Debug image URLs specifically
-  allTrips.forEach((trip, index) => {
-    console.log(`Trip ${index}:`, {
-      id: trip.id,
-      title: trip.title,
-      imageUrl: trip.imageUrl,
-      type: trip.type
-    });
-  });
 
   const filteredTrips = allTrips.filter(trip =>
     trip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -272,13 +258,9 @@ export default function TripGallery() {
                             alt={trip.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
-                              console.warn('Failed to load image:', trip.imageUrl, 'for trip:', trip.title);
                               // Hide the image and show fallback
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                            }}
-                            onLoad={() => {
-                              console.log('Successfully loaded image:', trip.imageUrl, 'for trip:', trip.title);
                             }}
                           />
                         ) : null}
@@ -331,13 +313,9 @@ export default function TripGallery() {
                             alt={trip.title}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              console.warn('Failed to load image in list view:', trip.imageUrl, 'for trip:', trip.title);
                               // Hide the image and show fallback
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                            }}
-                            onLoad={() => {
-                              console.log('Successfully loaded image in list view:', trip.imageUrl, 'for trip:', trip.title);
                             }}
                           />
                         ) : null}

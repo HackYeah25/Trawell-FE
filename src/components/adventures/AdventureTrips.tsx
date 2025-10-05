@@ -80,12 +80,6 @@ export function AdventureTrips({
   const isLoading = adventureType === 'project' ? projectTripsLoading : brainstormTripsLoading;
   const tripCount = trips?.length || 0;
 
-  // Debug logs
-  console.log('AdventureTrips - adventureType:', adventureType);
-  console.log('AdventureTrips - projectTrips:', projectTrips);
-  console.log('AdventureTrips - brainstormTrips:', brainstormTrips);
-  console.log('AdventureTrips - mappedBrainstormTrips:', mappedBrainstormTrips);
-  console.log('AdventureTrips - trips:', trips);
 
   const handleTripClick = (trip: MappedTrip) => {
     if (trip.id) {
@@ -153,7 +147,6 @@ export function AdventureTrips({
             {trips?.map((trip: MappedTrip, index: number) => {
               // Validate trip data and provide fallbacks
               if (!trip || typeof trip !== 'object') {
-                console.warn('Invalid trip data:', trip);
                 return null;
               }
 
