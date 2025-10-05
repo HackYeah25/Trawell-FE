@@ -18,7 +18,7 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
   return (
     <Card
       className={cn(
-        'overflow-hidden transition-all duration-300 animate-fade-in my-4 max-w-[600px]',
+        'overflow-hidden transition-all duration-300 animate-fade-in my-4 max-w-[460px] rounded-xl shadow-lg hover:shadow-xl border-0 bg-gradient-to-br from-white to-warm-sand/30',
         isRejected && 'opacity-40 grayscale border-2 border-muted',
         isRated && 'border-2 border-warm-turquoise shadow-lg ring-2 ring-warm-turquoise/30 bg-warm-turquoise/5',
         !isDisabled && 'hover:scale-[1.02]'
@@ -84,12 +84,12 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
             disabled={isDisabled}
             onClick={() => onDecision('reject')}
             className={cn(
-              'flex-col gap-1 h-auto py-2',
-              isRejected && 'bg-muted'
+              'flex-col gap-1 h-auto py-3 rounded-lg border-2 hover:border-red-300 hover:bg-red-50 transition-all duration-200',
+              isRejected && 'bg-red-100 border-red-300 text-red-700'
             )}
           >
             <X className="h-4 w-4" />
-            <span className="text-xs hidden sm:inline">Odrzuć</span>
+            <span className="text-xs hidden sm:inline font-medium">Odrzuć</span>
           </Button>
 
           {[1, 2, 3].map((stars) => (
@@ -100,15 +100,15 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
               disabled={isDisabled}
               onClick={() => onDecision(stars as 1 | 2 | 3)}
               className={cn(
-                'flex-col gap-1 h-auto py-2',
-                isRated && attraction.rating === stars && 'bg-warm-turquoise/10 border-warm-turquoise text-warm-turquoise'
+                'flex-col gap-1 h-auto py-3 rounded-lg border-2 transition-all duration-200',
+                'hover:border-warm-turquoise/50 hover:bg-warm-turquoise/5',
+                isRated && attraction.rating === stars && 'bg-warm-turquoise/10 border-warm-turquoise text-warm-turquoise shadow-md'
               )}
             >
               <Star className={cn(
                 'h-4 w-4',
                 isRated && attraction.rating === stars && 'fill-warm-turquoise'
               )} />
-              <span className="text-xs hidden sm:inline">{stars}★</span>
             </Button>
           ))}
         </div>
