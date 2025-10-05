@@ -166,7 +166,7 @@ export const ChatThread = memo(function ChatThread({
               />
             
             {message.locationProposal && (
-              <div className="max-w-md mx-auto">
+              <div className="max-w-[600px] mx-auto">
                 <LocationProposalCard
                   location={message.locationProposal}
                   onDecision={(decision) => onLocationDecision?.(message.locationProposal!.id, decision)}
@@ -175,7 +175,7 @@ export const ChatThread = memo(function ChatThread({
             )}
             
             {message.attractionProposal && (
-              <div className="max-w-md mx-auto">
+              <div className="max-w-[600px] mx-auto">
                 <AttractionProposalCard
                   attraction={message.attractionProposal}
                   onDecision={(decision) => onAttractionDecision?.(message.attractionProposal!.id, decision)}

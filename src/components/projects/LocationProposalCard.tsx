@@ -18,7 +18,7 @@ export function LocationProposalCard({ location, onDecision }: LocationProposalC
   return (
     <Card
       className={cn(
-        'overflow-hidden transition-all duration-300 animate-fade-in my-4',
+        'overflow-hidden transition-all duration-300 animate-fade-in my-4 max-w-[600px]',
         isRejected && 'opacity-40 grayscale border-2 border-muted',
         isRated && 'border-2 border-warm-turquoise shadow-lg ring-2 ring-warm-turquoise/30 bg-warm-turquoise/5',
         !isDisabled && 'hover:scale-[1.02]'
