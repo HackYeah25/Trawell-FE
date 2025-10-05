@@ -218,30 +218,6 @@ export default function ProjectView() {
       
       if (isBrainstorm && location) {
         // For brainstorm sessions, create recommendation and navigate to trip view
-<<<<<<< HEAD
-        createRecommendationMutation.mutate(
-          {
-            sessionId: actualId,
-            locationData: {
-              ...location,
-              rating: decision,
-            },
-          },
-          {
-            onSuccess: (response) => {
-              toast.success('Podróż utworzona!', `🎉 Przechodzisz do ${location.name}`);
-              console.log('Created recommendation:', response.recommendation_id);
-              
-              // Navigate to trip view with the recommendation ID
-              navigate(`/app/trips/${response.recommendation_id}`);
-            },
-            onError: (error) => {
-              console.error('Error creating recommendation:', error);
-              toast.error('Błąd tworzenia podróży', 'Spróbuj ponownie za chwilę');
-            },
-          }
-        );
-=======
          createRecommendationMutation.mutate(
            {
              sessionId: actualId,
@@ -280,7 +256,6 @@ export default function ProjectView() {
              },
            }
          );
->>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
       } else if (location) {
         // For project sessions, show trip creation modal
         setSelectedLocation(location);
@@ -298,27 +273,6 @@ export default function ProjectView() {
       if (location) {
         if (isBrainstorm) {
           // For brainstorm sessions, create recommendation directly
-<<<<<<< HEAD
-          createRecommendationMutation.mutate(
-            {
-              sessionId: actualId!,
-              locationData: {
-                ...location,
-                rating: 3, // Default to 3 stars for quick reply
-              },
-            },
-            {
-              onSuccess: (response) => {
-                toast.success('Podróż utworzona!', `🎉 Przechodzisz do ${location.name}`);
-                navigate(`/app/trips/${response.recommendation_id}`);
-              },
-              onError: (error) => {
-                console.error('Error creating recommendation:', error);
-                toast.error('Błąd tworzenia podróży', 'Spróbuj ponownie za chwilę');
-              },
-            }
-          );
-=======
            createRecommendationMutation.mutate(
              {
                sessionId: actualId!,
@@ -355,7 +309,6 @@ export default function ProjectView() {
                },
              }
            );
->>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
         } else {
           // For project sessions, show modal
           setSelectedLocation(location);

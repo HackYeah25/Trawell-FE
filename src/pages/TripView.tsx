@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio, ArrowLeft } from 'lucide-react';
-=======
 import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio, ArrowLeft, Sparkles } from 'lucide-react';
->>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -232,11 +228,7 @@ export default function TripView() {
         {/* Header - Fixed */}
         <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60]">
           <div className="max-w-4xl mx-auto">
-<<<<<<< HEAD
-            <div className="flex items-center gap-3">
-=======
             <div className="flex items-center gap-3 mb-2">
->>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
               <Button
                 variant="ghost"
                 size="icon"
@@ -245,10 +237,6 @@ export default function TripView() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-<<<<<<< HEAD
-              <div className="w-10 h-10 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
-                <MapPin className="w-5 h-5 text-white" />
-=======
               <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
@@ -262,79 +250,59 @@ export default function TripView() {
                 Back to Planning
               </Button>
             </div>
-            {isEditingTitle ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveTitle();
-                    if (e.key === 'Escape') handleCancelEdit();
-                  }}
-                  className="text-xl md:text-2xl font-bold"
-                  autoFocus
-                />
-                <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
-                  <Check className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
-                  <X className="w-4 h-4" />
-                </Button>
->>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
-              </div>
-              <div className="flex-1 min-w-0">
-                {isEditingTitle ? (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={editedTitle}
-                      onChange={(e) => setEditedTitle(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSaveTitle();
-                        if (e.key === 'Escape') handleCancelEdit();
-                      }}
-                      className="text-xl font-pacifico bg-transparent border-warm-coral/30 focus:border-warm-coral/60 h-8 px-2"
-                      placeholder="Enter trip name..."
-                      autoFocus
-                    />
-                    <div className="flex items-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleSaveTitle}
-                        disabled={!editedTitle.trim()}
-                        className="h-8 w-8 p-0 hover:bg-green-100"
-                      >
-                        <Check className="w-4 h-4 text-green-600" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleCancelEdit}
-                        className="h-8 w-8 p-0 hover:bg-red-100"
-                      >
-                        <X className="w-4 h-4 text-red-600" />
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 group">
-                    <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
-                      {trip.title}
-                    </h1>
+            <div className="flex-1 min-w-0">
+              {isEditingTitle ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveTitle();
+                      if (e.key === 'Escape') handleCancelEdit();
+                    }}
+                    className="text-xl font-pacifico bg-transparent border-warm-coral/30 focus:border-warm-coral/60 h-8 px-2"
+                    placeholder="Enter trip name..."
+                    autoFocus
+                  />
+                  <div className="flex items-center gap-1">
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => {
-                        setEditedTitle(trip.title);
-                        setIsEditingTitle(true);
-                      }}
-                      className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
+                      onClick={handleSaveTitle}
+                      disabled={!editedTitle.trim()}
+                      className="h-8 w-8 p-0 hover:bg-green-100"
                     >
-                      <Pencil className="w-4 h-4 text-warm-coral" />
+                      <Check className="w-4 h-4 text-green-600" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleCancelEdit}
+                      className="h-8 w-8 p-0 hover:bg-red-100"
+                    >
+                      <X className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>
-                )}
-                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 group">
+                  <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                    {trip.title}
+                  </h1>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setEditedTitle(trip.title);
+                      setIsEditingTitle(true);
+                    }}
+                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-warm-coral/10"
+                  >
+                    <Pencil className="w-4 h-4 text-warm-coral" />
+                  </Button>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3 md:w-4 md:h-4 text-warm-coral" />
                 {trip.locationName}
@@ -367,7 +335,6 @@ export default function TripView() {
                   </button>
                 </>
               )}
-                </div>
               </div>
             </div>
           </div>
