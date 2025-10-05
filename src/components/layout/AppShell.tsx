@@ -1,7 +1,5 @@
 import { ReactNode } from 'react';
-import { ArrowLeft, Plane } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Plane } from 'lucide-react';
 import { UserMenu } from './UserMenu';
 import { useUser } from '@/api/hooks/use-user';
 
@@ -10,10 +8,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { data: user } = useUser();
-  const showBackButton = location.pathname !== '/app';
 
   return (
     <div className="min-h-screen flex flex-col w-full">
@@ -21,17 +16,6 @@ export function AppShell({ children }: AppShellProps) {
       <header className="h-16 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="h-full px-4 flex items-center justify-between gap-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
-            {showBackButton && (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => navigate('/app')}
-                className="hover:bg-warm-coral/10"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            )}
-            
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center shadow-warm">
                 <Plane className="w-5 h-5 text-white" />
