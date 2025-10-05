@@ -548,7 +548,7 @@ export default function ProjectView() {
             
             {/* Location Proposals */}
             {locationProposals.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-3 pb-8">
                 <div className="flex items-center gap-2">
                   <div className="h-px flex-1 bg-warm-coral/20"></div>
                   <p className="text-sm text-warm-coral font-medium">✨ Destination Proposals</p>
