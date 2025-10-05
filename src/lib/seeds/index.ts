@@ -185,8 +185,8 @@ export const seedTrips: Trip[] = [
     })()
   },
   {
-    id: 'trip-iguana-bcn',
-    projectId: 'proj-krakow-iguana',
+    id: 'trip-iguana-krakow',
+    projectId: 'shared-proj-iguana',
     locationId: 'loc-krakow',
     locationName: 'Kraków, Poland',
     title: 'Krakow Winter Escape',
@@ -194,7 +194,40 @@ export const seedTrips: Trip[] = [
     updatedAt: '2025-01-10T10:30:00Z',
     lastMessagePreview: 'Tomek: Sunrise na Błoniach - genialne! 🌅',
     startDate: '2025-02-14T00:00:00Z',
-    endDate: '2025-02-17T23:59:59Z'
+    endDate: '2025-02-17T23:59:59Z',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    status: 'active',
+    rating: 3
+  },
+  {
+    id: 'trip-iguana-krakow-main',
+    projectId: 'shared-proj-iguana',
+    locationId: 'loc-krakow-main',
+    locationName: 'Kraków, Poland',
+    title: 'Krakow Cultural Discovery',
+    createdAt: '2025-01-10T10:00:00Z',
+    updatedAt: '2025-01-10T10:30:00Z',
+    lastMessagePreview: 'Ania: Idealnie! Marek, zajmiesz się rezerwacjami?',
+    startDate: '2025-02-14T00:00:00Z',
+    endDate: '2025-02-17T23:59:59Z',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    status: 'pending',
+    rating: 3
+  },
+  {
+    id: 'trip-iguana-wieliczka',
+    projectId: 'shared-proj-iguana',
+    locationId: 'loc-wieliczka',
+    locationName: 'Wieliczka, Poland',
+    title: 'Wieliczka Salt Mine Adventure',
+    createdAt: '2025-01-10T10:00:00Z',
+    updatedAt: '2025-01-10T10:30:00Z',
+    lastMessagePreview: 'Marek: Wieliczka to must-see! Kopalnia soli z XIII wieku.',
+    startDate: '2025-02-15T00:00:00Z',
+    endDate: '2025-02-16T23:59:59Z',
+    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    status: 'pending',
+    rating: 2
   }
 ];
 

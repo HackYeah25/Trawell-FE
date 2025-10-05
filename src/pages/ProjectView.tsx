@@ -381,7 +381,49 @@ export default function ProjectView() {
         {
           onSuccess: (newMessages) => {
             // Update messages with response (API returns both user and assistant messages)
-            setMessages((prev) => [...prev, ...newMessages]);
+            setMessages((prev) => {
+              const updatedMessages = [...prev, ...newMessages];
+              
+              // Add location proposals based on project type after messages are updated
+              const userMessageCount = updatedMessages.filter(m => m.role === 'user').length;
+              const currentUserMessageCount = updatedMessages.filter(m => m.role === 'user' && !m.userName).length;
+              
+              if (locationSuggestions) {
+                let shouldAddProposal = false;
+                
+                // For iguana project, add proposals after first current user message
+                if (actualId === 'shared-proj-iguana' && currentUserMessageCount === 1) {
+                  shouldAddProposal = true;
+                }
+                // For other projects, add proposals every 3 user messages
+                else if (actualId !== 'shared-proj-iguana' && userMessageCount % 3 === 0) {
+                  shouldAddProposal = true;
+                }
+                
+                if (shouldAddProposal) {
+                  const unusedLocations = locationSuggestions.filter(loc => 
+                    !updatedMessages.some(msg => msg.locationProposal?.id === loc.id)
+                  );
+
+                  if (unusedLocations.length > 0) {
+                    const nextLocation = unusedLocations[0];
+                    const proposalMessage: ChatMessage = {
+                      id: `loc-proposal-${Date.now()}`,
+                      role: 'assistant',
+                      markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
+                      locationProposal: { ...nextLocation, status: 'pending' },
+                      createdAt: new Date().toISOString(),
+                    };
+
+                    setTimeout(() => {
+                      setMessages((prev) => [...prev, proposalMessage]);
+                    }, 1500);
+                  }
+                }
+              }
+              
+              return updatedMessages;
+            });
             setIsSending(false);
           },
           onError: (error) => {
@@ -391,44 +433,6 @@ export default function ProjectView() {
           },
         }
       );
-    }
-
-    // Add location proposals based on project type
-    const userMessageCount = messages.filter(m => m.role === 'user').length;
-    const currentUserMessageCount = messages.filter(m => m.role === 'user' && !m.userName).length;
-    
-    if (locationSuggestions) {
-      let shouldAddProposal = false;
-      
-      // For iguana project, add proposals after first current user message
-      if (actualId === 'shared-proj-iguana' && currentUserMessageCount === 1) {
-        shouldAddProposal = true;
-      }
-      // For other projects, add proposals every 3 user messages
-      else if (actualId !== 'shared-proj-iguana' && userMessageCount % 3 === 0) {
-        shouldAddProposal = true;
-      }
-      
-      if (shouldAddProposal) {
-        const unusedLocations = locationSuggestions.filter(loc => 
-          !messages.some(msg => msg.locationProposal?.id === loc.id)
-        );
-
-        if (unusedLocations.length > 0) {
-          const nextLocation = unusedLocations[0];
-          const proposalMessage: ChatMessage = {
-            id: `loc-proposal-${Date.now()}`,
-            role: 'assistant',
-            markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
-            locationProposal: { ...nextLocation, status: 'pending' },
-            createdAt: new Date().toISOString(),
-          };
-
-          setTimeout(() => {
-            setMessages((prev) => [...prev, proposalMessage]);
-          }, 1500);
-        }
-      }
     }
   };
 
