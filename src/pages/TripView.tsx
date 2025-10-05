@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
@@ -17,6 +17,7 @@ import {
   useAttractionDecision,
   useTripSummary,
 } from '@/api/hooks/use-trips';
+import { usePlanningWebSocket } from '@/api/hooks/use-planning';
 import { useRenameTrip } from '@/api/hooks/use-rename';
 import { SummaryCard } from '@/components/trips/SummaryCard';
 import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
@@ -29,6 +30,8 @@ export default function TripView() {
   const [activeTab, setActiveTab] = useState<'chat' | 'summary'>('chat');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [currentStreamingMessage, setCurrentStreamingMessage] = useState<string>('');
+  const [isAIResponding, setIsAIResponding] = useState(false);
   const isMobile = useIsMobile();
 
   const { data: trip } = useTrip(tripId!);
@@ -38,6 +41,60 @@ export default function TripView() {
   const sendMessageMutation = useSendTripMessage();
   const attractionDecisionMutation = useAttractionDecision();
   const renameMutation = useRenameTrip();
+
+  // Planning WebSocket handlers
+  const handlePlanningMessage = useCallback((content: string) => {
+    console.log('Planning message received:', content);
+    // This won't be called for streaming - we use tokens instead
+  }, []);
+
+  const handlePlanningToken = useCallback((token: string) => {
+    setCurrentStreamingMessage((prev) => prev + token);
+  }, []);
+
+  const handlePlanningThinking = useCallback(() => {
+    console.log('Planning agent is thinking...');
+    setIsAIResponding(true);
+    setCurrentStreamingMessage('');
+  }, []);
+
+  const handlePlanningComplete = useCallback((content: string) => {
+    console.log('Planning response complete');
+    setIsAIResponding(false);
+    
+    // Add complete AI message to chat
+    const aiMessage: ChatMessage = {
+      id: `ai-${Date.now()}`,
+      role: 'assistant',
+      markdown: content,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setLocalMessages((prev) => [...prev, aiMessage]);
+    setCurrentStreamingMessage('');
+  }, []);
+
+  const handlePlanningError = useCallback((error: string) => {
+    console.error('Planning error:', error);
+    setIsAIResponding(false);
+    setCurrentStreamingMessage('');
+  }, []);
+
+  const handleTripUpdated = useCallback((updates: any[]) => {
+    console.log('Trip updated with structured data:', updates);
+    // TODO: Update UI to reflect new trip data (budget, dates, etc.)
+  }, []);
+
+  // Initialize Planning WebSocket
+  const { isConnected, sendMessage: sendWSMessage } = usePlanningWebSocket({
+    recommendationId: tripId || '',
+    onMessage: handlePlanningMessage,
+    onToken: handlePlanningToken,
+    onThinking: handlePlanningThinking,
+    onComplete: handlePlanningComplete,
+    onError: handlePlanningError,
+    onTripUpdated: handleTripUpdated,
+  });
 
   // Pagination for chat messages
   const {
@@ -99,69 +156,25 @@ export default function TripView() {
     setEditedTitle(trip?.title || '');
   };
 
-  const handleSendMessage = async (text: string) => {
-    if (!tripId) return;
+  const handleSendMessage = useCallback((text: string) => {
+    if (!tripId || !isConnected) {
+      console.warn('Cannot send message: no tripId or WebSocket not connected');
+      return;
+    }
 
-    const tempMessage: ChatMessage = {
-      id: `temp-${Date.now()}`,
+    // Add user message to local state immediately
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
       role: 'user',
       markdown: text,
       createdAt: new Date().toISOString(),
-      status: 'sending',
     };
 
-    setLocalMessages((prev) => [...prev, tempMessage]);
+    setLocalMessages((prev) => [...prev, userMessage]);
 
-    try {
-      // Mock API call with delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Update with successful message
-      setLocalMessages((prev) =>
-        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: undefined } : m))
-      );
-
-      // Add AI response
-      const aiResponse: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        role: 'assistant',
-        markdown: 'Rozumiem! Szukam dla Ciebie najlepszych atrakcji. 🎯',
-        createdAt: new Date().toISOString(),
-      };
-
-      setTimeout(() => {
-        setLocalMessages((prev) => [...prev, aiResponse]);
-      }, 500);
-
-      // Every 4 user messages, add an attraction proposal
-      const userMessageCount = localMessages.filter(m => m.role === 'user').length + 1;
-      if (attractions && userMessageCount % 4 === 0) {
-        const unusedAttractions = attractions.filter(attr =>
-          !localMessages.some(msg => msg.attractionProposal?.id === attr.id)
-        );
-
-        if (unusedAttractions.length > 0) {
-          const nextAttraction = unusedAttractions[0];
-          const proposalMessage: ChatMessage = {
-            id: `attr-proposal-${Date.now()}`,
-            role: 'assistant',
-            markdown: 'Sprawdź tę atrakcję! 🎯',
-            attractionProposal: { ...nextAttraction, status: 'pending' },
-            createdAt: new Date().toISOString(),
-          };
-
-          setTimeout(() => {
-            setLocalMessages((prev) => [...prev, proposalMessage]);
-          }, 1500);
-        }
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setLocalMessages((prev) =>
-        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: 'error' } : m))
-      );
-    }
-  };
+    // Send via WebSocket
+    sendWSMessage(text);
+  }, [tripId, isConnected, sendWSMessage]);
 
   const handleAttractionDecision = (attractionId: string, decision: 'reject' | 1 | 2 | 3) => {
     setLocalMessages((prev) =>
@@ -300,7 +313,8 @@ export default function TripView() {
                 <div className="flex-1 overflow-y-auto pb-6">
                   <ChatThread
                     messages={displayedMessages}
-                    isLoading={sendMessageMutation.isPending}
+                    isLoading={isAIResponding}
+                    streamingMessage={currentStreamingMessage}
                     onAttractionDecision={handleAttractionDecision}
                     hasMore={hasMore}
                     isLoadingMore={isLoadingMore}
@@ -313,8 +327,8 @@ export default function TripView() {
                 <div className="flex-shrink-0">
                   <Composer
                     onSend={handleSendMessage}
-                    disabled={sendMessageMutation.isPending}
-                    placeholder="Opisz swoje preferencje..."
+                    disabled={isAIResponding || !isConnected}
+                    placeholder={isConnected ? "Opisz swoje preferencje..." : "Łączenie..."}
                   />
                 </div>
               </div>

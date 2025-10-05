@@ -17,7 +17,26 @@ export function useTrips() {
 export function useTrip(tripId: string) {
   return useQuery({
     queryKey: ['trip', tripId],
-    queryFn: () => apiClient.get<Trip>(`/trips/${tripId}`),
+    queryFn: async () => {
+      // Try to fetch as a recommendation first (from brainstorm)
+      try {
+        const recommendation = await apiClient.get<any>(`/brainstorm/recommendations/${tripId}`);
+        // Transform recommendation to Trip format
+        return {
+          id: recommendation.recommendation_id,
+          title: recommendation.destination.name || recommendation.destination.city,
+          destination: recommendation.destination.city || recommendation.destination.name,
+          status: recommendation.status,
+          dates: null,
+          participants: [],
+          createdAt: recommendation.created_at,
+          updatedAt: recommendation.updated_at,
+        } as Trip;
+      } catch (error) {
+        // Fallback to regular trip endpoint
+        return apiClient.get<Trip>(`/trips/${tripId}`);
+      }
+    },
     enabled: !!tripId,
   });
 }
