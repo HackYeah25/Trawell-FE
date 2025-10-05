@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import type { ChatMessage } from '@/types';
 
 interface UseChatPaginationOptions {
@@ -19,14 +19,39 @@ export function useChatPagination({
   allMessages,
   pageSize = 10,
 }: UseChatPaginationOptions): UseChatPaginationReturn {
-  const [displayedCount, setDisplayedCount] = useState(pageSize);
+  const [displayedCount, setDisplayedCount] = useState(() => Math.min(pageSize, allMessages.length || 0));
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Reset displayedCount when allMessages changes significantly (e.g., new conversation)
+  useEffect(() => {
+    if (allMessages.length <= pageSize) {
+      setDisplayedCount(allMessages.length);
+    }
+  }, [allMessages.length, pageSize]);
+
+
   const displayedMessages = useMemo(() => {
-    // Always show the last N messages (most recent ones)
-    const startIndex = Math.max(0, allMessages.length - displayedCount);
-    return allMessages.slice(startIndex);
+    // For now, always show all messages to debug the issue
+    const messages = allMessages;
+    
+    console.log('displayedMessages calculated (showing all):', { 
+      allMessagesLength: allMessages.length, 
+      displayedCount, 
+      messagesLength: messages.length,
+      lastMessage: messages[messages.length - 1]?.markdown?.substring(0, 50),
+      allMessages: allMessages.map(m => ({ id: m.id, role: m.role, markdown: m.markdown?.substring(0, 30) }))
+    });
+    return messages;
   }, [allMessages, displayedCount]);
+
+  // Update displayedCount when allMessages changes
+  useEffect(() => {
+    if (allMessages.length > displayedCount) {
+      const newDisplayedCount = Math.min(allMessages.length, displayedCount + pageSize);
+      console.log('Updating displayedCount from', displayedCount, 'to', newDisplayedCount);
+      setDisplayedCount(newDisplayedCount);
+    }
+  }, [allMessages.length, displayedCount, pageSize]);
 
   const remainingCount = useMemo(() => {
     return Math.max(0, allMessages.length - displayedCount);

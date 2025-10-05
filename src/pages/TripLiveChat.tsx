@@ -6,6 +6,7 @@ import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
 import { useTrip } from '@/api/hooks/use-trips';
+import { useTripLiveMessages, useSendLiveMessage } from '@/api/hooks/use-trip-live-chat';
 import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
 import type { ChatMessage } from '@/types';
@@ -24,6 +25,8 @@ export default function TripLiveChat() {
   const [isSending, setIsSending] = useState(false);
 
   const { data: trip } = useTrip(tripId!);
+  const { data: messagesData } = useTripLiveMessages(tripId!);
+  const sendMessageMutation = useSendLiveMessage();
 
   // Pagination for chat messages
   const {
@@ -37,17 +40,19 @@ export default function TripLiveChat() {
     pageSize: 10,
   });
 
-  // Load chat history from localStorage or initialize with welcome message
+  // Load chat history from localStorage or API
   useEffect(() => {
     if (tripId) {
       const stored = loadChatHistory(`trip-live-${tripId}`);
       if (stored && stored.length > 0) {
         setLocalMessages(stored);
+      } else if (messagesData && messagesData.length > 0) {
+        setLocalMessages(messagesData);
       } else {
         setLocalMessages([INITIAL_MESSAGE]);
       }
     }
-  }, [tripId]);
+  }, [tripId, messagesData]);
 
   // Save to localStorage on every message change
   useEffect(() => {
@@ -71,26 +76,20 @@ export default function TripLiveChat() {
     setIsSending(true);
 
     try {
-      // Mock API call with delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Send via API
+      const newMessages = await sendMessageMutation.mutateAsync({ tripId, text });
       
       // Update with successful message
       setLocalMessages((prev) =>
         prev.map((m) => (m.id === tempMessage.id ? { ...m, status: undefined } : m))
       );
 
-      // Add AI response
-      const aiResponse: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        role: 'assistant',
-        markdown: generateLiveResponse(text),
-        createdAt: new Date().toISOString(),
-      };
+      // Add new messages from API response
+      if (newMessages && newMessages.length > 0) {
+        setLocalMessages((prev) => [...prev, ...newMessages]);
+      }
 
-      setTimeout(() => {
-        setLocalMessages((prev) => [...prev, aiResponse]);
-        setIsSending(false);
-      }, 500);
+      setIsSending(false);
     } catch (error) {
       console.error('Error sending message:', error);
       setLocalMessages((prev) =>
@@ -100,27 +99,6 @@ export default function TripLiveChat() {
     }
   };
 
-  const generateLiveResponse = (userMessage: string): string => {
-    const lower = userMessage.toLowerCase();
-    
-    if (lower.includes('hungry') || lower.includes('food') || lower.includes('restaurant') || lower.includes('eat')) {
-      return 'Based on your current location, here are some great nearby options:\n\n**Quick & Close:**\n- **Ramen Ichiban** (2 min walk) - Quick service, authentic tonkotsu ramen\n- **Sushi Express** (5 min walk) - Fresh sushi, counter seating\n\n**Sit-down:**\n- **Sakura Garden** (8 min walk) - Traditional kaiseki, reservations recommended\n\nAll are open now! Would you like directions to any of these?';
-    }
-    
-    if (lower.includes('transport') || lower.includes('metro') || lower.includes('taxi') || lower.includes('bus')) {
-      return 'Transportation Options:\n\n**Metro:** Nearest station is 3 minutes away (Exit B). Trains run every 5 minutes.\n\n**Taxi:** Available at the stand 100m to your left. Estimated wait: 2-3 minutes.\n\n**Bus:** Route 24 stops across the street, arrives in 7 minutes.\n\nWhere would you like to go?';
-    }
-    
-    if (lower.includes('emergency') || lower.includes('help') || lower.includes('doctor') || lower.includes('hospital')) {
-      return '**Emergency Assistance:**\n\n**Police:** 110 (English support available)\n**Ambulance/Fire:** 119\n\n**Nearest Hospital:** City Medical Center\n- 1.2 km away (5 min by taxi)\n- 24/7 Emergency Room\n- English-speaking staff\n\n**Your Embassy:** +XX-XXXX-XXXX\n\nDo you need immediate assistance?';
-    }
-    
-    if (lower.includes('what to do') || lower.includes('recommend') || lower.includes('see') || lower.includes('visit')) {
-      return '**Right Now:**\n\nBased on the time and your location, I recommend:\n\n1. **Temple Garden** (10 min walk) - Beautiful at sunset, free entry\n2. **Local Market** (5 min walk) - Open until 8 PM, great for souvenirs\n3. **Observation Deck** (15 min walk) - Best city views, open until 10 PM\n\nWhat interests you most?';
-    }
-
-    return 'I\'m here to help! Could you tell me more about what you need? I can assist with:\n- Finding restaurants or food nearby\n- Transportation and directions\n- Things to do right now\n- Emergency assistance\n- Local tips and recommendations';
-  };
 
   if (!tripId || !trip) {
     return (

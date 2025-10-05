@@ -120,6 +120,29 @@ export default function ProjectView() {
     }
   }, [brainstormSession, projectMessagesData, isBrainstorm, isProject]);
 
+  // Update messages when projectMessagesData changes (after sending new message)
+  useEffect(() => {
+    if (isProject && projectMessagesData?.pages && hasLoadedInitialMessages.current) {
+      const allMessages = projectMessagesData.pages.flatMap(page => page.messages);
+      console.log('Updating project messages from API after change:', allMessages.length);
+      
+      // Merge with existing messages instead of replacing
+      setMessages((prevMessages) => {
+        // Find messages that are not already in local messages
+        const newMessages = allMessages.filter(apiMsg => 
+          !prevMessages.some(localMsg => localMsg.id === apiMsg.id)
+        );
+        
+        if (newMessages.length > 0) {
+          console.log('Adding new messages from API:', newMessages.length);
+          return [...prevMessages, ...newMessages];
+        }
+        
+        return prevMessages;
+      });
+    }
+  }, [projectMessagesData, isProject]);
+
   // Reset the loaded flag when session ID changes
   useEffect(() => {
     hasLoadedInitialMessages.current = false;

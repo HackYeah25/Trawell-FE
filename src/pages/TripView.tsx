@@ -33,6 +33,7 @@ export default function TripView() {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState<string>('');
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [currentPhotos, setCurrentPhotos] = useState<Array<{ query: string; caption: string; url: string }>>([]);
+  const [hasInitializedMessages, setHasInitializedMessages] = useState(false);
   const isMobile = useIsMobile();
 
   const { data: trip } = useTrip(tripId!);
@@ -103,6 +104,16 @@ export default function TripView() {
     onPhotos: handlePhotos,
   });
 
+  // Debug WebSocket connection status
+  useEffect(() => {
+    console.log('WebSocket connection status:', { isConnected, tripId });
+  }, [isConnected, tripId]);
+
+  // Reset initialization flag when tripId changes
+  useEffect(() => {
+    setHasInitializedMessages(false);
+  }, [tripId]);
+
   // Pagination for chat messages
   const {
     displayedMessages,
@@ -115,12 +126,37 @@ export default function TripView() {
     pageSize: 10,
   });
 
+  // Debug localMessages changes
+  useEffect(() => {
+    console.log('localMessages changed:', { 
+      length: localMessages.length, 
+      lastMessage: localMessages[localMessages.length - 1]?.markdown?.substring(0, 50),
+      lastMessageRole: localMessages[localMessages.length - 1]?.role
+    });
+  }, [localMessages]);
+
+  // Debug displayedMessages changes
+  useEffect(() => {
+    console.log('displayedMessages changed:', { 
+      length: displayedMessages.length, 
+      lastMessage: displayedMessages[displayedMessages.length - 1]?.markdown?.substring(0, 50),
+      lastMessageRole: displayedMessages[displayedMessages.length - 1]?.role
+    });
+  }, [displayedMessages]);
+
   // Load chat history from localStorage or initialize with welcome message
   useEffect(() => {
-    if (tripId) {
+    if (tripId && !hasInitializedMessages) {
       const stored = loadChatHistory(`trip-${tripId}`);
       if (stored && stored.length > 0) {
+        console.log('Loading messages from localStorage:', stored.length);
         setLocalMessages(stored);
+        setHasInitializedMessages(true);
+      } else if (messagesData && messagesData.pages && messagesData.pages.length > 0) {
+        const allMessages = messagesData.pages.flatMap(page => page.messages);
+        console.log('Loading messages from API:', allMessages.length);
+        setLocalMessages(allMessages);
+        setHasInitializedMessages(true);
       } else {
         // Initialize with welcome message
         const welcomeMessage: ChatMessage = {
@@ -129,10 +165,35 @@ export default function TripView() {
           markdown: `Welcome to trip planning! 🌟 I'll help you create the perfect plan. Tell me what you're looking for?`,
           createdAt: new Date().toISOString(),
         };
+        console.log('Initializing with welcome message');
         setLocalMessages([welcomeMessage]);
+        setHasInitializedMessages(true);
       }
     }
-  }, [tripId]);
+  }, [tripId, messagesData, hasInitializedMessages]);
+
+  // Update localMessages when messagesData changes (after sending new message)
+  useEffect(() => {
+    if (tripId && hasInitializedMessages && messagesData && messagesData.pages && messagesData.pages.length > 0) {
+      const allMessages = messagesData.pages.flatMap(page => page.messages);
+      console.log('Updating localMessages from API after change:', allMessages.length);
+      
+      // Merge with existing local messages instead of replacing
+      setLocalMessages((prevLocalMessages) => {
+        // Find messages that are not already in local messages
+        const newMessages = allMessages.filter(apiMsg => 
+          !prevLocalMessages.some(localMsg => localMsg.id === apiMsg.id)
+        );
+        
+        if (newMessages.length > 0) {
+          console.log('Adding new messages from API:', newMessages.length);
+          return [...prevLocalMessages, ...newMessages];
+        }
+        
+        return prevLocalMessages;
+      });
+    }
+  }, [tripId, messagesData, hasInitializedMessages]);
 
   // Save to localStorage on every message change
   useEffect(() => {
@@ -164,8 +225,10 @@ export default function TripView() {
   };
 
   const handleSendMessage = useCallback((text: string) => {
-    if (!tripId || !isConnected) {
-      console.warn('Cannot send message: no tripId or WebSocket not connected');
+    console.log('handleSendMessage called:', { tripId, isConnected, text });
+    
+    if (!tripId) {
+      console.warn('Cannot send message: no tripId');
       return;
     }
 
@@ -177,11 +240,41 @@ export default function TripView() {
       createdAt: new Date().toISOString(),
     };
 
-    setLocalMessages((prev) => [...prev, userMessage]);
+    setLocalMessages((prev) => {
+      const newMessages = [...prev, userMessage];
+      console.log('Adding user message to localMessages:', { 
+        prevLength: prev.length, 
+        newLength: newMessages.length,
+        userMessage: userMessage.markdown.substring(0, 50)
+      });
+      return newMessages;
+    });
 
-    // Send via WebSocket
-    sendWSMessage(text);
-  }, [tripId, isConnected, sendWSMessage]);
+    // Try to send via WebSocket if connected, otherwise fallback to API
+    if (isConnected) {
+      console.log('Sending via WebSocket');
+      sendWSMessage(text);
+    } else {
+      console.log('WebSocket not connected, trying API fallback');
+      // Fallback to API call
+      sendMessageMutation.mutate(
+        { tripId, text },
+        {
+          onSuccess: (newMessages) => {
+            console.log('API fallback success:', newMessages);
+            // Only add assistant messages from API response, not user messages (already added)
+            const assistantMessages = newMessages.filter(msg => msg.role === 'assistant');
+            if (assistantMessages.length > 0) {
+              setLocalMessages((prev) => [...prev, ...assistantMessages]);
+            }
+          },
+          onError: (error) => {
+            console.error('API fallback error:', error);
+          }
+        }
+      );
+    }
+  }, [tripId, isConnected, sendWSMessage, sendMessageMutation]);
 
   const handleAttractionDecision = (attractionId: string, decision: 'reject' | 1 | 2 | 3) => {
     setLocalMessages((prev) =>
