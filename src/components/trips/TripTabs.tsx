@@ -11,7 +11,7 @@ interface TripTabsProps {
 export function TripTabs({ activeTab, onTabChange, chatContent, summaryContent }: TripTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as 'chat' | 'summary')} className="flex-1 flex flex-col min-h-0">
-      <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+      <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-2 flex-shrink-0">
         <TabsTrigger value="chat" className="flex items-center gap-2">
           <MessageSquare className="h-4 w-4" />
           <span>Chat</span>

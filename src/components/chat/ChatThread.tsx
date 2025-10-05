@@ -121,7 +121,7 @@ export const ChatThread = memo(function ChatThread({
       aria-label="Chat messages"
     >
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-3xl mx-auto">{/* Reduced from max-w-4xl to max-w-3xl for better desktop width */}
+        <div className="max-w-4xl mx-auto">{/* Set to max-w-4xl (896px) for desktop width */}
         {/* Load More Button */}
         {hasMore && !isLoadingMore && (
           <div className="flex justify-center mb-6 animate-fade-in">
