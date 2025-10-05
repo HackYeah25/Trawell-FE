@@ -15,6 +15,7 @@ interface ChatThreadProps {
   onRetryMessage?: (messageId: string) => void;
   onLocationDecision?: (locationId: string, decision: 'reject' | 1 | 2 | 3) => void;
   onAttractionDecision?: (attractionId: string, decision: 'reject' | 1 | 2 | 3) => void;
+  onViewTrip?: (tripId: string) => void;
   className?: string;
   hasMore?: boolean;
   isLoadingMore?: boolean;
@@ -29,6 +30,7 @@ export const ChatThread = memo(function ChatThread({
   onRetryMessage,
   onLocationDecision,
   onAttractionDecision,
+  onViewTrip,
   className,
   hasMore = false,
   isLoadingMore = false,
@@ -159,6 +161,7 @@ export const ChatThread = memo(function ChatThread({
                     ? () => onRetryMessage?.(message.id)
                     : undefined
                 }
+                onViewTrip={onViewTrip}
                 disableAnimation={isHistoricalMessage}
               />
             

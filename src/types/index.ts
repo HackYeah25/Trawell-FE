@@ -38,6 +38,12 @@ export interface ChatMessage {
   userAvatar?: string;
   locationProposal?: Location;
   attractionProposal?: Attraction;
+  tripCreated?: {
+    tripId: string;
+    title: string;
+    locationName: string;
+    createdAt: string;
+  };
 }
 
 export interface User {
@@ -155,6 +161,15 @@ export interface TripSummarySection {
 
 export interface TripSummary {
   sections: TripSummarySection[];
+}
+
+export interface TripCard {
+  id: string;
+  title: string;
+  locationName: string;
+  imageUrl?: string;
+  createdAt: string;
+  rating?: 1 | 2 | 3;
 }
 
 // Seed data types

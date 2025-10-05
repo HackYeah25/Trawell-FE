@@ -87,12 +87,26 @@ export default function ProjectView() {
   useEffect(() => {
     if (isBrainstorm && brainstormSession?.messages && !hasLoadedInitialMessages.current) {
       // Brainstorm session messages
-      const chatMessages: ChatMessage[] = brainstormSession.messages.map((msg, idx) => ({
-        id: `msg-${idx}`,
-        role: msg.role,
-        markdown: msg.content,
-        createdAt: msg.timestamp,
-      }));
+      const chatMessages: ChatMessage[] = brainstormSession.messages.map((msg: any, idx) => {
+        const baseMessage: ChatMessage = {
+          id: `msg-${idx}`,
+          role: msg.role,
+          markdown: msg.content,
+          createdAt: msg.timestamp,
+        };
+        
+        // Check if message has trip_created metadata
+        if (msg.metadata && msg.metadata.type === 'trip_created') {
+          baseMessage.tripCreated = {
+            tripId: msg.metadata.tripId,
+            title: msg.metadata.title,
+            locationName: msg.metadata.locationName,
+            createdAt: msg.timestamp,
+          };
+        }
+        
+        return baseMessage;
+      });
       setMessages(chatMessages);
       hasLoadedInitialMessages.current = true;
       console.log('Loaded initial brainstorm messages:', chatMessages.length);
@@ -204,6 +218,7 @@ export default function ProjectView() {
       
       if (isBrainstorm && location) {
         // For brainstorm sessions, create recommendation and navigate to trip view
+<<<<<<< HEAD
         createRecommendationMutation.mutate(
           {
             sessionId: actualId,
@@ -226,6 +241,46 @@ export default function ProjectView() {
             },
           }
         );
+=======
+         createRecommendationMutation.mutate(
+           {
+             sessionId: actualId,
+             locationData: {
+               ...location,
+               rating: decision,
+             },
+           },
+           {
+             onSuccess: (response) => {
+               toast.success(`🎉 Trip to ${location.name} created!`);
+               console.log('Created recommendation:', response.recommendation_id);
+               
+               // Add trip creation message to chat
+               const tripMessage: ChatMessage = {
+                 id: `trip-created-${Date.now()}`,
+                 role: 'assistant',
+                 markdown: `🎉 **Trip Created!**\n\nYour trip to **${location.name}** has been created successfully! You can now start planning your adventure.`,
+                 createdAt: new Date().toISOString(),
+                 tripCreated: {
+                   tripId: response.recommendation_id,
+                   title: `Trip to ${location.name}`,
+                   locationName: location.name,
+                   createdAt: new Date().toISOString(),
+                 },
+               };
+               
+               setMessages((prev) => [...prev, tripMessage]);
+               
+               // Navigate to trip view with the recommendation ID
+               navigate(`/app/trips/${response.recommendation_id}`);
+             },
+             onError: (error) => {
+               console.error('Error creating recommendation:', error);
+               toast.error('Failed to create trip. Please try again.');
+             },
+           }
+         );
+>>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
       } else if (location) {
         // For project sessions, show trip creation modal
         setSelectedLocation(location);
@@ -243,6 +298,7 @@ export default function ProjectView() {
       if (location) {
         if (isBrainstorm) {
           // For brainstorm sessions, create recommendation directly
+<<<<<<< HEAD
           createRecommendationMutation.mutate(
             {
               sessionId: actualId!,
@@ -262,6 +318,44 @@ export default function ProjectView() {
               },
             }
           );
+=======
+           createRecommendationMutation.mutate(
+             {
+               sessionId: actualId!,
+               locationData: {
+                 ...location,
+                 rating: 3, // Default to 3 stars for quick reply
+               },
+             },
+             {
+               onSuccess: (response) => {
+                 toast.success(`🎉 Trip to ${location.name} created!`);
+                 
+                 // Add trip creation message to chat
+                 const tripMessage: ChatMessage = {
+                   id: `trip-created-${Date.now()}`,
+                   role: 'assistant',
+                   markdown: `🎉 **Trip Created!**\n\nYour trip to **${location.name}** has been created successfully! You can now start planning your adventure.`,
+                   createdAt: new Date().toISOString(),
+                   tripCreated: {
+                     tripId: response.recommendation_id,
+                     title: `Trip to ${location.name}`,
+                     locationName: location.name,
+                     createdAt: new Date().toISOString(),
+                   },
+                 };
+                 
+                 setMessages((prev) => [...prev, tripMessage]);
+                 
+                 navigate(`/app/trips/${response.recommendation_id}`);
+               },
+               onError: (error) => {
+                 console.error('Error creating recommendation:', error);
+                 toast.error('Failed to create trip. Please try again.');
+               },
+             }
+           );
+>>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
         } else {
           // For project sessions, show modal
           setSelectedLocation(location);
@@ -279,6 +373,22 @@ export default function ProjectView() {
         projectId: actualId,
         selectedLocationId: selectedLocation.id,
       });
+
+      // Add trip creation message to chat
+      const tripMessage: ChatMessage = {
+        id: `trip-created-${Date.now()}`,
+        role: 'assistant',
+        markdown: `🎉 **Trip Created!**\n\nYour trip to **${selectedLocation.name}** has been created successfully! You can now start planning your adventure.`,
+        createdAt: new Date().toISOString(),
+        tripCreated: {
+          tripId: result.tripId,
+          title: tripData.title,
+          locationName: selectedLocation.name,
+          createdAt: new Date().toISOString(),
+        },
+      };
+      
+      setMessages((prev) => [...prev, tripMessage]);
 
       // Close modal and navigate to trip
       setShowCreateTripModal(false);
@@ -541,6 +651,7 @@ export default function ProjectView() {
               messages={displayMessages}
               isLoading={isSending}
               onQuickReply={handleQuickReply}
+              onViewTrip={(tripId) => navigate(`/app/trips/${tripId}`)}
               hasMore={hasMore}
               isLoadingMore={isLoadingMore}
               onLoadMore={loadMore}

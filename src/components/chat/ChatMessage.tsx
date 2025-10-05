@@ -5,12 +5,14 @@ import { Bot, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { cn } from '@/lib/utils';
+import { TripCard } from '@/components/trips/TripCard';
 
 interface ChatMessageProps {
   message: ChatMessageType;
   onQuickReply?: (payload: unknown) => void;
   onRetry?: () => void;
   disableAnimation?: boolean;
+  onViewTrip?: (tripId: string) => void;
 }
 
 export const ChatMessage = memo(function ChatMessage({
@@ -18,6 +20,7 @@ export const ChatMessage = memo(function ChatMessage({
   onQuickReply,
   onRetry,
   disableAnimation = false,
+  onViewTrip,
 }: ChatMessageProps) {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -167,6 +170,21 @@ export const ChatMessage = memo(function ChatMessage({
                   Try again
                 </Button>
               )}
+            </div>
+          )}
+
+          {/* Trip Card */}
+          {message.tripCreated && (
+            <div className="mt-3">
+              <TripCard
+                trip={{
+                  id: message.tripCreated.tripId,
+                  title: message.tripCreated.title,
+                  locationName: message.tripCreated.locationName,
+                  createdAt: message.tripCreated.createdAt,
+                }}
+                onViewTrip={onViewTrip}
+              />
             </div>
           )}
         </div>

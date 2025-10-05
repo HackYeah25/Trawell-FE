@@ -193,9 +193,13 @@ export const apiClient = {
       return mockFetch([] as T);
     }
 
-    // Trips list
+    // Trips list - use real backend
     if (endpoint === '/trips') {
-      return mockFetch(mockTrips as T);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
     }
 
     // Single trip

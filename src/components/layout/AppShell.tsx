@@ -1,7 +1,10 @@
 import { ReactNode } from 'react';
-import { Plane } from 'lucide-react';
+import { Plane, Home, Grid3X3 } from 'lucide-react';
 import { UserMenu } from './UserMenu';
 import { useUser } from '@/api/hooks/use-user';
+import { Button } from '@/components/ui/button';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 interface AppShellProps {
   children: ReactNode;
@@ -9,6 +12,10 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const { data: user } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="min-h-screen flex flex-col w-full">
@@ -24,6 +31,38 @@ export function AppShell({ children }: AppShellProps) {
                 TraWell
               </h1>
             </div>
+            
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center gap-2">
+              <Button
+                variant={isActive('/app') ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => navigate('/app')}
+                className={cn(
+                  "text-sm",
+                  isActive('/app') 
+                    ? "bg-gradient-sunset text-white shadow-warm" 
+                    : "hover:bg-warm-coral/10"
+                )}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                History
+              </Button>
+              <Button
+                variant={isActive('/app/gallery') ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => navigate('/app/gallery')}
+                className={cn(
+                  "text-sm",
+                  isActive('/app/gallery') 
+                    ? "bg-gradient-sunset text-white shadow-warm" 
+                    : "hover:bg-warm-coral/10"
+                )}
+              >
+                <Grid3X3 className="w-4 h-4 mr-2" />
+                Gallery
+              </Button>
+            </nav>
           </div>
 
           {user && (

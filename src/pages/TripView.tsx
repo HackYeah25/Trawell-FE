@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio, ArrowLeft } from 'lucide-react';
+=======
+import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio, ArrowLeft, Sparkles } from 'lucide-react';
+>>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
@@ -228,7 +232,11 @@ export default function TripView() {
         {/* Header - Fixed */}
         <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60]">
           <div className="max-w-4xl mx-auto">
+<<<<<<< HEAD
             <div className="flex items-center gap-3">
+=======
+            <div className="flex items-center gap-3 mb-2">
+>>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
               <Button
                 variant="ghost"
                 size="icon"
@@ -237,8 +245,42 @@ export default function TripView() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
+<<<<<<< HEAD
               <div className="w-10 h-10 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
                 <MapPin className="w-5 h-5 text-white" />
+=======
+              <div className="w-8 h-8 rounded-lg bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/app')}
+                className="text-sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Back to Planning
+              </Button>
+            </div>
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveTitle();
+                    if (e.key === 'Escape') handleCancelEdit();
+                  }}
+                  className="text-xl md:text-2xl font-bold"
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                  <X className="w-4 h-4" />
+                </Button>
+>>>>>>> 3cf8cf2 (feat: Add Trip Gallery page and integrate trip viewing functionality across chat components and navigation)
               </div>
               <div className="flex-1 min-w-0">
                 {isEditingTitle ? (

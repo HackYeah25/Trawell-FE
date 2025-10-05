@@ -10,12 +10,20 @@ export interface BrainstormSession {
   updatedAt: string;
   messageCount: number;
   isShared: boolean;
+  trips?: import('@/types').TripCard[];
 }
 
 export interface BrainstormMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  metadata?: {
+    type?: 'trip_created';
+    tripId?: string;
+    title?: string;
+    locationName?: string;
+    imageUrl?: string;
+  };
 }
 
 export interface BrainstormSessionDetail {
@@ -112,17 +120,13 @@ export function useCreateRecommendation() {
   });
 }
 
-// Get recommendations for a brainstorm session
-export function useSessionRecommendations(sessionId: string | null) {
+// Get all recommendations for the current user
+export function useAllRecommendations() {
   return useQuery({
-    queryKey: ['brainstorm', 'sessions', sessionId, 'recommendations'],
+    queryKey: ['brainstorm', 'recommendations', 'all'],
     queryFn: async () => {
-      if (!sessionId) return { recommendations: [] };
-      return await apiClient.get<{ recommendations: any[] }>(
-        `/brainstorm/sessions/${sessionId}/recommendations`
-      );
+      return await apiClient.get<{ recommendations: any[] }>('/brainstorm/recommendations');
     },
-    enabled: !!sessionId,
   });
 }
 

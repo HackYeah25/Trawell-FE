@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, UserPlus } from 'lucide-react';
+import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -80,6 +80,15 @@ export default function History() {
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-3xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent">Your Trips</h1>
           <div className="flex gap-2">
+            <Button 
+              onClick={() => navigate('/app/gallery')}
+              variant="outline"
+              size="sm"
+              className="sm:px-4"
+            >
+              <Grid3X3 className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Trip Gallery</span>
+            </Button>
             <Button 
               onClick={() => setShowJoinDialog(true)}
               variant="outline"

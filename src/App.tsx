@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import ProjectView from "./pages/ProjectView";
 import TripView from "./pages/TripView";
 import TripLiveChat from "./pages/TripLiveChat";
+import TripGallery from "./pages/TripGallery";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -90,6 +91,10 @@ function AppRoutes() {
       <Route
         path="/app/trips/:tripId/live"
         element={user && !needsOnboarding ? <TripLiveChat /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/app/gallery"
+        element={user && !needsOnboarding ? <TripGallery /> : <Navigate to="/" replace />}
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
