@@ -366,16 +366,6 @@ export default function ProjectView() {
       return;
     }
 
-    // Add user message to UI
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      markdown: text,
-      createdAt: new Date().toISOString(),
-      status: 'sent',
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
     setIsSending(true);
     setCurrentStreamingMessage('');
     streamingMessageIdRef.current = null;
@@ -390,7 +380,7 @@ export default function ProjectView() {
         { projectId: actualId, text },
         {
           onSuccess: (newMessages) => {
-            // Update messages with response
+            // Update messages with response (API returns both user and assistant messages)
             setMessages((prev) => [...prev, ...newMessages]);
             setIsSending(false);
           },
@@ -404,7 +394,7 @@ export default function ProjectView() {
     }
 
     // Every 3 user messages, add a location proposal
-    const userMessageCount = messages.filter(m => m.role === 'user').length + 1;
+    const userMessageCount = messages.filter(m => m.role === 'user').length;
     if (locationSuggestions && userMessageCount % 3 === 0) {
       const unusedLocations = locationSuggestions.filter(loc => 
         !messages.some(msg => msg.locationProposal?.id === loc.id)
