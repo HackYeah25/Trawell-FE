@@ -21,6 +21,7 @@ export default function ProjectView() {
   const [isSending, setIsSending] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
   const streamingMessageIdRef = useRef<string | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -47,6 +48,16 @@ export default function ProjectView() {
     pageSize: 10,
   });
 
+  // Auto-scroll to bottom function
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   // Load messages from session data
   useEffect(() => {
     if (session?.messages) {
@@ -59,6 +70,16 @@ export default function ProjectView() {
       setMessages(chatMessages);
     }
   }, [session]);
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    // Small delay to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [messages, currentStreamingMessage]);
 
   // WebSocket handlers
   const handleMessage = (wsMessage: { content?: string; role?: string }) => {
@@ -319,9 +340,9 @@ export default function ProjectView() {
 
   return (
     <AppShell>
-      <div className="h-full flex flex-col">
+      <div className="h-screen flex flex-col">
         {/* Fixed Header */}
-        <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
+        <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-10">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3">
               <Button
@@ -389,8 +410,11 @@ export default function ProjectView() {
         </div>
 
         {/* Scrollable Chat Area */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto">
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto min-h-0"
+        >
+          <div className="max-w-4xl mx-auto p-4">
             <ChatThread
               messages={displayMessages}
               isLoading={isSending}
@@ -405,7 +429,7 @@ export default function ProjectView() {
         </div>
 
         {/* Fixed Composer */}
-        <div className="flex-shrink-0 border-t border-warm-coral/20 bg-card/80 backdrop-blur-md">
+        <div className="flex-shrink-0 border-t border-warm-coral/20 bg-card/80 backdrop-blur-md sticky bottom-0 z-10">
           <div className="max-w-4xl mx-auto p-4">
             <Composer onSend={handleSendMessage} disabled={isSending} />
           </div>
