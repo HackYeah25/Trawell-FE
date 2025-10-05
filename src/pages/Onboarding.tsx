@@ -44,7 +44,7 @@ export default function Onboarding() {
 
   // Check if user already has profile - skip onboarding
   useEffect(() => {
-    if (profileStatus && profileStatus.has_profile && profileStatus.profile_completeness === 100) {
+    if (profileStatus && profileStatus.should_skip_onboarding) {
       console.log('User already has complete profile, redirecting to app...');
       navigate('/app/brainstorm');
     }
@@ -119,7 +119,7 @@ export default function Onboarding() {
     console.log('Start session check - sessionId:', sessionId, 'isPending:', startProfilingMutation.isPending, 'isSuccess:', startProfilingMutation.isSuccess);
 
     // Don't start if user already has profile or profile is still loading
-    if (profileStatusLoading || (profileStatus?.has_profile && profileStatus?.profile_completeness === 100)) {
+    if (profileStatusLoading || profileStatus?.should_skip_onboarding) {
       return;
     }
 

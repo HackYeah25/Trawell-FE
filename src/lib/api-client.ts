@@ -68,6 +68,33 @@ export const apiClient = {
       return response.json();
     }
 
+    // Profiling status - use real backend
+    if (endpoint === '/profiling/status') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
+    // Brainstorm sessions - use real backend
+    if (endpoint === '/brainstorm/sessions') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
+    // Single brainstorm session
+    if (endpoint.match(/^\/brainstorm\/sessions\/[^/]+$/)) {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
     // Projects list
     if (endpoint === '/projects') {
       return mockFetch(mockProjects as T);
@@ -223,6 +250,21 @@ export const apiClient = {
   post: async <T>(endpoint: string, data?: unknown): Promise<T> => {
     // Start profiling session - use real backend
     if (endpoint === '/profiling/start') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
+    // Create brainstorm session - use real backend
+    if (endpoint === '/brainstorm/sessions') {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -593,6 +635,28 @@ export const apiClient = {
   },
 
   delete: async <T>(endpoint: string): Promise<T> => {
+    // Delete brainstorm session
+    if (endpoint.match(/^\/brainstorm\/sessions\/[^/]+$/)) {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
+    // Delete profiling profile/reset
+    if (endpoint === '/profiling/profile/reset') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
     throw new ApiError(`DELETE not implemented: ${endpoint}`, 404);
   },
 };

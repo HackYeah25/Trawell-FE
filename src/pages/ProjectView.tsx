@@ -1,46 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, Pencil, Check, X, Share2 } from 'lucide-react';
-import { ChatMessageSkeleton } from '@/components/chat/ChatMessageSkeleton';
+import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  useProject,
-  useProjectMessages,
-  useSendProjectMessage,
-  useProjectLocationSuggestions,
-  useCreateTripFromLocation,
-  useProjectParticipants,
-} from '@/api/hooks/use-projects';
-import { useRenameProject } from '@/api/hooks/use-rename';
+import { useBrainstormSession, useBrainstormWebSocket } from '@/api/hooks/use-brainstorm';
+import { useProjectLocationSuggestions, useCreateTripFromLocation } from '@/api/hooks/use-projects';
 import { useTrips } from '@/api/hooks/use-trips';
-import { initialProjectQuestions } from '@/lib/mock-data';
-import { ShareCodeDialog } from '@/components/projects/ShareCodeDialog';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
-import { saveChatHistory, loadChatHistory } from '@/lib/chat-storage';
 import type { ChatMessage, Location } from '@/types';
+import { toast } from 'sonner';
 
 export default function ProjectView() {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId, sessionId } = useParams<{ projectId?: string; sessionId?: string }>();
   const navigate = useNavigate();
-  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editedTitle, setEditedTitle] = useState('');
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
+  const streamingMessageIdRef = useRef<string | null>(null);
 
-  const { data: project } = useProject(projectId!);
-  const { data: messagesData } = useProjectMessages(projectId!);
-  const { data: locationSuggestions } = useProjectLocationSuggestions(projectId!);
+  // Use sessionId for brainstorm routes, projectId for project routes
+  const actualId = sessionId || projectId;
+  
+  const { data: session, isLoading: sessionLoading, error: sessionError } = useBrainstormSession(actualId || null);
+  const { data: locationSuggestions } = useProjectLocationSuggestions(actualId!);
   const { data: trips } = useTrips();
-  const { data: participants } = useProjectParticipants(projectId!, !!project?.shareCode);
-  const sendMessageMutation = useSendProjectMessage();
   const createTripMutation = useCreateTripFromLocation();
-  const renameMutation = useRenameProject();
 
   // Pagination for chat messages
   const {
@@ -50,128 +36,84 @@ export default function ProjectView() {
     loadMore,
     remainingCount,
   } = useChatPagination({
-    allMessages: localMessages,
+    allMessages: messages,
     pageSize: 10,
   });
 
-  // Auto-redirect to trip if this shared project already has one
+  // Load messages from session data
   useEffect(() => {
-    if (project?.isShared && trips && trips.length > 0) {
-      const existingTrip = trips.find(trip => trip.projectId === projectId);
-      if (existingTrip) {
-        navigate(`/app/trips/${existingTrip.id}`);
-      }
+    if (session?.messages) {
+      const chatMessages: ChatMessage[] = session.messages.map((msg, idx) => ({
+        id: `msg-${idx}`,
+        role: msg.role,
+        markdown: msg.content,
+        createdAt: msg.timestamp,
+      }));
+      setMessages(chatMessages);
     }
-  }, [project, trips, projectId, navigate]);
+  }, [session]);
 
-  // Load chat history from localStorage or initialize with first question
-  useEffect(() => {
-    if (projectId) {
-      const stored = loadChatHistory(`project-${projectId}`);
-      if (stored && stored.length > 0) {
-        setLocalMessages(stored);
-      } else {
-        // Initialize with first question
-        setLocalMessages([initialProjectQuestions[0]]);
-      }
-    }
-  }, [projectId]);
-
-  // Save to localStorage on every message change
-  useEffect(() => {
-    if (projectId && localMessages.length > 0) {
-      saveChatHistory(`project-${projectId}`, localMessages);
-    }
-  }, [projectId, localMessages]);
-
-  const handleSaveTitle = async () => {
-    if (!projectId || !editedTitle.trim()) {
-      setIsEditingTitle(false);
-      return;
-    }
-
-    try {
-      await renameMutation.mutateAsync({
-        projectId,
-        title: editedTitle.trim(),
-      });
-      setIsEditingTitle(false);
-    } catch (error) {
-      console.error('Error renaming project:', error);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditingTitle(false);
-    setEditedTitle(project?.title || '');
-  };
-
-  const handleSendMessage = async (text: string) => {
-    if (!projectId) return;
-
-    const tempMessage: ChatMessage = {
-      id: `temp-${Date.now()}`,
-      role: 'user',
-      markdown: text,
-      createdAt: new Date().toISOString(),
-      status: 'sending',
-    };
-
-    setLocalMessages((prev) => [...prev, tempMessage]);
-
-    try {
-      // Mock API call with delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Update with successful message
-      setLocalMessages((prev) =>
-        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: undefined } : m))
-      );
-
-      // Add AI response
-      const aiResponse: ChatMessage = {
-        id: `ai-${Date.now()}`,
+  // WebSocket handlers
+  const handleMessage = (wsMessage: any) => {
+    if (wsMessage.content && wsMessage.role === 'assistant') {
+      // Clear streaming message and add final message
+      const newMessage: ChatMessage = {
+        id: streamingMessageIdRef.current || `ws-${Date.now()}`,
         role: 'assistant',
-        markdown: 'Świetnie! Rozumiem Twoje preferencje. Pracuję nad znalezieniem idealnych miejsc dla Ciebie. ✨',
+        markdown: wsMessage.content,
         createdAt: new Date().toISOString(),
       };
-
-      setTimeout(() => {
-        setLocalMessages((prev) => [...prev, aiResponse]);
-      }, 500);
-
-      // Every 3 user messages, add a location proposal
-      const userMessageCount = localMessages.filter(m => m.role === 'user').length + 1;
-      if (locationSuggestions && userMessageCount % 3 === 0) {
-        const unusedLocations = locationSuggestions.filter(loc => 
-          !localMessages.some(msg => msg.locationProposal?.id === loc.id)
-        );
-
-        if (unusedLocations.length > 0) {
-          const nextLocation = unusedLocations[0];
-          const proposalMessage: ChatMessage = {
-            id: `loc-proposal-${Date.now()}`,
-            role: 'assistant',
-            markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
-            locationProposal: { ...nextLocation, status: 'pending' },
-            createdAt: new Date().toISOString(),
-          };
-
-          setTimeout(() => {
-            setLocalMessages((prev) => [...prev, proposalMessage]);
-          }, 1500);
-        }
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setLocalMessages((prev) =>
-        prev.map((m) => (m.id === tempMessage.id ? { ...m, status: 'error' } : m))
-      );
+      setMessages((prev) => [...prev, newMessage]);
+      setCurrentStreamingMessage('');
+      streamingMessageIdRef.current = null;
+      setIsSending(false);
     }
   };
 
+  const handleToken = (token: string) => {
+    if (!streamingMessageIdRef.current) {
+      streamingMessageIdRef.current = `streaming-${Date.now()}`;
+    }
+    setCurrentStreamingMessage((prev) => prev + token);
+  };
+
+  const handleThinking = () => {
+    console.log('Agent is thinking...');
+  };
+
+  const handleComplete = () => {
+    // Finalize the streaming message
+    if (currentStreamingMessage && streamingMessageIdRef.current) {
+      const finalMessage: ChatMessage = {
+        id: streamingMessageIdRef.current,
+        role: 'assistant',
+        markdown: currentStreamingMessage,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, finalMessage]);
+      setCurrentStreamingMessage('');
+      streamingMessageIdRef.current = null;
+    }
+    setIsSending(false);
+  };
+
+  const handleError = (error: string) => {
+    console.error('Brainstorm error:', error);
+    toast.error(error);
+    setIsSending(false);
+  };
+
+  const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
+    sessionId: actualId || null,
+    onMessage: handleMessage,
+    onToken: handleToken,
+    onThinking: handleThinking,
+    onComplete: handleComplete,
+    onError: handleError,
+  });
+
   const handleLocationDecision = (locationId: string, decision: 'reject' | 1 | 2 | 3) => {
-    setLocalMessages((prev) =>
+    setMessages((prev) =>
       prev.map((msg) => {
         if (msg.locationProposal?.id === locationId) {
           return {
@@ -202,7 +144,7 @@ export default function ProjectView() {
           ],
           createdAt: new Date().toISOString(),
         };
-        setLocalMessages((prev) => [...prev, confirmMessage]);
+        setMessages((prev) => [...prev, confirmMessage]);
       }, 800);
     }
   };
@@ -215,11 +157,11 @@ export default function ProjectView() {
   };
 
   const handleCreateTrip = async (locationId: string) => {
-    if (!projectId || createTripMutation.isPending) return;
+    if (!actualId || createTripMutation.isPending) return;
 
     try {
       const result = await createTripMutation.mutateAsync({
-        projectId,
+        projectId: actualId,
         selectedLocationId: locationId,
       });
 
@@ -229,115 +171,148 @@ export default function ProjectView() {
     }
   };
 
-  if (!projectId || !project) {
+  const handleSendMessage = async (text: string) => {
+    if (!actualId) {
+      toast.error('No session ID');
+      return;
+    }
+
+    // Add user message to UI
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      markdown: text,
+      createdAt: new Date().toISOString(),
+      status: 'sent',
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsSending(true);
+    setCurrentStreamingMessage('');
+    streamingMessageIdRef.current = null;
+
+    // Send via WebSocket
+    sendWSMessage(text);
+
+    // Every 3 user messages, add a location proposal
+    const userMessageCount = messages.filter(m => m.role === 'user').length + 1;
+    if (locationSuggestions && userMessageCount % 3 === 0) {
+      const unusedLocations = locationSuggestions.filter(loc => 
+        !messages.some(msg => msg.locationProposal?.id === loc.id)
+      );
+
+      if (unusedLocations.length > 0) {
+        const nextLocation = unusedLocations[0];
+        const proposalMessage: ChatMessage = {
+          id: `loc-proposal-${Date.now()}`,
+          role: 'assistant',
+          markdown: 'Mam dla Ciebie propozycję destynacji! 🌍',
+          locationProposal: { ...nextLocation, status: 'pending' },
+          createdAt: new Date().toISOString(),
+        };
+
+        setTimeout(() => {
+          setMessages((prev) => [...prev, proposalMessage]);
+        }, 1500);
+      }
+    }
+  };
+
+  if (sessionLoading) {
     return (
-      <AppShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="space-y-4 w-full max-w-3xl px-4">
-            <ChatMessageSkeleton width="75%" />
-            <ChatMessageSkeleton width="85%" />
-            <ChatMessageSkeleton width="65%" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-sunset flex items-center justify-center shadow-warm">
+            <Sparkles className="w-8 h-8 text-white animate-pulse" />
           </div>
+          <Loader2 className="w-8 h-8 mx-auto animate-spin text-warm-coral" />
+          <p className="mt-4 text-muted-foreground">Loading your brainstorm session...</p>
         </div>
-      </AppShell>
+      </div>
     );
+  }
+
+  if (sessionError || !session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-coral/5 via-warm-turquoise/5 to-warm-sand">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center">
+            <span className="text-2xl">❌</span>
+          </div>
+          <p className="text-muted-foreground mb-4">Failed to load brainstorm session</p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Session ID: {actualId} | Error: {sessionError?.message || 'Unknown error'}
+          </p>
+          <Button onClick={() => navigate('/app')} variant="outline">
+            Back to History
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Combine messages with streaming message
+  const displayMessages = [...messages];
+  if (currentStreamingMessage && streamingMessageIdRef.current) {
+    displayMessages.push({
+      id: streamingMessageIdRef.current,
+      role: 'assistant',
+      markdown: currentStreamingMessage,
+      createdAt: new Date().toISOString(),
+    });
   }
 
   return (
     <AppShell>
-      <div className="h-[calc(100vh-4rem)] flex flex-col">
-        {/* Header */}
-        <div className="border-b border-warm-coral/20 bg-card/80 backdrop-blur-md p-4 flex-shrink-0">
-          <div className="max-w-4xl mx-auto space-y-4">
-            <div>
-              {isEditingTitle ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={editedTitle}
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveTitle();
-                      if (e.key === 'Escape') handleCancelEdit();
-                    }}
-                    className="text-xl md:text-2xl font-bold"
-                    autoFocus
-                  />
-                  <Button size="icon" variant="ghost" onClick={handleSaveTitle}>
-                    <Check className="w-4 h-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl md:text-2xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
-                    {project.title}
-                  </h1>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="hover:bg-warm-coral/10"
-                    onClick={() => {
-                      setEditedTitle(project.title);
-                      setIsEditingTitle(true);
-                    }}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  {project.shareCode && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="hover:bg-warm-coral/10"
-                      onClick={() => setShareDialogOpen(true)}
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              )}
-              <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                Travel Project · {new Date(project.createdAt).toLocaleDateString('en-US')}
-              </p>
+      <div className="h-full flex flex-col">
+        {/* Fixed Header */}
+        <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/app')}
+                className="flex-shrink-0"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="w-10 h-10 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                  {session.title}
+                </h1>
+                <p className="text-xs text-muted-foreground">Solo brainstorm session</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Chat and Composer Container */}
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Chat Thread */}
-          <div className="flex-1 overflow-y-auto h-0 pb-6">
+        {/* Scrollable Chat Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
             <ChatThread
-              messages={displayedMessages}
-              isLoading={sendMessageMutation.isPending}
+              messages={displayMessages}
+              isLoading={isSending}
               onLocationDecision={handleLocationDecision}
               onQuickReply={handleQuickReply}
               hasMore={hasMore}
               isLoadingMore={isLoadingMore}
               onLoadMore={loadMore}
               remainingCount={remainingCount}
-              className={isMobile ? 'pb-24' : ''}
             />
           </div>
+        </div>
 
-          {/* Composer - Always visible */}
-          <Composer
-            onSend={handleSendMessage}
-            disabled={sendMessageMutation.isPending}
-            placeholder="Opisz swoje oczekiwania..."
-          />
+        {/* Fixed Composer */}
+        <div className="flex-shrink-0 border-t border-warm-coral/20 bg-card/80 backdrop-blur-md">
+          <div className="max-w-4xl mx-auto p-4">
+            <Composer onSend={handleSendMessage} disabled={isSending} />
+          </div>
         </div>
       </div>
-
-      {project.shareCode && (
-        <ShareCodeDialog
-          open={shareDialogOpen}
-          onOpenChange={setShareDialogOpen}
-          shareCode={project.shareCode}
-          participants={participants}
-        />
-      )}
     </AppShell>
   );
 }

@@ -80,6 +80,10 @@ function AppRoutes() {
         element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/" replace />}
       />
       <Route
+        path="/app/brainstorm/:sessionId"
+        element={user && !needsOnboarding ? <ProjectView /> : <Navigate to="/" replace />}
+      />
+      <Route
         path="/app/trips/:tripId"
         element={user && !needsOnboarding ? <TripView /> : <Navigate to="/" replace />}
       />

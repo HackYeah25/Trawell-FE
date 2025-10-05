@@ -8,10 +8,12 @@ export function useProfileStatus() {
     queryKey: ['profiling', 'status'],
     queryFn: async () => {
       const response = await apiClient.get<{
-        has_profile: boolean;
+        has_completed_profiling: boolean;
+        should_skip_onboarding: boolean;
         profile_completeness: number;
-        user_id?: string;
-        message?: string;
+        last_session_id?: string | null;
+        user_id?: string | null;
+        completed_at?: string;
       }>('/profiling/status');
       return response;
     },
