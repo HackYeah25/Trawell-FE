@@ -250,8 +250,26 @@ export default function TripView() {
       return newMessages;
     });
 
-    // Try to send via WebSocket if connected, otherwise fallback to API
-    if (isConnected) {
+    // For shared trips, always use API. For private trips, try WebSocket first
+    if (tripId?.includes('iguana')) {
+      console.log('Shared trip detected, using API directly');
+      sendMessageMutation.mutate(
+        { tripId, text },
+        {
+          onSuccess: (newMessages) => {
+            console.log('API success for shared trip:', newMessages);
+            // Only add assistant messages from API response, not user messages (already added)
+            const assistantMessages = newMessages.filter(msg => msg.role === 'assistant');
+            if (assistantMessages.length > 0) {
+              setLocalMessages((prev) => [...prev, ...assistantMessages]);
+            }
+          },
+          onError: (error) => {
+            console.error('API error for shared trip:', error);
+          }
+        }
+      );
+    } else if (isConnected) {
       console.log('Sending via WebSocket');
       sendWSMessage(text);
     } else {
@@ -465,8 +483,8 @@ export default function TripView() {
             <div className="max-w-4xl mx-auto p-4">
               <Composer
                 onSend={handleSendMessage}
-                disabled={isAIResponding || !isConnected}
-                placeholder={isConnected ? "Opisz swoje preferencje..." : "Łączenie..."}
+                disabled={isAIResponding || (!isConnected && !tripId?.includes('iguana'))}
+                placeholder={isConnected ? "Opisz swoje preferencje..." : (tripId?.includes('iguana') ? "Napisz wiadomość..." : "Łączenie...")}
               />
             </div>
           </div>
