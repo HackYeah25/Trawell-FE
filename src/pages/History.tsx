@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, Grid3X3 } from 'lucide-react';
+import { Plus, FolderKanban, Calendar, ChevronRight, Palmtree, Users as UsersIcon, UserPlus, Grid3X3, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/api/hooks/use-user';
 import { AppShell } from '@/components/layout/AppShell';
@@ -8,10 +8,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCreateProject, useJoinProject, useProjects } from '@/api/hooks/use-projects';
 import { useBrainstormSessions, useCreateBrainstormSession } from '@/api/hooks/use-brainstorm';
+import { useProjectTrips } from '@/api/hooks/use-trips';
+import { useBrainstormTrips } from '@/api/hooks/use-brainstorm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { ProjectTypeDialog } from '@/components/projects/ProjectTypeDialog';
 import { JoinProjectDialog } from '@/components/projects/JoinProjectDialog';
+import { AdventureTrips } from '@/components/adventures/AdventureTrips';
 import { useToast } from '@/hooks/use-custom-toast';
 
 export default function History() {
@@ -25,6 +28,7 @@ export default function History() {
   const joinProjectMutation = useJoinProject();
   const [showProjectTypeDialog, setShowProjectTypeDialog] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const [expandedAdventures, setExpandedAdventures] = useState<Set<string>>(new Set());
 
   const handleSelectProjectType = (isShared: boolean) => {
     setShowProjectTypeDialog(false);
@@ -70,6 +74,35 @@ export default function History() {
           toast.error('Nieprawidłowy kod', 'Sprawdź kod i spróbuj ponownie');
         },
       }
+    );
+  };
+
+  const toggleAdventureExpansion = (adventureId: string) => {
+    setExpandedAdventures(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(adventureId)) {
+        newSet.delete(adventureId);
+      } else {
+        newSet.add(adventureId);
+      }
+      return newSet;
+    });
+  };
+
+  // Component to show trip count indicator
+  const TripCountIndicator = ({ adventureId, adventureType }: { adventureId: string; adventureType: 'project' | 'brainstorm' }) => {
+    const { data: projectTrips } = useProjectTrips(adventureType === 'project' ? adventureId : '');
+    const { data: brainstormTrips } = useBrainstormTrips(adventureType === 'brainstorm' ? adventureId : '');
+    
+    const tripCount = adventureType === 'project' ? (projectTrips?.length || 0) : (brainstormTrips?.length || 0);
+    
+    if (tripCount === 0) return null;
+    
+    return (
+      <div className="flex items-center gap-1 text-xs text-warm-coral ml-2">
+        <MapPin className="w-3 h-3" />
+        <span>{tripCount}</span>
+      </div>
     );
   };
 
@@ -133,108 +166,134 @@ export default function History() {
             </Button>
           </Card>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-6">
             {/* Projects (shared adventures) */}
             {projects && projects.map((project) => {
               const isShared = project.isShared;
+              const isExpanded = expandedAdventures.has(project.id);
 
               return (
-                <Card
-                  key={project.id}
-                  className={cn(
-                    "border-warm-coral/20 bg-card/80 backdrop-blur-sm cursor-pointer hover:bg-warm-coral/5 transition-colors",
-                    isShared && "border-warm-turquoise/40 bg-warm-turquoise/5"
-                  )}
-                  onClick={() => navigate(`/app/projects/${project.id}`)}
-                >
-                  <div className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
-                        isShared
-                          ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80"
-                          : "bg-gradient-sunset"
-                      )}>
-                        {isShared ? (
-                          <UsersIcon className="w-5 h-5 text-white" />
-                        ) : (
-                          <FolderKanban className="w-5 h-5 text-white" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(project.createdAt).toLocaleDateString('en-US')}
-                          {project.lastMessagePreview && (
-                            <>
-                              <span className="mx-1">•</span>
-                              <span>Project</span>
-                            </>
+                <div key={project.id} className="mb-6">
+                  <Card
+                    className={cn(
+                      "border-warm-coral/20 bg-card/80 backdrop-blur-sm cursor-pointer hover:bg-warm-coral/5 transition-colors shadow-sm",
+                      isShared && "border-warm-turquoise/40 bg-warm-turquoise/5"
+                    )}
+                    onClick={() => navigate(`/app/projects/${project.id}`)}
+                  >
+                    <div className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
+                          isShared
+                            ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80"
+                            : "bg-gradient-sunset"
+                        )}>
+                          {isShared ? (
+                            <UsersIcon className="w-5 h-5 text-white" />
+                          ) : (
+                            <FolderKanban className="w-5 h-5 text-white" />
                           )}
-                        </p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
+                            <TripCountIndicator adventureId={project.id} adventureType="project" />
+                          </div>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(project.createdAt).toLocaleDateString('en-US')}
+                            {project.lastMessagePreview && (
+                              <>
+                                <span className="mx-1">•</span>
+                                <span>Project</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isShared && (
+                          <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                            Shared
+                          </Badge>
+                        )}
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {isShared && (
-                        <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                          Shared
-                        </Badge>
-                      )}
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                  
+                  {/* Trips list */}
+                  <AdventureTrips
+                    adventureId={project.id}
+                    adventureType="project"
+                    isExpanded={isExpanded}
+                    onToggle={() => toggleAdventureExpansion(project.id)}
+                  />
+                </div>
               );
             })}
 
             {/* Brainstorm Sessions (solo adventures) */}
             {brainstormSessions && brainstormSessions.map((session) => {
               const isShared = session.isShared;
+              const isExpanded = expandedAdventures.has(session.id);
 
               return (
-                <Card
-                  key={session.id}
-                  className={cn(
-                    "border-warm-coral/20 bg-card/80 backdrop-blur-sm cursor-pointer hover:bg-warm-coral/5 transition-colors",
-                    isShared && "border-warm-turquoise/40 bg-warm-turquoise/5"
-                  )}
-                  onClick={() => navigate(`/app/brainstorm/${session.id}`)}
-                >
-                  <div className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
-                        isShared
-                          ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80"
-                          : "bg-gradient-sunset"
-                      )}>
-                        {isShared ? (
-                          <UsersIcon className="w-5 h-5 text-white" />
-                        ) : (
-                          <FolderKanban className="w-5 h-5 text-white" />
+                <div key={session.id} className="mb-6">
+                  <Card
+                    className={cn(
+                      "border-warm-coral/20 bg-card/80 backdrop-blur-sm cursor-pointer hover:bg-warm-coral/5 transition-colors shadow-sm",
+                      isShared && "border-warm-turquoise/40 bg-warm-turquoise/5"
+                    )}
+                    onClick={() => navigate(`/app/brainstorm/${session.id}`)}
+                  >
+                    <div className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
+                          isShared
+                            ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80"
+                            : "bg-gradient-sunset"
+                        )}>
+                          {isShared ? (
+                            <UsersIcon className="w-5 h-5 text-white" />
+                          ) : (
+                            <FolderKanban className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{session.title}</h3>
+                            <TripCountIndicator adventureId={session.id} adventureType="brainstorm" />
+                          </div>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(session.createdAt).toLocaleDateString('en-US')}
+                            <span className="mx-1">•</span>
+                            {session.messageCount} {session.messageCount === 1 ? 'message' : 'messages'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isShared && (
+                          <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                            Shared
+                          </Badge>
                         )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{session.title}</h3>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(session.createdAt).toLocaleDateString('en-US')}
-                          <span className="mx-1">•</span>
-                          {session.messageCount} {session.messageCount === 1 ? 'message' : 'messages'}
-                        </p>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {isShared && (
-                        <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                          Shared
-                        </Badge>
-                      )}
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                  
+                  {/* Trips list */}
+                  <AdventureTrips
+                    adventureId={session.id}
+                    adventureType="brainstorm"
+                    isExpanded={isExpanded}
+                    onToggle={() => toggleAdventureExpansion(session.id)}
+                  />
+                </div>
               );
             })}
           </div>

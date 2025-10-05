@@ -14,6 +14,14 @@ export function useTrips() {
   });
 }
 
+export function useProjectTrips(projectId: string) {
+  return useQuery({
+    queryKey: ['trips', 'project', projectId],
+    queryFn: () => apiClient.get<Trip[]>(`/projects/${projectId}/trips`),
+    enabled: !!projectId,
+  });
+}
+
 export function useTrip(tripId: string) {
   return useQuery({
     queryKey: ['trip', tripId],

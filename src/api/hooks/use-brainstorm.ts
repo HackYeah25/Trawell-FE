@@ -60,6 +60,19 @@ export function useBrainstormSession(sessionId: string | null) {
   });
 }
 
+// Get trips for brainstorm session (recommendations)
+export function useBrainstormTrips(sessionId: string | null) {
+  return useQuery({
+    queryKey: ['brainstorm', 'trips', sessionId],
+    queryFn: async () => {
+      if (!sessionId) return [];
+      const response = await apiClient.get<{ recommendations: any[] }>(`/brainstorm/sessions/${sessionId}/recommendations`);
+      return response.recommendations || [];
+    },
+    enabled: !!sessionId,
+  });
+}
+
 // Create new brainstorm session
 export function useCreateBrainstormSession() {
   const queryClient = useQueryClient();

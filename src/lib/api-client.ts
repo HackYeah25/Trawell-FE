@@ -193,6 +193,44 @@ export const apiClient = {
       return mockFetch([] as T);
     }
 
+    // Project trips
+    if (endpoint.match(/^\/projects\/[^/]+\/trips$/)) {
+      const projectId = endpoint.split('/')[2];
+      const projectTrips = mockTrips.filter(trip => trip.projectId === projectId);
+      return mockFetch(projectTrips as T);
+    }
+
+    // Brainstorm session trips (recommendations)
+    if (endpoint.match(/^\/brainstorm\/sessions\/[^/]+\/recommendations$/)) {
+      const sessionId = endpoint.split('/')[3];
+      // Mock some recommendations for demo
+      const mockRecommendations = [
+        {
+          recommendation_id: `rec-${sessionId}-1`,
+          destination: {
+            name: 'Tokyo, Japan',
+            city: 'Tokyo',
+            imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400',
+            rating: 4.5
+          },
+          created_at: new Date().toISOString(),
+          status: 'active'
+        },
+        {
+          recommendation_id: `rec-${sessionId}-2`,
+          destination: {
+            name: 'Barcelona, Spain',
+            city: 'Barcelona',
+            imageUrl: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400',
+            rating: 4.2
+          },
+          created_at: new Date().toISOString(),
+          status: 'active'
+        }
+      ];
+      return mockFetch({ recommendations: mockRecommendations } as T);
+    }
+
     // Trips list - use real backend
     if (endpoint === '/trips') {
       const response = await fetch(`${API_BASE_URL}${endpoint}`);
