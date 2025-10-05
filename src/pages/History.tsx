@@ -12,11 +12,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { ProjectTypeDialog } from '@/components/projects/ProjectTypeDialog';
 import { JoinProjectDialog } from '@/components/projects/JoinProjectDialog';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-custom-toast';
 
 export default function History() {
   const navigate = useNavigate();
   const { data: user } = useUser();
+  const toast = useToast();
   const { data: brainstormSessions, isLoading: brainstormLoading } = useBrainstormSessions();
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const createProjectMutation = useCreateProject();
@@ -35,7 +36,9 @@ export default function History() {
         {
           onSuccess: (result) => {
             if (result.shareCode) {
-              toast.success(`Project created! Share code: ${result.shareCode}`);
+              toast.success('Projekt utworzony!', `Kod udostępniania: ${result.shareCode}`);
+            } else {
+              toast.success('Projekt utworzony!', 'Przechodzisz do nowego projektu');
             }
             navigate(`/app/projects/${result.id}`);
           },
@@ -45,11 +48,11 @@ export default function History() {
       // Use new brainstorm system for solo adventures
       createBrainstormMutation.mutate(undefined, {
         onSuccess: (result) => {
-          toast.success('New brainstorm session created!');
+          toast.success('Nowa sesja!', 'Rozpoczynasz nową przygodę');
           navigate(`/app/brainstorm/${result.session_id}`);
         },
         onError: () => {
-          toast.error('Failed to create brainstorm session');
+          toast.error('Błąd tworzenia', 'Nie udało się utworzyć sesji');
         },
       });
     }
@@ -64,7 +67,7 @@ export default function History() {
           // Project will appear in the list automatically due to query invalidation
         },
         onError: () => {
-          toast.error('Invalid share code. Please check and try again.');
+          toast.error('Nieprawidłowy kod', 'Sprawdź kod i spróbuj ponownie');
         },
       }
     );

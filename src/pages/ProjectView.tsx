@@ -15,11 +15,12 @@ import { useTrips } from '@/api/hooks/use-trips';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
 import { LocationProposalCard } from '@/components/projects/LocationProposalCard';
 import type { ChatMessage, Location } from '@/types';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-custom-toast';
 
 export default function ProjectView() {
   const { projectId, sessionId } = useParams<{ projectId?: string; sessionId?: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
@@ -158,15 +159,15 @@ export default function ProjectView() {
 
   const handleError = useCallback((error: string) => {
     console.error('Brainstorm error:', error);
-    toast.error(error);
+    toast.error('Błąd połączenia', error);
     setIsSending(false);
-  }, []);
+  }, [toast]);
 
   const handleLocations = useCallback((locations: LocationProposal[]) => {
     console.log('Received location proposals:', locations);
     setLocationProposals(locations);
-    toast.success(`${locations.length} destination${locations.length > 1 ? 's' : ''} proposed!`);
-  }, []);
+    toast.success('Nowe propozycje!', `${locations.length} destynacj${locations.length > 1 ? 'i' : 'a'} do sprawdzenia`);
+  }, [toast]);
 
   const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
     sessionId: isBrainstorm ? actualId : null,
@@ -213,7 +214,7 @@ export default function ProjectView() {
           },
           {
             onSuccess: (response) => {
-              toast.success(`🎉 Trip to ${location.name} created!`);
+              toast.success('Podróż utworzona!', `🎉 Przechodzisz do ${location.name}`);
               console.log('Created recommendation:', response.recommendation_id);
               
               // Navigate to trip view with the recommendation ID
@@ -221,7 +222,7 @@ export default function ProjectView() {
             },
             onError: (error) => {
               console.error('Error creating recommendation:', error);
-              toast.error('Failed to create trip. Please try again.');
+              toast.error('Błąd tworzenia podróży', 'Spróbuj ponownie za chwilę');
             },
           }
         );
@@ -231,7 +232,7 @@ export default function ProjectView() {
         setShowCreateTripModal(true);
       }
     }
-  }, [locationProposals, actualId, isBrainstorm, createRecommendationMutation, navigate]);
+  }, [locationProposals, actualId, isBrainstorm, createRecommendationMutation, navigate, toast]);
 
   const handleQuickReply = (payload: unknown) => {
     if (typeof payload === 'string') {
@@ -252,12 +253,12 @@ export default function ProjectView() {
             },
             {
               onSuccess: (response) => {
-                toast.success(`🎉 Trip to ${location.name} created!`);
+                toast.success('Podróż utworzona!', `🎉 Przechodzisz do ${location.name}`);
                 navigate(`/app/trips/${response.recommendation_id}`);
               },
               onError: (error) => {
                 console.error('Error creating recommendation:', error);
-                toast.error('Failed to create trip. Please try again.');
+                toast.error('Błąd tworzenia podróży', 'Spróbuj ponownie za chwilę');
               },
             }
           );
@@ -284,10 +285,10 @@ export default function ProjectView() {
       setSelectedLocation(null);
       navigate(`/app/trips/${result.tripId}`);
       
-      toast.success('Podróż została utworzona!');
+      toast.success('Podróż utworzona!', 'Przechodzisz do nowej podróży');
     } catch (error) {
       console.error('Error creating trip:', error);
-      toast.error('Nie udało się utworzyć podróży');
+      toast.error('Błąd tworzenia podróży', 'Spróbuj ponownie za chwilę');
     }
   };
 
@@ -298,7 +299,7 @@ export default function ProjectView() {
 
   const handleSendMessage = async (text: string) => {
     if (!actualId) {
-      toast.error('No session ID');
+      toast.error('Błąd sesji', 'Brak identyfikatora sesji');
       return;
     }
 
@@ -332,7 +333,7 @@ export default function ProjectView() {
           },
           onError: (error) => {
             console.error('Error sending project message:', error);
-            toast.error('Failed to send message');
+            toast.error('Błąd wysyłania', 'Nie udało się wysłać wiadomości');
             setIsSending(false);
           },
         }
@@ -393,11 +394,11 @@ export default function ProjectView() {
       // For now, we'll just update the UI optimistically
       setIsEditing(false);
       setEditedTitle('');
-      toast.success('Project name updated successfully!');
+      toast.success('Nazwa zaktualizowana!', 'Projekt został zapisany');
       
     } catch (error) {
       console.error('Error saving project name:', error);
-      toast.error('Failed to save project name');
+      toast.error('Błąd zapisywania', 'Nie udało się zapisać nazwy');
     } finally {
       setIsSaving(false);
     }
