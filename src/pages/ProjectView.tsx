@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, Sparkles, Edit2, Check, X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
+import { CreateTripModal } from '@/components/projects/CreateTripModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -32,6 +33,10 @@ export default function ProjectView() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Trip creation modal state
+  const [showCreateTripModal, setShowCreateTripModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   // Use sessionId for brainstorm routes, projectId for project routes
   const actualId = sessionId || projectId;
@@ -192,11 +197,12 @@ export default function ProjectView() {
 
     console.log(`Location ${locationId} decision: ${decision}`);
 
-    // If rated with stars, create recommendation and navigate to trip view
-    if (decision !== 'reject' && isBrainstorm) {
+    // If rated with stars, handle based on session type
+    if (decision !== 'reject') {
       const location = locationProposals.find(l => l.id === locationId);
-      if (location) {
-        // Create recommendation from this location
+      
+      if (isBrainstorm && location) {
+        // For brainstorm sessions, create recommendation and navigate to trip view
         createRecommendationMutation.mutate(
           {
             sessionId: actualId,
@@ -219,46 +225,75 @@ export default function ProjectView() {
             },
           }
         );
-      }
-    } else if (decision !== 'reject') {
-      // For non-brainstorm sessions, just send a follow-up message
-      const location = locationProposals.find(l => l.id === locationId);
-      if (location) {
-        const message = `Great! You've shown interest in ${location.name}. ${
-          decision === 3 
-            ? "I can tell you're really excited about it! 🌟" 
-            : decision === 2
-            ? "Nice choice! 👍"
-            : "Interesting option! ✨"
-        } Tell me more about what you'd like to do there, and I'll help you plan the details.`;
-        
-        setTimeout(() => {
-          sendWSMessage(message);
-        }, 500);
+      } else if (location) {
+        // For project sessions, show trip creation modal
+        setSelectedLocation(location);
+        setShowCreateTripModal(true);
       }
     }
-  }, [locationProposals, sendWSMessage, actualId, isBrainstorm, createRecommendationMutation, navigate]);
+  }, [locationProposals, actualId, isBrainstorm, createRecommendationMutation, navigate]);
 
   const handleQuickReply = (payload: unknown) => {
     if (typeof payload === 'string') {
-      // Create trip from location ID
-      handleCreateTrip(payload);
+      // Find location by ID in location proposals or messages
+      const location = locationProposals.find(l => l.id === payload) || 
+                     messages.find(msg => msg.locationProposal?.id === payload)?.locationProposal;
+      
+      if (location) {
+        if (isBrainstorm) {
+          // For brainstorm sessions, create recommendation directly
+          createRecommendationMutation.mutate(
+            {
+              sessionId: actualId!,
+              locationData: {
+                ...location,
+                rating: 3, // Default to 3 stars for quick reply
+              },
+            },
+            {
+              onSuccess: (response) => {
+                toast.success(`🎉 Trip to ${location.name} created!`);
+                navigate(`/app/trips/${response.recommendation_id}`);
+              },
+              onError: (error) => {
+                console.error('Error creating recommendation:', error);
+                toast.error('Failed to create trip. Please try again.');
+              },
+            }
+          );
+        } else {
+          // For project sessions, show modal
+          setSelectedLocation(location);
+          setShowCreateTripModal(true);
+        }
+      }
     }
   };
 
-  const handleCreateTrip = async (locationId: string) => {
-    if (!actualId || createTripMutation.isPending) return;
+  const handleCreateTrip = async (tripData: { title: string; startDate?: string; endDate?: string }) => {
+    if (!actualId || !selectedLocation || createTripMutation.isPending) return;
 
     try {
       const result = await createTripMutation.mutateAsync({
         projectId: actualId,
-        selectedLocationId: locationId,
+        selectedLocationId: selectedLocation.id,
       });
 
+      // Close modal and navigate to trip
+      setShowCreateTripModal(false);
+      setSelectedLocation(null);
       navigate(`/app/trips/${result.tripId}`);
+      
+      toast.success('Podróż została utworzona!');
     } catch (error) {
       console.error('Error creating trip:', error);
+      toast.error('Nie udało się utworzyć podróży');
     }
+  };
+
+  const handleCloseCreateTripModal = () => {
+    setShowCreateTripModal(false);
+    setSelectedLocation(null);
   };
 
   const handleSendMessage = async (text: string) => {
@@ -538,6 +573,17 @@ export default function ProjectView() {
           </div>
         </div>
       </div>
+
+      {/* Create Trip Modal */}
+      {selectedLocation && (
+        <CreateTripModal
+          isOpen={showCreateTripModal}
+          onClose={handleCloseCreateTripModal}
+          location={selectedLocation}
+          onCreateTrip={handleCreateTrip}
+          isLoading={createTripMutation.isPending}
+        />
+      )}
     </AppShell>
   );
 }

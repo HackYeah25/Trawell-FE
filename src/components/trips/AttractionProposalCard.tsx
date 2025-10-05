@@ -25,33 +25,42 @@ export function AttractionProposalCard({ attraction, onDecision }: AttractionPro
       )}
     >
       {/* Image */}
-      {attraction.imageUrl && (
-        <div className={cn(
-          "relative h-32 sm:h-40 lg:h-48 overflow-hidden",
-          isRejected && "after:absolute after:inset-0 after:bg-muted/60 after:content-['']"
-        )}>
+      <div className={cn(
+        "relative h-32 sm:h-40 lg:h-48 overflow-hidden",
+        isRejected && "after:absolute after:inset-0 after:bg-muted/60 after:content-['']"
+      )}>
+        {attraction.imageUrl ? (
           <img
             src={attraction.imageUrl}
             alt={attraction.title}
             className="w-full h-full object-cover"
           />
-          {isRated && attraction.rating && (
-            <Badge className="absolute top-3 right-3 bg-warm-turquoise text-white shadow-lg text-sm px-3 py-1.5 font-semibold z-10">
-              {'★'.repeat(attraction.rating)}{'☆'.repeat(3 - attraction.rating)}
-            </Badge>
-          )}
-          {isRejected && (
-            <Badge className="absolute top-3 right-3 bg-muted/90 text-muted-foreground shadow-lg text-sm px-3 py-1.5 font-semibold z-10 border-2 border-border">
-              ✕ Odrzucono
-            </Badge>
-          )}
-          {attraction.category && !isRejected && !isRated && (
-            <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur shadow-md">
-              {attraction.category}
-            </Badge>
-          )}
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-warm-coral/20 to-warm-turquoise/20 flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-sunset flex items-center justify-center">
+                <span className="text-white text-xl">🎯</span>
+              </div>
+              <p className="text-sm font-medium">Brak zdjęcia</p>
+            </div>
+          </div>
+        )}
+        {isRated && attraction.rating && (
+          <Badge className="absolute top-3 right-3 bg-warm-turquoise text-white shadow-lg text-sm px-3 py-1.5 font-semibold z-10">
+            {'★'.repeat(attraction.rating)}{'☆'.repeat(3 - attraction.rating)}
+          </Badge>
+        )}
+        {isRejected && (
+          <Badge className="absolute top-3 right-3 bg-muted/90 text-muted-foreground shadow-lg text-sm px-3 py-1.5 font-semibold z-10 border-2 border-border">
+            ✕ Odrzucono
+          </Badge>
+        )}
+        {attraction.category && !isRejected && !isRated && (
+          <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur shadow-md">
+            {attraction.category}
+          </Badge>
+        )}
+      </div>
 
       {/* Content */}
       <div className={cn(
