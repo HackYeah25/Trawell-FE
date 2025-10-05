@@ -15,6 +15,18 @@ interface AdventureTripsProps {
   onToggle: () => void;
 }
 
+interface MappedTrip {
+  id: string;
+  title: string;
+  locationName: string;
+  imageUrl?: string;
+  createdAt: string;
+  rating?: number;
+  status: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export function AdventureTrips({ 
   adventureId, 
   adventureType, 
@@ -30,21 +42,52 @@ export function AdventureTrips({
   );
 
   // Map brainstorm trips to consistent format
-  const mappedBrainstormTrips = brainstormTrips?.map((trip: any) => ({
-    id: trip.recommendation_id,
-    title: trip.destination?.name || trip.destination?.city || 'Trip',
-    locationName: trip.destination?.city || trip.destination?.name || 'Unknown',
-    imageUrl: trip.destination?.imageUrl || trip.url,
-    createdAt: trip.created_at,
-    rating: trip.destination?.rating,
-    status: trip.status,
-  })) || [];
+  const mappedBrainstormTrips: MappedTrip[] = brainstormTrips?.map((trip: unknown) => {
+    // Type guard to ensure trip is an object
+    if (!trip || typeof trip !== 'object') {
+      return {
+        id: 'invalid-trip',
+        title: 'Invalid Trip Data',
+        locationName: 'Unknown',
+        imageUrl: undefined,
+        createdAt: new Date().toISOString(),
+        rating: undefined,
+        status: 'pending',
+      };
+    }
+    
+    const tripObj = trip as Record<string, unknown>;
+    const destination = (tripObj.destination as Record<string, unknown>) || {};
+    const title = (destination.name as string) || (destination.city as string) || (tripObj.title as string) || 'Trip';
+    const locationName = (destination.city as string) || (destination.name as string) || (tripObj.locationName as string) || 'Unknown';
+    const imageUrl = (destination.imageUrl as string) || (tripObj.url as string) || (tripObj.imageUrl as string);
+    const createdAt = (tripObj.created_at as string) || (tripObj.createdAt as string) || new Date().toISOString();
+    const rating = (destination.rating as number) || (tripObj.rating as number);
+    const status = (tripObj.status as string) || 'pending';
+    
+    return {
+      id: (tripObj.recommendation_id as string) || (tripObj.id as string) || 'unknown-id',
+      title,
+      locationName,
+      imageUrl,
+      createdAt,
+      rating,
+      status,
+    };
+  }) || [];
 
-  const trips = adventureType === 'project' ? projectTrips : mappedBrainstormTrips;
+  const trips: MappedTrip[] = adventureType === 'project' ? (projectTrips as MappedTrip[]) : mappedBrainstormTrips;
   const isLoading = adventureType === 'project' ? projectTripsLoading : brainstormTripsLoading;
   const tripCount = trips?.length || 0;
 
-  const handleTripClick = (trip: any) => {
+  // Debug logs
+  console.log('AdventureTrips - adventureType:', adventureType);
+  console.log('AdventureTrips - projectTrips:', projectTrips);
+  console.log('AdventureTrips - brainstormTrips:', brainstormTrips);
+  console.log('AdventureTrips - mappedBrainstormTrips:', mappedBrainstormTrips);
+  console.log('AdventureTrips - trips:', trips);
+
+  const handleTripClick = (trip: MappedTrip) => {
     if (trip.id) {
       navigate(`/app/trips/${trip.id}`);
     }
@@ -107,73 +150,92 @@ export function AdventureTrips({
             </Button>
           </div>
           <div className="space-y-2">
-            {trips?.map((trip: any, index: number) => (
-              <Card
-                key={trip.id}
-                className="group p-4 border-warm-coral/15 bg-gradient-to-r from-warm-coral/3 to-warm-turquoise/3 hover:from-warm-coral/8 hover:to-warm-turquoise/8 hover:border-warm-coral/25 transition-all duration-200 cursor-pointer hover:shadow-sm"
-                onClick={() => handleTripClick(trip)}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Trip image or icon */}
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-warm group-hover:scale-105 transition-transform overflow-hidden">
-                    {trip.imageUrl ? (
-                      <img
-                        src={trip.imageUrl}
-                        alt={trip.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-sunset flex items-center justify-center">
+            {trips?.map((trip: MappedTrip, index: number) => {
+              // Validate trip data and provide fallbacks
+              if (!trip || typeof trip !== 'object') {
+                console.warn('Invalid trip data:', trip);
+                return null;
+              }
+
+              const tripTitle = trip.title || 'Untitled Trip';
+              const tripLocation = trip.locationName || 'Unknown Location';
+              const tripImageUrl = trip.imageUrl;
+              const tripCreatedAt = trip.createdAt || new Date().toISOString();
+              const tripRating = trip.rating;
+              const tripStatus = trip.status || 'pending';
+
+              return (
+                <Card
+                  key={trip.id || `trip-${index}`}
+                  className="group p-4 border-warm-coral/15 bg-gradient-to-r from-warm-coral/3 to-warm-turquoise/3 hover:from-warm-coral/8 hover:to-warm-turquoise/8 hover:border-warm-coral/25 transition-all duration-200 cursor-pointer hover:shadow-sm"
+                  onClick={() => handleTripClick(trip)}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Trip image or icon */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-warm group-hover:scale-105 transition-transform overflow-hidden">
+                      {tripImageUrl ? (
+                        <img
+                          src={tripImageUrl}
+                          alt={tripTitle}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to icon if image fails to load
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-full h-full bg-gradient-sunset flex items-center justify-center ${tripImageUrl ? 'hidden' : ''}`}>
                         <Plane className="w-6 h-6 text-white" />
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Trip details */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm truncate mb-1">
-                      {trip.title}
-                    </h4>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                    </div>
+                    
+                    {/* Trip details */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm truncate mb-1">
+                        {tripTitle}
+                      </h4>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
                         <span>
                           {trip.startDate ? 
                             new Date(trip.startDate).toLocaleDateString() : 
-                            new Date(trip.createdAt).toLocaleDateString()
+                            new Date(tripCreatedAt).toLocaleDateString()
                           }
                         </span>
-                      </div>
-                      {trip.rating && (
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span>{trip.rating}</span>
                         </div>
+                        {tripRating && (
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span>{tripRating}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status badges */}
+                    <div className="flex-shrink-0 flex flex-col gap-1">
+                      {tripStatus === 'active' && (
+                        <Badge variant="secondary" className="text-xs w-fit">
+                          Active
+                        </Badge>
+                      )}
+                      {trip.startDate && trip.endDate && (
+                        <Badge variant="outline" className="text-xs w-fit border-warm-coral/30 text-warm-coral">
+                          Planned
+                        </Badge>
+                      )}
+                      {!tripStatus && !trip.startDate && (
+                        <Badge variant="outline" className="text-xs w-fit border-warm-turquoise/30 text-warm-turquoise">
+                          Idea
+                        </Badge>
                       )}
                     </div>
                   </div>
-
-                  {/* Status badges */}
-                  <div className="flex-shrink-0 flex flex-col gap-1">
-                    {trip.status === 'active' && (
-                      <Badge variant="secondary" className="text-xs w-fit">
-                        Active
-                      </Badge>
-                    )}
-                    {trip.startDate && trip.endDate && (
-                      <Badge variant="outline" className="text-xs w-fit border-warm-coral/30 text-warm-coral">
-                        Planned
-                      </Badge>
-                    )}
-                    {!trip.status && !trip.startDate && (
-                      <Badge variant="outline" className="text-xs w-fit border-warm-turquoise/30 text-warm-turquoise">
-                        Idea
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}

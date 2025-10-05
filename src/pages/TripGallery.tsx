@@ -62,10 +62,6 @@ export default function TripGallery() {
   const { data: trips, isLoading: tripsLoading } = useTrips();
   const { data: recommendations, isLoading: recommendationsLoading } = useAllRecommendations();
   
-  // Debug logging
-  console.log('Trips data:', trips);
-  console.log('Recommendations data:', recommendations);
-  
   // Combine trips and recommendations
   const allTrips = [
     ...(trips || []).map(trip => ({
@@ -87,6 +83,21 @@ export default function TripGallery() {
       rating: rec.destination?.rating,
     })),
   ];
+
+  // Debug logging
+  console.log('Trips data:', trips);
+  console.log('Recommendations data:', recommendations);
+  console.log('All trips combined:', allTrips);
+  
+  // Debug image URLs specifically
+  allTrips.forEach((trip, index) => {
+    console.log(`Trip ${index}:`, {
+      id: trip.id,
+      title: trip.title,
+      imageUrl: trip.imageUrl,
+      type: trip.type
+    });
+  });
 
   const filteredTrips = allTrips.filter(trip =>
     trip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -260,12 +271,20 @@ export default function TripGallery() {
                             src={trip.imageUrl}
                             alt={trip.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              console.warn('Failed to load image:', trip.imageUrl, 'for trip:', trip.title);
+                              // Hide the image and show fallback
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                            onLoad={() => {
+                              console.log('Successfully loaded image:', trip.imageUrl, 'for trip:', trip.title);
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-warm-coral/20 to-warm-turquoise/20 flex items-center justify-center">
-                            <MapPin className="w-12 h-12 text-warm-coral" />
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`w-full h-full bg-gradient-to-br from-warm-coral/20 to-warm-turquoise/20 flex items-center justify-center ${trip.imageUrl ? 'hidden' : ''}`}>
+                          <MapPin className="w-12 h-12 text-warm-coral" />
+                        </div>
                         
                         {/* Overlay */}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
@@ -311,10 +330,18 @@ export default function TripGallery() {
                             src={trip.imageUrl}
                             alt={trip.title}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.warn('Failed to load image in list view:', trip.imageUrl, 'for trip:', trip.title);
+                              // Hide the image and show fallback
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                            onLoad={() => {
+                              console.log('Successfully loaded image in list view:', trip.imageUrl, 'for trip:', trip.title);
+                            }}
                           />
-                        ) : (
-                          <MapPin className="w-8 h-8 text-warm-coral" />
-                        )}
+                        ) : null}
+                        <MapPin className={`w-8 h-8 text-warm-coral ${trip.imageUrl ? 'hidden' : ''}`} />
                       </div>
                       
                       <div className="flex-1 min-w-0">
