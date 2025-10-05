@@ -95,6 +95,15 @@ export const apiClient = {
       return response.json();
     }
 
+    // Brainstorm session recommendations
+    if (endpoint.match(/^\/brainstorm\/sessions\/[^/]+\/recommendations$/)) {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
     // Projects list
     if (endpoint === '/projects') {
       return mockFetch(mockProjects as T);
@@ -264,6 +273,21 @@ export const apiClient = {
 
     // Create brainstorm session - use real backend
     if (endpoint === '/brainstorm/sessions') {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new ApiError(`HTTP ${response.status}`, response.status);
+      }
+      return response.json();
+    }
+
+    // Create recommendation from brainstorm session - use real backend
+    if (endpoint.match(/^\/brainstorm\/sessions\/[^/]+\/recommendations$/)) {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {

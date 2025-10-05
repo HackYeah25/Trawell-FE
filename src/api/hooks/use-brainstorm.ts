@@ -87,6 +87,45 @@ export function useDeleteBrainstormSession() {
   });
 }
 
+// Create recommendation (trip) from location proposal
+export function useCreateRecommendation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ sessionId, locationData }: {
+      sessionId: string;
+      locationData: LocationProposal & { rating: 1 | 2 | 3 };
+    }) => {
+      return await apiClient.post<{
+        recommendation_id: string;
+        destination: any;
+        status: string;
+        message: string;
+      }>(`/brainstorm/sessions/${sessionId}/recommendations`, locationData);
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate session recommendations
+      queryClient.invalidateQueries({ 
+        queryKey: ['brainstorm', 'sessions', variables.sessionId, 'recommendations'] 
+      });
+    },
+  });
+}
+
+// Get recommendations for a brainstorm session
+export function useSessionRecommendations(sessionId: string | null) {
+  return useQuery({
+    queryKey: ['brainstorm', 'sessions', sessionId, 'recommendations'],
+    queryFn: async () => {
+      if (!sessionId) return { recommendations: [] };
+      return await apiClient.get<{ recommendations: any[] }>(
+        `/brainstorm/sessions/${sessionId}/recommendations`
+      );
+    },
+    enabled: !!sessionId,
+  });
+}
+
 // WebSocket message types
 export interface BrainstormWSMessage {
   type: 'message' | 'token' | 'thinking' | 'complete' | 'error' | 'locations';

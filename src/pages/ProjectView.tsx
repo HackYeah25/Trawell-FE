@@ -7,13 +7,9 @@ import { ChatThread } from '@/components/chat/ChatThread';
 import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-<<<<<<< HEAD
-import { useBrainstormSession, useBrainstormWebSocket } from '@/api/hooks/use-brainstorm';
+
 import { useProject, useProjectMessages, useProjectLocationSuggestions, useCreateTripFromLocation, useSendProjectMessage } from '@/api/hooks/use-projects';
-=======
-import { useBrainstormSession, useBrainstormWebSocket, type LocationProposal } from '@/api/hooks/use-brainstorm';
-import { useProjectLocationSuggestions, useCreateTripFromLocation } from '@/api/hooks/use-projects';
->>>>>>> 31e5b9a (now only me and god knows what is happening soon it will be god only)
+import { useBrainstormSession, useBrainstormWebSocket, useCreateRecommendation, type LocationProposal } from '@/api/hooks/use-brainstorm';
 import { useTrips } from '@/api/hooks/use-trips';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
 import { LocationProposalCard } from '@/components/projects/LocationProposalCard';
@@ -56,6 +52,7 @@ export default function ProjectView() {
   const { data: trips } = useTrips();
   const createTripMutation = useCreateTripFromLocation();
   const sendProjectMessageMutation = useSendProjectMessage();
+  const createRecommendationMutation = useCreateRecommendation();
 
   // Pagination for chat messages
   const {
@@ -177,7 +174,7 @@ export default function ProjectView() {
   });
 
   const handleLocationProposalDecision = useCallback((decision: 'reject' | 1 | 2 | 3, locationId?: string) => {
-    if (!locationId) return;
+    if (!locationId || !actualId) return;
     
     // Update location proposal status
     setLocationProposals((prev) =>
@@ -195,8 +192,36 @@ export default function ProjectView() {
 
     console.log(`Location ${locationId} decision: ${decision}`);
 
-    // If rated with stars, send message about planning
-    if (decision !== 'reject') {
+    // If rated with stars, create recommendation and navigate to trip view
+    if (decision !== 'reject' && isBrainstorm) {
+      const location = locationProposals.find(l => l.id === locationId);
+      if (location) {
+        // Create recommendation from this location
+        createRecommendationMutation.mutate(
+          {
+            sessionId: actualId,
+            locationData: {
+              ...location,
+              rating: decision,
+            },
+          },
+          {
+            onSuccess: (response) => {
+              toast.success(`🎉 Trip to ${location.name} created!`);
+              console.log('Created recommendation:', response.recommendation_id);
+              
+              // Navigate to trip view with the recommendation ID
+              navigate(`/app/trips/${response.recommendation_id}`);
+            },
+            onError: (error) => {
+              console.error('Error creating recommendation:', error);
+              toast.error('Failed to create trip. Please try again.');
+            },
+          }
+        );
+      }
+    } else if (decision !== 'reject') {
+      // For non-brainstorm sessions, just send a follow-up message
       const location = locationProposals.find(l => l.id === locationId);
       if (location) {
         const message = `Great! You've shown interest in ${location.name}. ${
@@ -207,13 +232,12 @@ export default function ProjectView() {
             : "Interesting option! ✨"
         } Tell me more about what you'd like to do there, and I'll help you plan the details.`;
         
-        // Send follow-up message via WebSocket
         setTimeout(() => {
           sendWSMessage(message);
         }, 500);
       }
     }
-  }, [locationProposals, sendWSMessage]);
+  }, [locationProposals, sendWSMessage, actualId, isBrainstorm, createRecommendationMutation, navigate]);
 
   const handleQuickReply = (payload: unknown) => {
     if (typeof payload === 'string') {
