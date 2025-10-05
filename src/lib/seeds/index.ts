@@ -8,6 +8,7 @@ import alpineConversation from './conversations/project-alpine-2025.json';
 import japanConversation from './conversations/project-japan-dream.json';
 import krakowConversation from './conversations/project-krakow-iguana.json';
 import tokyoConversation from './conversations/trip-tokyo.json';
+import krakowTripConversation from './conversations/trip-krakow-iguana.json';
 
 // Type definitions for seed data
 export interface SeedUser extends User {
@@ -43,10 +44,66 @@ export const seedConversations: Record<string, ChatMessage[]> = {
 // Trip conversations
 export const seedTripConversations: Record<string, ChatMessage[]> = {
   'trip-tokyo-001': tokyoConversation as ChatMessage[],
+  'trip-iguana-bcn': krakowTripConversation as ChatMessage[],
 };
 
 // Attractions for trips
 export const seedAttractions: Record<string, Attraction[]> = {
+  'trip-iguana-bcn': [
+    {
+      id: 'attr-krakow-001',
+      title: 'Wawel Castle & Cathedral',
+      description: 'Najważniejszy zamek w Polsce z katedrą i smoczą jamą. Absolutna podstawa wizyty w Krakowie.',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'History',
+      rating: 3,
+      status: 'rated'
+    },
+    {
+      id: 'attr-krakow-002',
+      title: 'Rynek Główny & Sukiennice',
+      description: 'Największy średniowieczny rynek w Europie z charakterystycznymi Sukiennicami.',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'History',
+      rating: 3,
+      status: 'rated'
+    },
+    {
+      id: 'attr-krakow-003',
+      title: 'Kazimierz District',
+      description: 'Historyczna dzielnica żydowska z klimatycznymi kafelkami, street art i świetną kuchnią.',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'Culture',
+      rating: 3,
+      status: 'rated'
+    },
+    {
+      id: 'attr-krakow-004',
+      title: 'Schindler\'s Factory',
+      description: 'Muzeum w dawnej fabryce Oskara Schindlera - poruszająca historia II wojny światowej.',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'History',
+      rating: 2,
+      status: 'rated'
+    },
+    {
+      id: 'attr-krakow-005',
+      title: 'Planty Park',
+      description: 'Piękny park wokół Starego Miasta - idealny na relaksujący spacer.',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'Nature',
+      rating: 2,
+      status: 'rated'
+    },
+    {
+      id: 'attr-krakow-006',
+      title: 'Plac Nowy - Zapiekanki',
+      description: 'Słynne zapiekanki na Placu Nowym - must-have dla każdego foodie!',
+      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      category: 'Food',
+      status: 'pending'
+    }
+  ],
   'trip-tokyo-001': [
     {
       id: 'attr-tokyo-001',

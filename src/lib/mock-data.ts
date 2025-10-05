@@ -290,7 +290,7 @@ export const iguanaSharedProject: Project = {
   createdAt: new Date('2025-01-08').toISOString(),
   lastMessagePreview: 'Group planning for Barcelona adventure',
   isShared: true,
-  shareCode: 'IGUANA',
+  shareCode: 'iguana',
   ownerId: 'user-sarah-456',
 };
 

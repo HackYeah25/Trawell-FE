@@ -72,22 +72,23 @@ export const ChatMessage = memo(function ChatMessage({
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const isOtherUser = isUser && message.userName; // Message from another user in group chat
+  const isCurrentUser = isUser && !message.userName; // Message from current user
 
   return (
     <div
       className={cn(
         'flex mb-6',
-        isUser && !isOtherUser ? 'justify-end' : 'justify-start'
+        isCurrentUser ? 'justify-end' : 'justify-start'
       )}
       role="article"
       aria-label={`${message.role} message`}
     >
-      <div 
-        className={cn(
-          'flex flex-col gap-1 w-full',
-          isUser && !isOtherUser ? 'items-end max-w-[85%] sm:max-w-xl md:max-w-2xl' : 'max-w-[85%] sm:max-w-xl md:max-w-2xl'
-        )}
-      >
+        <div 
+          className={cn(
+            'flex flex-col gap-1 w-full',
+            isCurrentUser ? 'items-end max-w-[85%] sm:max-w-xl md:max-w-2xl' : 'max-w-[85%] sm:max-w-xl md:max-w-2xl'
+          )}
+        >
         {/* Avatar + Username ABOVE bubble for other users */}
         {isOtherUser && (
           <div className="flex items-center gap-2 ml-1">
@@ -110,7 +111,7 @@ export const ChatMessage = memo(function ChatMessage({
         <div 
           className={cn(
             'flex gap-3 w-full',
-            isUser && !isOtherUser && 'flex-row-reverse'
+            isCurrentUser && 'flex-row-reverse'
           )}
         >
           {/* Avatar for current user and assistant */}
@@ -139,8 +140,10 @@ export const ChatMessage = memo(function ChatMessage({
             <div
               className={cn(
                 'rounded-2xl px-4 py-3 shadow-sm',
-                isUser && !isOtherUser
+                isCurrentUser
                   ? 'bg-gradient-sunset text-white shadow-warm'
+                  : isOtherUser
+                  ? 'bg-white text-foreground border border-warm-coral/20 shadow-sm'
                   : 'bg-card text-card-foreground border border-warm-coral/20'
               )}
               data-is-typing={isTyping ? 'true' : 'false'}

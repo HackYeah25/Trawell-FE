@@ -25,6 +25,7 @@ import {
   iguanaTrip,
   iguanaLocation,
 } from './mock-data';
+import { getSeedConversation, getSeedTripConversation, getSeedAttractions } from './seeds';
 
 // Simulate network delay
 async function mockDelay(ms: number = 300): Promise<void> {
@@ -441,132 +442,23 @@ export const apiClient = {
         return { projectId: specialSharedProject.id } as T;
       }
 
-      // Check for IGUANA shared project code
-      if (body.shareCode.toUpperCase() === 'IGUANA') {
+      // Check for iguana shared project code
+      if (body.shareCode.toLowerCase() === 'iguana') {
         const existingProject = mockProjects.find(p => p.id === iguanaSharedProject.id);
         if (!existingProject) {
           mockProjects.push({ ...iguanaSharedProject });
           mockTrips.push({ ...iguanaTrip });
           
-          // Add project messages
-          mockProjectMessages[iguanaSharedProject.id] = [
-            {
-              id: 'iguana-proj-msg-1',
-              role: 'assistant',
-              markdown: '🌟 Welcome to **Barcelona Group Trip 2025**!\n\nThis is a collaborative project for planning an amazing group trip to Barcelona!',
-              createdAt: new Date('2025-01-08T10:00:00').toISOString(),
-            },
-            {
-              id: 'iguana-proj-msg-2',
-              role: 'user',
-              markdown: 'I\'d love to visit Park Güell and the Sagrada Familia! - Sarah',
-              createdAt: new Date('2025-01-08T10:15:00').toISOString(),
-            },
-            {
-              id: 'iguana-proj-msg-3',
-              role: 'user',
-              markdown: 'Definitely! And we should check out the Gothic Quarter. - Mark',
-              createdAt: new Date('2025-01-08T10:20:00').toISOString(),
-            },
-            {
-              id: 'iguana-proj-msg-4',
-              role: 'assistant',
-              markdown: 'Great suggestions! I\'ve prepared some fantastic attractions for your Barcelona adventure. Let me show you what I found!',
-              createdAt: new Date('2025-01-08T10:25:00').toISOString(),
-            },
-          ];
+          // Add project messages from seed data
+          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('proj-krakow-iguana');
           
-          // Multi-user conversation
-          mockTripMessages[iguanaTrip.id] = [
-            {
-              id: 'iguana-msg-1',
-              role: 'assistant',
-              markdown: '🌟 Welcome to **Barcelona Summer Adventure**!\n\nPlanning an amazing group trip to Barcelona!',
-              createdAt: new Date('2025-01-09T10:00:00').toISOString(),
-            },
-            {
-              id: 'iguana-msg-2',
-              role: 'user',
-              markdown: 'I\'d love to visit Park Güell and the Sagrada Familia! - Sarah',
-              createdAt: new Date('2025-01-09T10:15:00').toISOString(),
-            },
-            {
-              id: 'iguana-msg-3',
-              role: 'user',
-              markdown: 'Definitely! And we should check out the Gothic Quarter. - Mark',
-              createdAt: new Date('2025-01-09T10:20:00').toISOString(),
-            },
-            {
-              id: 'iguana-msg-4',
-              role: 'assistant',
-              markdown: 'Great suggestions! I\'ve prepared a list of attractions based on your preferences. Check the **Attractions** tab!',
-              createdAt: new Date('2025-01-09T10:25:00').toISOString(),
-            },
-            {
-              id: 'iguana-msg-5',
-              role: 'user',
-              markdown: 'Perfect! I\'ll review the beach options. - Emma',
-              createdAt: new Date('2025-01-09T11:00:00').toISOString(),
-            },
-          ];
+          // Multi-user conversation from seed data
+          mockTripMessages[iguanaTrip.id] = getSeedTripConversation('trip-iguana-bcn');
           
-          // Attractions for Barcelona trip
-          mockAttractions[iguanaTrip.id] = [
-            {
-              id: 'attr-bcn-1',
-              title: 'Sagrada Familia Tour',
-              description: 'Skip-the-line guided tour of Gaudí\'s masterpiece basilica',
-              category: 'Architecture',
-              imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80',
-              rating: 3,
-              status: 'rated',
-            },
-            {
-              id: 'attr-bcn-2',
-              title: 'Park Güell Visit',
-              description: 'Explore the colorful mosaic park with panoramic city views',
-              category: 'Parks',
-              imageUrl: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80',
-              rating: 3,
-              status: 'rated',
-            },
-            {
-              id: 'attr-bcn-3',
-              title: 'Gothic Quarter Walking Tour',
-              description: 'Discover medieval streets, hidden squares, and Roman ruins',
-              category: 'Culture',
-              imageUrl: 'https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=600&q=80',
-              rating: 2,
-              status: 'rated',
-            },
-            {
-              id: 'attr-bcn-4',
-              title: 'Barceloneta Beach Day',
-              description: 'Relax at the famous urban beach with beachside restaurants',
-              category: 'Beach',
-              imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80',
-              rating: 3,
-              status: 'rated',
-            },
-            {
-              id: 'attr-bcn-5',
-              title: 'Tapas Food Tour',
-              description: 'Taste authentic Catalan cuisine at local tapas bars',
-              category: 'Food',
-              imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80',
-              rating: 3,
-              status: 'rated',
-            },
-          ];
+          // Attractions for Krakow trip from seed data
+          mockAttractions[iguanaTrip.id] = getSeedAttractions('trip-iguana-bcn');
           
-          mockProjectMessages[iguanaSharedProject.id] = [
-            {
-              id: 'iguana-proj-msg-1',
-              role: 'assistant',
-              markdown: '👥 Welcome to the collaborative Barcelona project! Your trip is ready to explore.',
-              createdAt: new Date('2025-01-08').toISOString(),
-            },
-          ];
+          mockProjectMessages[iguanaSharedProject.id] = getSeedConversation('proj-krakow-iguana');
         }
         return { projectId: iguanaSharedProject.id } as T;
       }
