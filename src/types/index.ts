@@ -95,15 +95,68 @@ export interface Location {
 
 export interface Trip {
   id: ID;
-  projectId: ID;
-  locationId: ID;
+  projectId?: ID;
+  locationId?: ID;
   locationName: string;
   title: string;
+  destination?: string;
   createdAt: string;
   lastMessagePreview?: string;
   updatedAt?: string;
   startDate?: string; // Trip start date
   endDate?: string; // Trip end date
+  status?: string;
+  rating?: number;
+  // Images
+  imageUrl?: string; // Legacy field
+  url?: string; // Google Places photo URL
+  // Logistics data
+  flights?: {
+    outbound?: {
+      price: string;
+      currency: string;
+      itinerary: {
+        totalDuration: string;
+        segments: Array<{
+          from: string;
+          to: string;
+          departureAt: string;
+          arrivalAt: string;
+          duration: string;
+        }>;
+      };
+    };
+    return?: {
+      price: string;
+      currency: string;
+      itinerary: {
+        totalDuration: string;
+        segments: Array<{
+          from: string;
+          to: string;
+          departureAt: string;
+          arrivalAt: string;
+          duration: string;
+        }>;
+      };
+    };
+  };
+  hotels?: Array<{
+    name: string;
+    price: string;
+    currency: string;
+    checkInDate: string;
+    checkOutDate: string;
+  }>;
+  weather?: any; // Weather forecast data structure
+  // Trip details
+  optimal_season?: string;
+  estimated_budget?: number;
+  currency?: string;
+  highlights?: string[];
+  // Additional fields
+  dates?: any;
+  participants?: any[];
 }
 
 export interface Attraction {

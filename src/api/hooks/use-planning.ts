@@ -8,7 +8,7 @@ const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
 const TEST_USER_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
 export interface PlanningWSMessage {
-  type: 'message' | 'token' | 'thinking' | 'complete' | 'error' | 'trip_updated' | 'pong';
+  type: 'message' | 'token' | 'thinking' | 'complete' | 'error' | 'trip_updated' | 'photos' | 'pong';
   recommendation_id?: string;
   content?: string;
   token?: string;
@@ -17,6 +17,11 @@ export interface PlanningWSMessage {
     field: string;
     value: any;
     currency?: string;
+  }>;
+  photos?: Array<{
+    query: string;
+    caption: string;
+    url: string;
   }>;
 }
 
@@ -28,6 +33,7 @@ export interface UsePlanningWebSocketOptions {
   onComplete?: (content: string) => void;
   onError?: (error: string) => void;
   onTripUpdated?: (updates: any[]) => void;
+  onPhotos?: (photos: Array<{ query: string; caption: string; url: string }>) => void;
 }
 
 /**
@@ -42,6 +48,7 @@ export function usePlanningWebSocket(options: UsePlanningWebSocketOptions) {
     onComplete,
     onError,
     onTripUpdated,
+    onPhotos,
   } = options;
 
   const [isConnected, setIsConnected] = useState(false);
@@ -134,6 +141,13 @@ export function usePlanningWebSocket(options: UsePlanningWebSocketOptions) {
               console.log('🔄 Trip updated with structured data:', wsMessage.updates);
               if (wsMessage.updates && onTripUpdated) {
                 onTripUpdated(wsMessage.updates);
+              }
+              break;
+
+            case 'photos':
+              console.log('📸 Photos received:', wsMessage.photos);
+              if (wsMessage.photos && onPhotos) {
+                onPhotos(wsMessage.photos);
               }
               break;
 

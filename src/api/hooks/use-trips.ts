@@ -39,9 +39,19 @@ export function useTrip(tripId: string) {
           participants: [],
           createdAt: recommendation.created_at,
           updatedAt: recommendation.updated_at,
+          // Logistics data from new backend fields
+          url: recommendation.url,
+          imageUrl: recommendation.url, // Backwards compatibility
+          flights: recommendation.flights,
+          hotels: recommendation.hotels,
+          weather: recommendation.weather,
+          optimal_season: recommendation.optimal_season,
+          estimated_budget: recommendation.estimated_budget,
+          currency: recommendation.currency,
+          highlights: recommendation.highlights,
         } as Trip;
       } catch (error) {
-        // Fallback to regular trip endpoint
+        // Fallback to regular trip endpoint (already returns new fields)
         return apiClient.get<Trip>(`/trips/${tripId}`);
       }
     },

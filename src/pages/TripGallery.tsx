@@ -81,7 +81,7 @@ export default function TripGallery() {
       id: rec.recommendation_id,
       title: rec.destination?.name || rec.destination?.city || 'Trip',
       locationName: rec.destination?.city || rec.destination?.name || 'Unknown',
-      imageUrl: rec.destination?.imageUrl,
+      imageUrl: rec.url, // ✅ Use rec.url from Google Places API
       createdAt: rec.created_at,
       type: 'recommendation' as const,
       rating: rec.destination?.rating,

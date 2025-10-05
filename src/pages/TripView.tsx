@@ -32,6 +32,7 @@ export default function TripView() {
   const [editedTitle, setEditedTitle] = useState('');
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState<string>('');
   const [isAIResponding, setIsAIResponding] = useState(false);
+  const [currentPhotos, setCurrentPhotos] = useState<Array<{ query: string; caption: string; url: string }>>([]);
   const isMobile = useIsMobile();
 
   const { data: trip } = useTrip(tripId!);
@@ -85,6 +86,11 @@ export default function TripView() {
     // TODO: Update UI to reflect new trip data (budget, dates, etc.)
   }, []);
 
+  const handlePhotos = useCallback((photos: Array<{ query: string; caption: string; url: string }>) => {
+    console.log('📸 Photos received:', photos);
+    setCurrentPhotos(photos);
+  }, []);
+
   // Initialize Planning WebSocket
   const { isConnected, sendMessage: sendWSMessage } = usePlanningWebSocket({
     recommendationId: tripId || '',
@@ -94,6 +100,7 @@ export default function TripView() {
     onComplete: handlePlanningComplete,
     onError: handlePlanningError,
     onTripUpdated: handleTripUpdated,
+    onPhotos: handlePhotos,
   });
 
   // Pagination for chat messages
@@ -304,6 +311,27 @@ export default function TripView() {
                     onLoadMore={loadMore}
                     remainingCount={remainingCount}
                   />
+
+                  {/* Inline Photos */}
+                  {currentPhotos.length > 0 && !isAIResponding && (
+                    <div className="max-w-4xl mx-auto px-4 mt-4 space-y-3">
+                      {currentPhotos.map((photo, index) => (
+                        <div key={index} className="rounded-lg overflow-hidden shadow-lg border border-warm-coral/20">
+                          <img
+                            src={photo.url}
+                            alt={photo.caption}
+                            className="w-full h-64 object-cover"
+                            loading="lazy"
+                          />
+                          {photo.caption && (
+                            <div className="bg-card/95 backdrop-blur p-3 text-sm text-muted-foreground border-t border-warm-coral/10">
+                              📸 {photo.caption}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             }
