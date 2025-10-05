@@ -161,11 +161,6 @@ export default function History() {
                             </>
                           )}
                         </p>
-                        {project.lastMessagePreview && (
-                          <p className="text-xs text-muted-foreground mt-1 truncate">
-                            {project.lastMessagePreview}
-                          </p>
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -216,11 +211,6 @@ export default function History() {
                           <span className="mx-1">•</span>
                           {session.messageCount} {session.messageCount === 1 ? 'message' : 'messages'}
                         </p>
-                        {session.lastMessage && (
-                          <p className="text-xs text-muted-foreground mt-1 truncate">
-                            {session.lastMessage}
-                          </p>
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
