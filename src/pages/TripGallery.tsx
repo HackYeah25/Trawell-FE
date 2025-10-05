@@ -113,7 +113,24 @@ export default function TripGallery() {
           {/* Header Skeleton */}
           <div className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-warm-coral/20">
             <div className="max-w-6xl mx-auto p-4">
-              <div className="flex items-center justify-between gap-4">
+              {/* Mobile Layout Skeleton */}
+              <div className="flex flex-col gap-4 sm:hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="w-10 h-10 rounded-lg" />
+                    <Skeleton className="w-10 h-10 rounded-xl" />
+                    <div className="min-w-0 flex-1">
+                      <Skeleton className="h-6 w-32 mb-2" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-10 w-20" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+              </div>
+
+              {/* Desktop Layout Skeleton */}
+              <div className="hidden sm:flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <Skeleton className="w-10 h-10 rounded-lg" />
                   <Skeleton className="w-10 h-10 rounded-xl" />
@@ -145,7 +162,73 @@ export default function TripGallery() {
         {/* Header */}
         <div className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-warm-coral/20">
           <div className="max-w-6xl mx-auto p-4">
-            <div className="flex items-center justify-between gap-4">
+            {/* Mobile Layout - Stacked */}
+            <div className="flex flex-col gap-4 sm:hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate('/app')}
+                    className="flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-sunset flex items-center justify-center shadow-warm flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-xl font-pacifico bg-gradient-sunset bg-clip-text text-transparent truncate">
+                      Trip Gallery
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                      {filteredTrips.length} trip{filteredTrips.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* View Mode Toggle - Mobile */}
+                <div className="flex border border-warm-coral/20 rounded-lg overflow-hidden">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className={cn(
+                      "rounded-none border-0",
+                      viewMode === 'grid' 
+                        ? "bg-gradient-sunset text-white shadow-warm" 
+                        : "hover:bg-warm-coral/10"
+                    )}
+                  >
+                    <Grid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className={cn(
+                      "rounded-none border-0",
+                      viewMode === 'list' 
+                        ? "bg-gradient-sunset text-white shadow-warm" 
+                        : "hover:bg-warm-coral/10"
+                    )}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Search - Mobile */}
+              <Input
+                placeholder="Search trips..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border-warm-coral/20 focus:border-warm-coral/60"
+              />
+            </div>
+
+            {/* Desktop Layout - Horizontal */}
+            <div className="hidden sm:flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Button
                   variant="ghost"
@@ -347,10 +430,10 @@ export default function TripGallery() {
 
                       <Button
                         size="sm"
-                        className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0"
+                        className="bg-gradient-sunset hover:opacity-90 text-white shadow-warm border-0 flex-shrink-0"
                       >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View
+                        <Eye className="w-4 h-4 sm:mr-2" />
+                        <span className="hidden sm:inline">View</span>
                       </Button>
                     </>
                   )}
