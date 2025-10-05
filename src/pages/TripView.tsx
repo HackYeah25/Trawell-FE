@@ -233,8 +233,16 @@ export default function TripView() {
     <AppShell>
       <div className="h-screen flex flex-col">
         {/* Header - Fixed */}
-        <div className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60]">
-          <div className="max-w-4xl mx-auto">
+        <div 
+          className="flex-shrink-0 p-4 border-b border-warm-coral/20 bg-card/80 backdrop-blur-md sticky top-0 z-[60] relative"
+          style={{
+            backgroundImage: trip.imageUrl ? `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(${trip.imageUrl})` : undefined,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="max-w-4xl mx-auto relative z-10">
             <div className="flex items-center gap-3 mb-2">
               <Button
                 variant="ghost"

@@ -358,21 +358,21 @@ export const krakowLocationSuggestions: Location[] = [
     name: 'Wieliczka',
     country: 'Poland',
     teaser: 'Famous salt mine with underground chambers, chapels, and unique salt sculptures',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&q=80',
   },
   {
     id: 'loc-auschwitz',
     name: 'Oświęcim (Auschwitz)',
     country: 'Poland',
     teaser: 'Important historical site and memorial, UNESCO World Heritage',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&q=80',
   },
   {
     id: 'loc-zakopane',
     name: 'Zakopane',
     country: 'Poland',
     teaser: 'Mountain resort town in the Tatra Mountains, perfect for winter sports',
-    imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80',
   },
 ];
 

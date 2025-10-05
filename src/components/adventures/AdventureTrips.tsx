@@ -29,14 +29,24 @@ export function AdventureTrips({
     adventureType === 'brainstorm' ? adventureId : ''
   );
 
-  const trips = adventureType === 'project' ? projectTrips : brainstormTrips;
+  // Map brainstorm trips to consistent format
+  const mappedBrainstormTrips = brainstormTrips?.map((trip: any) => ({
+    id: trip.recommendation_id,
+    title: trip.destination?.name || trip.destination?.city || 'Trip',
+    locationName: trip.destination?.city || trip.destination?.name || 'Unknown',
+    imageUrl: trip.destination?.imageUrl || trip.url,
+    createdAt: trip.created_at,
+    rating: trip.destination?.rating,
+    status: trip.status,
+  })) || [];
+
+  const trips = adventureType === 'project' ? projectTrips : mappedBrainstormTrips;
   const isLoading = adventureType === 'project' ? projectTripsLoading : brainstormTripsLoading;
   const tripCount = trips?.length || 0;
 
   const handleTripClick = (trip: any) => {
-    const tripId = trip.id || trip.recommendation_id;
-    if (tripId) {
-      navigate(`/app/trips/${tripId}`);
+    if (trip.id) {
+      navigate(`/app/trips/${trip.id}`);
     }
   };
 
@@ -63,7 +73,7 @@ export function AdventureTrips({
   }
 
   return (
-    <div className="ml-13 mt-3">
+    <div className="ml-13 mt-1">
       {/* Toggle button with better styling */}
       <Button
         variant="ghost"
@@ -85,7 +95,7 @@ export function AdventureTrips({
         <div className="mt-3 ml-4 border-l-2 border-warm-coral/20 pl-4 space-y-3">
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs font-medium text-warm-coral uppercase tracking-wide">
-              Your Adventures
+              Your Trips
             </div>
             <Button
               variant="ghost"
@@ -99,20 +109,30 @@ export function AdventureTrips({
           <div className="space-y-2">
             {trips?.map((trip: any, index: number) => (
               <Card
-                key={trip.id || trip.recommendation_id}
+                key={trip.id}
                 className="group p-4 border-warm-coral/15 bg-gradient-to-r from-warm-coral/3 to-warm-turquoise/3 hover:from-warm-coral/8 hover:to-warm-turquoise/8 hover:border-warm-coral/25 transition-all duration-200 cursor-pointer hover:shadow-sm"
                 onClick={() => handleTripClick(trip)}
               >
                 <div className="flex items-center gap-4">
-                  {/* Trip icon with better styling */}
-                  <div className="w-12 h-12 rounded-xl bg-gradient-sunset flex items-center justify-center flex-shrink-0 shadow-warm group-hover:scale-105 transition-transform">
-                    <Plane className="w-6 h-6 text-white" />
+                  {/* Trip image or icon */}
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-warm group-hover:scale-105 transition-transform overflow-hidden">
+                    {trip.imageUrl ? (
+                      <img
+                        src={trip.imageUrl}
+                        alt={trip.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-sunset flex items-center justify-center">
+                        <Plane className="w-6 h-6 text-white" />
+                      </div>
+                    )}
                   </div>
                   
                   {/* Trip details */}
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm truncate mb-1">
-                      {trip.title || trip.destination?.name || trip.destination?.city}
+                      {trip.title}
                     </h4>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
@@ -120,14 +140,14 @@ export function AdventureTrips({
                         <span>
                           {trip.startDate ? 
                             new Date(trip.startDate).toLocaleDateString() : 
-                            new Date(trip.created_at || trip.createdAt).toLocaleDateString()
+                            new Date(trip.createdAt).toLocaleDateString()
                           }
                         </span>
                       </div>
-                      {trip.destination?.rating && (
+                      {trip.rating && (
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span>{trip.destination.rating}</span>
+                          <span>{trip.rating}</span>
                         </div>
                       )}
                     </div>

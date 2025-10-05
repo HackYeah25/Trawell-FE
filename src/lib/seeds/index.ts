@@ -63,7 +63,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-002',
       title: 'Rynek Główny & Sukiennice',
       description: 'Największy średniowieczny rynek w Europie z charakterystycznymi Sukiennicami.',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800',
       category: 'History',
       rating: 3,
       status: 'rated'
@@ -72,7 +72,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-003',
       title: 'Kazimierz District',
       description: 'Historyczna dzielnica żydowska z klimatycznymi kafelkami, street art i świetną kuchnią.',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800',
       category: 'Culture',
       rating: 3,
       status: 'rated'
@@ -81,7 +81,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-004',
       title: 'Schindler\'s Factory',
       description: 'Muzeum w dawnej fabryce Oskara Schindlera - poruszająca historia II wojny światowej.',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800',
       category: 'History',
       rating: 2,
       status: 'rated'
@@ -90,7 +90,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-005',
       title: 'Planty Park',
       description: 'Piękny park wokół Starego Miasta - idealny na relaksujący spacer.',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800',
       category: 'Nature',
       rating: 2,
       status: 'rated'
@@ -99,7 +99,7 @@ export const seedAttractions: Record<string, Attraction[]> = {
       id: 'attr-krakow-006',
       title: 'Plac Nowy - Zapiekanki',
       description: 'Słynne zapiekanki na Placu Nowym - must-have dla każdego foodie!',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800',
       category: 'Food',
       status: 'pending'
     }
