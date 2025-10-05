@@ -6,7 +6,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useCreateProject, useJoinProject } from '@/api/hooks/use-projects';
+import { useCreateProject, useJoinProject, useProjects } from '@/api/hooks/use-projects';
 import { useBrainstormSessions, useCreateBrainstormSession } from '@/api/hooks/use-brainstorm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
@@ -18,6 +18,7 @@ export default function History() {
   const navigate = useNavigate();
   const { data: user } = useUser();
   const { data: brainstormSessions, isLoading: brainstormLoading } = useBrainstormSessions();
+  const { data: projects, isLoading: projectsLoading } = useProjects();
   const createProjectMutation = useCreateProject();
   const createBrainstormMutation = useCreateBrainstormSession();
   const joinProjectMutation = useJoinProject();
@@ -97,14 +98,14 @@ export default function History() {
           </div>
         </div>
 
-        {/* Brainstorm Sessions list */}
-        {brainstormLoading ? (
+        {/* Combined list of projects and brainstorm sessions */}
+        {(brainstormLoading || projectsLoading) ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-20" />
             ))}
           </div>
-        ) : !brainstormSessions || brainstormSessions.length === 0 ? (
+        ) : (!brainstormSessions || brainstormSessions.length === 0) && (!projects || projects.length === 0) ? (
           <Card className="p-12 text-center border-dashed border-warm-coral/30 bg-gradient-to-br from-warm-coral/5 to-warm-turquoise/5">
             <div className="w-20 h-20 rounded-full bg-gradient-sunset flex items-center justify-center mb-4 mx-auto shadow-warm">
               <Palmtree className="w-10 h-10 text-white" />
@@ -121,7 +122,67 @@ export default function History() {
           </Card>
         ) : (
           <div className="space-y-2">
-            {brainstormSessions.map((session) => {
+            {/* Projects (shared adventures) */}
+            {projects && projects.map((project) => {
+              const isShared = project.isShared;
+
+              return (
+                <Card
+                  key={project.id}
+                  className={cn(
+                    "border-warm-coral/20 bg-card/80 backdrop-blur-sm cursor-pointer hover:bg-warm-coral/5 transition-colors",
+                    isShared && "border-warm-turquoise/40 bg-warm-turquoise/5"
+                  )}
+                  onClick={() => navigate(`/app/projects/${project.id}`)}
+                >
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-warm",
+                        isShared
+                          ? "bg-gradient-to-br from-warm-turquoise to-warm-turquoise/80"
+                          : "bg-gradient-sunset"
+                      )}>
+                        {isShared ? (
+                          <UsersIcon className="w-5 h-5 text-white" />
+                        ) : (
+                          <FolderKanban className="w-5 h-5 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate sm:max-w-none max-w-[150px]">{project.title}</h3>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(project.createdAt).toLocaleDateString('en-US')}
+                          {project.lastMessagePreview && (
+                            <>
+                              <span className="mx-1">•</span>
+                              <span>Project</span>
+                            </>
+                          )}
+                        </p>
+                        {project.lastMessagePreview && (
+                          <p className="text-xs text-muted-foreground mt-1 truncate">
+                            {project.lastMessagePreview}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isShared && (
+                        <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                          Shared
+                        </Badge>
+                      )}
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+
+            {/* Brainstorm Sessions (solo adventures) */}
+            {brainstormSessions && brainstormSessions.map((session) => {
               const isShared = session.isShared;
 
               return (
@@ -164,7 +225,7 @@ export default function History() {
                     </div>
                     <div className="flex items-center gap-2">
                       {isShared && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
                           Shared
                         </Badge>
                       )}

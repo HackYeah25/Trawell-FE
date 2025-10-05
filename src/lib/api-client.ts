@@ -374,6 +374,34 @@ export const apiClient = {
           mockProjects.push({ ...iguanaSharedProject });
           mockTrips.push({ ...iguanaTrip });
           
+          // Add project messages
+          mockProjectMessages[iguanaSharedProject.id] = [
+            {
+              id: 'iguana-proj-msg-1',
+              role: 'assistant',
+              markdown: '🌟 Welcome to **Barcelona Group Trip 2025**!\n\nThis is a collaborative project for planning an amazing group trip to Barcelona!',
+              createdAt: new Date('2025-01-08T10:00:00').toISOString(),
+            },
+            {
+              id: 'iguana-proj-msg-2',
+              role: 'user',
+              markdown: 'I\'d love to visit Park Güell and the Sagrada Familia! - Sarah',
+              createdAt: new Date('2025-01-08T10:15:00').toISOString(),
+            },
+            {
+              id: 'iguana-proj-msg-3',
+              role: 'user',
+              markdown: 'Definitely! And we should check out the Gothic Quarter. - Mark',
+              createdAt: new Date('2025-01-08T10:20:00').toISOString(),
+            },
+            {
+              id: 'iguana-proj-msg-4',
+              role: 'assistant',
+              markdown: 'Great suggestions! I\'ve prepared some fantastic attractions for your Barcelona adventure. Let me show you what I found!',
+              createdAt: new Date('2025-01-08T10:25:00').toISOString(),
+            },
+          ];
+          
           // Multi-user conversation
           mockTripMessages[iguanaTrip.id] = [
             {

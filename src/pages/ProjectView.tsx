@@ -8,7 +8,7 @@ import { Composer } from '@/components/chat/Composer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBrainstormSession, useBrainstormWebSocket } from '@/api/hooks/use-brainstorm';
-import { useProjectLocationSuggestions, useCreateTripFromLocation } from '@/api/hooks/use-projects';
+import { useProject, useProjectMessages, useProjectLocationSuggestions, useCreateTripFromLocation, useSendProjectMessage } from '@/api/hooks/use-projects';
 import { useTrips } from '@/api/hooks/use-trips';
 import { useChatPagination } from '@/hooks/use-chat-pagination';
 import type { ChatMessage, Location } from '@/types';
@@ -30,11 +30,23 @@ export default function ProjectView() {
 
   // Use sessionId for brainstorm routes, projectId for project routes
   const actualId = sessionId || projectId;
+  const isProject = !!projectId;
+  const isBrainstorm = !!sessionId;
   
-  const { data: session, isLoading: sessionLoading, error: sessionError } = useBrainstormSession(actualId || null);
+  // Use appropriate hooks based on route type
+  const { data: brainstormSession, isLoading: brainstormLoading, error: brainstormError } = useBrainstormSession(isBrainstorm ? actualId : null);
+  const { data: project, isLoading: projectLoading, error: projectError } = useProject(isProject ? actualId! : '');
+  const { data: projectMessagesData } = useProjectMessages(isProject ? actualId! : '');
+  
+  // Use the appropriate data source
+  const session = isBrainstorm ? brainstormSession : project;
+  const sessionLoading = isBrainstorm ? brainstormLoading : projectLoading;
+  const sessionError = isBrainstorm ? brainstormError : projectError;
+  
   const { data: locationSuggestions } = useProjectLocationSuggestions(actualId!);
   const { data: trips } = useTrips();
   const createTripMutation = useCreateTripFromLocation();
+  const sendProjectMessageMutation = useSendProjectMessage();
 
   // Pagination for chat messages
   const {
@@ -61,8 +73,9 @@ export default function ProjectView() {
   // Load messages from session data (only on initial load)
   const hasLoadedInitialMessages = useRef(false);
   useEffect(() => {
-    if (session?.messages && !hasLoadedInitialMessages.current) {
-      const chatMessages: ChatMessage[] = session.messages.map((msg, idx) => ({
+    if (isBrainstorm && brainstormSession?.messages && !hasLoadedInitialMessages.current) {
+      // Brainstorm session messages
+      const chatMessages: ChatMessage[] = brainstormSession.messages.map((msg, idx) => ({
         id: `msg-${idx}`,
         role: msg.role,
         markdown: msg.content,
@@ -70,9 +83,15 @@ export default function ProjectView() {
       }));
       setMessages(chatMessages);
       hasLoadedInitialMessages.current = true;
-      console.log('Loaded initial messages:', chatMessages.length);
+      console.log('Loaded initial brainstorm messages:', chatMessages.length);
+    } else if (isProject && projectMessagesData?.pages && !hasLoadedInitialMessages.current) {
+      // Project messages from infinite query
+      const allMessages = projectMessagesData.pages.flatMap(page => page.messages);
+      setMessages(allMessages);
+      hasLoadedInitialMessages.current = true;
+      console.log('Loaded initial project messages:', allMessages.length);
     }
-  }, [session]);
+  }, [brainstormSession, projectMessagesData, isBrainstorm, isProject]);
 
   // Reset the loaded flag when session ID changes
   useEffect(() => {
@@ -130,7 +149,7 @@ export default function ProjectView() {
   }, []);
 
   const { sendMessage: sendWSMessage } = useBrainstormWebSocket({
-    sessionId: actualId || null,
+    sessionId: isBrainstorm ? actualId : null,
     onMessage: handleMessage,
     onToken: handleToken,
     onThinking: handleThinking,
@@ -217,8 +236,28 @@ export default function ProjectView() {
     setCurrentStreamingMessage('');
     streamingMessageIdRef.current = null;
 
-    // Send via WebSocket
-    sendWSMessage(text);
+    // Send via appropriate method based on type
+    if (isBrainstorm) {
+      // Send via WebSocket for brainstorm sessions
+      sendWSMessage(text);
+    } else if (isProject) {
+      // Send via API for projects
+      sendProjectMessageMutation.mutate(
+        { projectId: actualId, text },
+        {
+          onSuccess: (newMessages) => {
+            // Update messages with response
+            setMessages((prev) => [...prev, ...newMessages]);
+            setIsSending(false);
+          },
+          onError: (error) => {
+            console.error('Error sending project message:', error);
+            toast.error('Failed to send message');
+            setIsSending(false);
+          },
+        }
+      );
+    }
 
     // Every 3 user messages, add a location proposal
     const userMessageCount = messages.filter(m => m.role === 'user').length + 1;
@@ -313,7 +352,9 @@ export default function ProjectView() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center">
             <span className="text-2xl">❌</span>
           </div>
-          <p className="text-muted-foreground mb-4">Failed to load brainstorm session</p>
+          <p className="text-muted-foreground mb-4">
+            Failed to load {isProject ? 'project' : 'brainstorm session'}
+          </p>
           <p className="text-xs text-muted-foreground mb-4">
             Session ID: {actualId} | Error: {sessionError?.message || 'Unknown error'}
           </p>
@@ -401,7 +442,9 @@ export default function ProjectView() {
                     </Button>
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">Solo brainstorm session</p>
+                <p className="text-xs text-muted-foreground">
+                  {isProject ? 'Shared project' : 'Solo brainstorm session'}
+                </p>
               </div>
             </div>
           </div>
