@@ -97,7 +97,28 @@ export const ChatThread = memo(function ChatThread({
     const isNewMessage = messages.length > previousMessagesLength.current && !isLoadingMore;
     
     if (isNewMessage && !isUserScrolling.current) {
-      // Use requestAnimationFrame for smoother scrolling
+      // Use multiple requestAnimationFrame calls for more reliable scrolling
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({
+              top: scrollContainerRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+      
+      previousMessagesLength.current = messages.length;
+    }
+    
+    previousMessagesLength.current = messages.length;
+  }, [messages, isLoadingMore]);
+
+  // Additional effect to ensure scroll to bottom when loading state changes
+  useEffect(() => {
+    // When loading stops and we have messages, scroll to bottom
+    if (!isLoading && messages.length > 0 && !isUserScrolling.current) {
       requestAnimationFrame(() => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTo({
@@ -106,12 +127,8 @@ export const ChatThread = memo(function ChatThread({
           });
         }
       });
-      
-      previousMessagesLength.current = messages.length;
     }
-    
-    previousMessagesLength.current = messages.length;
-  }, [messages, isLoadingMore]);
+  }, [isLoading, messages.length]);
 
   return (
     <div 

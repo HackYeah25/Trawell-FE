@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Radio } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
@@ -23,6 +23,7 @@ export default function TripLiveChat() {
   const navigate = useNavigate();
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: trip } = useTrip(tripId!);
   const { data: messagesData } = useTripLiveMessages(tripId!);
@@ -39,6 +40,16 @@ export default function TripLiveChat() {
     allMessages: localMessages,
     pageSize: 10,
   });
+
+  // Auto-scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
 
   // Load chat history from localStorage or API
   useEffect(() => {
@@ -60,6 +71,16 @@ export default function TripLiveChat() {
       saveChatHistory(`trip-live-${tripId}`, localMessages);
     }
   }, [tripId, localMessages]);
+
+  // Auto-scroll when messages change or sending state changes
+  useEffect(() => {
+    // Small delay to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [localMessages, isSending, scrollToBottom]);
 
   const handleSendMessage = async (text: string) => {
     if (!tripId) return;
@@ -147,7 +168,7 @@ export default function TripLiveChat() {
         {/* Chat and Composer Container */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Chat Thread */}
-          <div className="flex-1 overflow-y-auto h-0 pb-6">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto h-0 pb-6">
             <ChatThread
               messages={displayedMessages}
               isLoading={isSending}

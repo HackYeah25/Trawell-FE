@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, Loader2, Pencil, Check, X, Radio, ArrowLeft, Sparkles } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
@@ -36,6 +36,7 @@ export default function TripView() {
   const [currentPhotos, setCurrentPhotos] = useState<Array<{ query: string; caption: string; url: string }>>([]);
   const [hasInitializedMessages, setHasInitializedMessages] = useState(false);
   const isMobile = useIsMobile();
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: trip } = useTrip(tripId!);
   const { data: messagesData } = useTripMessages(tripId!);
@@ -83,7 +84,7 @@ export default function TripView() {
     setCurrentStreamingMessage('');
   }, []);
 
-  const handleTripUpdated = useCallback((updates: any[]) => {
+  const handleTripUpdated = useCallback((updates: unknown[]) => {
     console.log('Trip updated with structured data:', updates);
     // TODO: Update UI to reflect new trip data (budget, dates, etc.)
   }, []);
@@ -126,6 +127,16 @@ export default function TripView() {
     allMessages: localMessages,
     pageSize: 10,
   });
+
+  // Auto-scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
 
   // Debug localMessages changes
   useEffect(() => {
@@ -202,6 +213,16 @@ export default function TripView() {
       saveChatHistory(`trip-${tripId}`, localMessages);
     }
   }, [tripId, localMessages]);
+
+  // Auto-scroll when messages change or AI stops responding
+  useEffect(() => {
+    // Small delay to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [localMessages, isAIResponding, currentStreamingMessage, scrollToBottom]);
 
   const handleSaveTitle = async () => {
     if (!tripId || !editedTitle.trim()) {
@@ -431,7 +452,7 @@ export default function TripView() {
             chatContent={
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Chat Thread - Scrollable */}
-                <div className="flex-1 overflow-y-auto pb-6">
+                <div ref={chatContainerRef} className="flex-1 overflow-y-auto pb-6">
                   <ChatThread
                     messages={displayedMessages}
                     isLoading={isAIResponding}
