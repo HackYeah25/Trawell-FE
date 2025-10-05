@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronRight, MapPin, Calendar, Star, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export function AdventureTrips({
   isExpanded, 
   onToggle 
 }: AdventureTripsProps) {
+  const navigate = useNavigate();
   const { data: projectTrips, isLoading: projectTripsLoading } = useProjectTrips(
     adventureType === 'project' ? adventureId : ''
   );
@@ -30,6 +32,13 @@ export function AdventureTrips({
   const trips = adventureType === 'project' ? projectTrips : brainstormTrips;
   const isLoading = adventureType === 'project' ? projectTripsLoading : brainstormTripsLoading;
   const tripCount = trips?.length || 0;
+
+  const handleTripClick = (trip: any) => {
+    const tripId = trip.id || trip.recommendation_id;
+    if (tripId) {
+      navigate(`/app/trips/${tripId}`);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -82,6 +91,7 @@ export function AdventureTrips({
               <Card
                 key={trip.id || trip.recommendation_id}
                 className="group p-4 border-warm-coral/15 bg-gradient-to-r from-warm-coral/3 to-warm-turquoise/3 hover:from-warm-coral/8 hover:to-warm-turquoise/8 hover:border-warm-coral/25 transition-all duration-200 cursor-pointer hover:shadow-sm"
+                onClick={() => handleTripClick(trip)}
               >
                 <div className="flex items-center gap-4">
                   {/* Trip icon with better styling */}
